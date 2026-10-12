@@ -1,13 +1,13 @@
 ---
-title: "Use LedgerSync in Claude or ChatGPT"
+title: "Use LedgerSync in Claude, ChatGPT or Grok"
 sidebarTitle: "Start here"
-description: "Ask Claude or ChatGPT about your clients' bank accounts, in plain words."
+description: "Ask Claude, ChatGPT or Grok about your clients' bank accounts, in plain words."
 mode: "frame"
 ---
 
 import { AiPage, AiChoice, AiNote, AiStuck } from "/snippets/ai-ui.jsx";
 
-<AiPage title="Use LedgerSync in Claude or ChatGPT" subtitle="Ask Claude or ChatGPT about your clients' bank accounts in plain words. It finds the answer in LedgerSync. Setup takes about 5 minutes." stage={1}>
+<AiPage title="Use LedgerSync in Claude, ChatGPT or Grok" subtitle="Ask Claude, ChatGPT or Grok about your clients' bank accounts in plain words. It finds the answer in LedgerSync. Setup takes about 5 minutes." stage={1}>
 
 <AiNote tone="green">
 
@@ -20,19 +20,22 @@ Your firm has no LedgerSync account yet? Sign up at [ledgersyncappv2.com/sign-up
 
 ## Which AI do you use?
 
-<div className="lsai-grid-2">
+<div className="lsai-grid-3">
   <AiChoice title="Claude" href="/ai/setup-claude" cta="Set up in Claude →">
     Works on any Claude plan. On Claude Team or Enterprise, your firm's Claude Owner adds LedgerSync first.
   </AiChoice>
   <AiChoice title="ChatGPT" href="/ai/setup-chatgpt" cta="Set up in ChatGPT →">
     Needs ChatGPT Plus or higher, on chatgpt.com in a web browser. On ChatGPT Business, Enterprise or Edu, your workspace admin adds LedgerSync first.
   </AiChoice>
+  <AiChoice title="Grok" href="/ai/setup-grok" cta="Set up in Grok →">
+    Works on any Grok plan, even the free one, on grok.com in a web browser. On Grok Business or Enterprise, Grok's help pages say your team admin adds LedgerSync first.
+  </AiChoice>
 </div>
 
 <AiNote tone="gray">
 
-**Good to know.** Claude calls this a **connector**. ChatGPT calls it an **app** or **plugin**. They are the
-same thing.
+**Good to know.** Claude and Grok call this a **connector**. ChatGPT calls it an **app** or **plugin**. They
+are the same thing.
 
 </AiNote>
 

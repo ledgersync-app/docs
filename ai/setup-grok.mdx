@@ -1,0 +1,137 @@
+---
+title: "Set up in Grok"
+description: "Add LedgerSync to Grok, sign in, and ask your first question."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiCopy, AiButton, AiNote, AiTest, AiStuck } from "/snippets/ai-ui.jsx";
+import AiAsk from "/snippets/ai-ask.mdx";
+
+<AiPage title="Set up in Grok" subtitle="5 steps · about 3 minutes · on grok.com in a web browser" stage={2}>
+
+<Accordion title="On Grok Business or Enterprise? Open this first">
+
+Grok's maker, xAI, says your team admin adds LedgerSync for your team once, in the xAI console. Then each
+person connects it with their own LedgerSync login. Not the team admin? Send them this page.
+
+**The team admin, once. These are xAI's steps:**
+
+xAI says the admin needs the **Team Read-Write** permission for these steps.
+
+1. Open [console.x.ai](https://console.x.ai) and pick your team.
+2. Click **Grok Business**, then **Connectors**, then **+ Add Connector**.
+3. Pick **Other**.
+4. Click **Copy** below and paste the LedgerSync address. Then complete any sign-in it asks for.
+
+<AiCopy label="Your LedgerSync address" text="https://api.ledgersyncappv2.com/mcp" />
+
+Asked to sign in to LedgerSync? Sign in with your own LedgerSync login and allow it, as in [step 3](#sign-in)
+and step 4 below. Don't create a new LedgerSync account. No LedgerSync login?
+[Book a call with our team](https://ledgersync.com/book-a-demo) and we'll set it up with you.
+
+**Then each person, with their own LedgerSync login:** xAI says you connect it at
+[grok.com/connectors](https://grok.com/connectors). Sign in and allow it as in [step 3](#sign-in) and step 4
+below. Then do step 5 and the test at the end of this page.
+
+</Accordion>
+
+<AiStep id="add" stage={2} n={1} total={5} title="Click New Connector, then Custom" imgs={[{ src: "/images/ai-connector/full/grok-1-new-connector.png", caption: "New Connector circled" }, { src: "/images/ai-connector/full/grok-1-custom.png", caption: "Custom circled" }]}>
+
+<AiButton href="https://grok.com/connectors" newTab>Open Grok connectors</AiButton>
+
+Grok opens in a new tab and shows its **Plugins** window, on **Connectors**. Keep it open, and come back to this
+tab for step 2.
+
+In Grok, click **New Connector** at the top right. Then click **Custom** (it says **Add your own custom
+connector**).
+
+LedgerSync is already under **Connected**? Go to step 5.
+
+</AiStep>
+
+<AiStep id="form" stage={2} n={2} total={5} title="Fill in the form" img="/images/ai-connector/full/grok-2-form.png" caption="Name, Server URL and Add Connector circled">
+
+1. In **Name**, type **LedgerSync**.
+2. Click **Copy** below. Click the **Server URL** box (it says `https://mcp.example.com/sse`) and press
+   **Ctrl+V** (Windows) or **Command+V** (Mac).
+3. Have your LedgerSync login ready, then click **Add Connector**. A small LedgerSync window opens: sign in
+   there right away (step 3).
+
+<AiCopy label="Your LedgerSync address" text="https://api.ledgersyncappv2.com/mcp" />
+
+</AiStep>
+
+<AiStep id="sign-in" stage={3} n={3} total={5} title="Sign in with your LedgerSync login" imgs={[{ src: "/images/ai-connector/full/grok-3-waiting.png", caption: "Grok waits while you sign in" }, { src: "/images/ai-connector/full/ls-1-email.png", caption: "Your email or username, then Next" }, { src: "/images/ai-connector/full/ls-2-password.png", caption: "Sign in circled" }]}>
+
+Grok says **Complete authentication in the popup window...** and a small LedgerSync window opens. Sign in there
+right away: Grok waits only a couple of minutes.
+
+Type the email or username you use in the LedgerSync app. Click **Next**.
+
+Type your password and click **Sign in**. Asked for a **Two Factor Authentication** code? Type the code from
+your Google Authenticator app and click **Verify**.
+
+Already signed in to LedgerSync in this browser? The small window goes straight to step 4.
+
+<AiNote tone="yellow">
+
+**The page says Create your LedgerSync account?** No LedgerSync login uses that email. Click **Change** and type
+your LedgerSync username. Don't create a second account. Your firm has no LedgerSync account yet? Sign up at
+[ledgersyncappv2.com/sign-up](https://ledgersyncappv2.com/sign-up) first, then come back here.
+
+</AiNote>
+
+Nothing opens? Your browser may have blocked the small window. Allow pop-ups for grok.com and try again.
+
+Grok says **Connection failed**? Click **Go Back** and add it again from step 1. Then sign in right away.
+
+</AiStep>
+
+<AiStep id="allow" stage={4} n={4} total={5} title="Click Allow, then Allow access" imgs={[{ src: "/images/ai-connector/full/ls-5-allow.png", caption: "Allow circled" }, { src: "/images/ai-connector/full/grok-4-allow-access.png", caption: "Allow access circled" }]}>
+
+You see your firm's name. Click **Allow**.
+
+Then Grok asks to access your account: **Grok would like access to your account**. Scroll down in the small
+window and click **Allow access**. You only see this the first time.
+
+The small window closes by itself. Grok says **Connector added successfully**.
+
+</AiStep>
+
+<AiStep id="connected" stage={4} n={5} total={5} title="Check that LedgerSync is connected" img="/images/ai-connector/full/grok-5-connected.png" caption="LedgerSync under Connected and Connector added successfully circled">
+
+In Grok's **Plugins** window, **LedgerSync** now shows under **Connected**.
+
+<AiNote tone="yellow">
+
+**Grok may change things in LedgerSync without asking you first.** In our test, Grok tried to add a client
+without asking. Tell it exactly what you want. Before it sends a message to a client, ask it to show you the
+message first.
+
+</AiNote>
+
+Came back later? Open [grok.com/connectors](https://grok.com/connectors). **LedgerSync** shows under **Connected**.
+
+</AiStep>
+
+<AiTest text="Use LedgerSync to check whether my account is ready." stage={5}>
+
+Click **Copy**. In Grok, start a new chat (**Chat** at the top left). Click the message box, press **Ctrl+V**
+(Command+V on a Mac), then press **Enter**.
+
+</AiTest>
+
+- Grok says your LedgerSync account is ready: you're done.
+- Grok doesn't use LedgerSync? Click **+** in the message box, then **Connectors**, and turn **LedgerSync** on.
+  Then ask again.
+- Anything else: see [Troubleshooting](/ai/troubleshooting).
+
+<Accordion title="What to ask next">
+
+<AiAsk />
+
+</Accordion>
+
+<AiStuck />
+
+</AiPage>

@@ -16,9 +16,10 @@ import { AiPage, AiBox, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
 | **LedgerSync is not set up for this sign-in yet.** Or: **This LedgerSync connection is not active.** | [Connect again](#connect-again). Sign in with the username or email you use in the LedgerSync app. Don't create a second account. Still not working? Email <AiEmail />. |
 | **Your LedgerSync password was changed, so this connection was turned off.** | [Connect again](#connect-again). Sign in again, with your new password if you changed it. |
 | **For now, only the firm owner can use LedgerSync in their own Claude or ChatGPT.** | Teammates can connect now. [Connect again](#connect-again) and sign in with your own LedgerSync login. |
-| **This LedgerSync login cannot use LedgerSync in Claude or ChatGPT.** | [Connect again](#connect-again) and sign in with your own LedgerSync login. Still there? Email <AiEmail />. |
-| It asks you to disconnect and reconnect LedgerSync, or it doesn't know something new, like check images links | Your AI still has an older copy of LedgerSync's tools. Do [After a LedgerSync update](#after-an-update). |
-| It doesn't seem to know LedgerSync | Start a new chat and ask again. In Claude, click **+** in the message box, then **Connectors**, and turn **LedgerSync** on. In ChatGPT, type **@** and pick **LedgerSync**. Not in the list? Open [Plugins](https://chatgpt.com/plugins), click **Personal**, then **LedgerSync**, then **Install plugin**. |
+| **This LedgerSync login cannot use LedgerSync in AI apps.** Or: **This LedgerSync login cannot use LedgerSync in Claude or ChatGPT.** | [Connect again](#connect-again) and sign in with your own LedgerSync login. Still there? Email <AiEmail />. |
+| It asks you to disconnect and reconnect LedgerSync, or it doesn't know something new, like check images links | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](#after-an-update). |
+| It doesn't seem to know LedgerSync | Start a new chat and ask again. In Claude or Grok, click **+** in the message box, then **Connectors**, and turn **LedgerSync** on. Not there in Grok? [Add it again](/ai/setup-grok). In ChatGPT, type **@** and pick **LedgerSync**. Not in that list? Open ChatGPT's [Plugins](https://chatgpt.com/plugins) page, click **Personal**, then **LedgerSync**, then **Install plugin**. |
+| Grok says **Connection failed** while you add LedgerSync | Click **Go Back** and add it again: see [Set up in Grok](/ai/setup-grok). When the small LedgerSync window opens, sign in right away. Grok waits only a couple of minutes. Still failing? Email <AiEmail />. |
 
 <AiBox id="connect-again" title="To connect again">
 
@@ -28,18 +29,25 @@ import { AiPage, AiBox, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
 **ChatGPT:** open [Settings, then Plugins](https://chatgpt.com/settings/plugins-settings) and click **LedgerSync**. Click
 **...** next to your account, then **Reconnect**.
 
-The LedgerSync sign-in page opens. Sign in, then click **Allow**.
+In Claude and ChatGPT, the LedgerSync sign-in page opens. Sign in, then click **Allow**.
+
+**Grok:** open [Plugins, then Connectors](https://grok.com/connectors) and click **LedgerSync**. Click
+**Reauthenticate**. A small LedgerSync window opens. Sign in if it asks you to, then click **Allow**. Grok says
+**Connector reauthenticated successfully**. Don't see **LedgerSync** under **Connected**? [Add it again](/ai/setup-grok).
 
 </AiBox>
 
 <AiBox id="after-an-update" title="After a LedgerSync update">
 
-Claude and ChatGPT keep a copy of LedgerSync's tools. When we add something new, load the new copy once:
+Claude and ChatGPT keep a copy of LedgerSync's tools, and Grok may too. When we add something new, load the new
+copy once:
 
 **Claude:** [connect again](#connect-again).
 
 **ChatGPT:** open [Plugins](https://chatgpt.com/plugins), click **Personal**, then **LedgerSync**, then
 **Refresh**.
+
+**Grok:** [connect again](#connect-again).
 
 Then start a new chat.
 
@@ -61,13 +69,13 @@ Then start a new chat.
     | **This sign-in is for accounting firms.** | This page is for accounting firms. Your accountant connects LedgerSync. |
     | **Create your LedgerSync account** (No LedgerSync account uses this email yet.) | Don't click **Create account**. Click **Change** and type the username you use in the LedgerSync app. Your firm has no LedgerSync account yet? Sign up at [ledgersyncappv2.com/sign-up](https://ledgersyncappv2.com/sign-up) first. |
     | **Finish creating your account** | Your firm already uses LedgerSync? Don't click **Finish**. Click **Change** and type the username you use in the LedgerSync app. Need help? Email <AiEmail />. |
-    | **This connect link has expired.** Or: **This connect link was already used.** | Go back to Claude or ChatGPT and [connect again](#connect-again). |
+    | **This connect link has expired.** Or: **This connect link was already used.** | Go back to your AI app and [connect again](#connect-again). |
     | **Your password was changed after you signed in.** | Click **Sign out**. Then sign in again with your new password. |
     | **Sign out, then sign in again with your two-step code.** | Click **Sign out**. Then sign in again and type your two-step code. |
     | **Check your email and try again.** | Check the email you typed. Then try again. |
     | **We could not finish connecting. Wait a minute, then click Allow again.** | Wait a minute. Then click **Allow** again. |
-    | **Something went wrong. Try again.** Or: **Something went wrong on our side.** | Try again. Still there? Go back to Claude or ChatGPT and [connect again](#connect-again). |
-    | **This account signs in with its email.** | Click **Sign out**. Go back to Claude or ChatGPT and [connect again](#connect-again). |
+    | **Something went wrong. Try again.** Or: **Something went wrong on our side.** | Try again. Still there? Go back to your AI app and [connect again](#connect-again). |
+    | **This account signs in with its email.** | Click **Sign out**. Go back to your AI app and [connect again](#connect-again). |
     | **Your LedgerSync account setup is not finished.** Or: **Your LedgerSync account needs a quick check.** Or: **This email is already connected to LedgerSync for another firm.** Or: **We could not connect this account.** Or: **Another LedgerSync login already uses this email to connect an AI assistant.** Or: **This LedgerSync account is closed.** Or: **Connecting an AI assistant is turned off for this account.** | Email <AiEmail />. |
     | **Your LedgerSync login cannot connect an AI assistant right now.** | Ask your firm's LedgerSync owner. Still not working? Email <AiEmail />. |
     | **Connecting an AI assistant is not available for sub-account logins yet.** | Sign in with your firm's own LedgerSync login, or ask your firm's LedgerSync owner. |
@@ -98,7 +106,7 @@ Then start a new chat.
     | This connection has used a tool too many times this hour or this day, its limit | Try again next hour or tomorrow, as the AI says. Your firm also uses the LedgerSync app? You can do it there now. |
     | **LedgerSync could not check your account just now.** | Try again in a minute. |
     | **LedgerSync could not complete this request.** | Try again in a minute. If it keeps failing, email support. |
-    | **This AI app is not supported yet.** | LedgerSync works in Claude and ChatGPT. To use another app, email support. |
+    | **This AI app is not supported yet.** | LedgerSync works in Claude, ChatGPT and Grok. To use another app, email support. |
   </Accordion>
 
   <Accordion title="Clients and banks: it cannot find the client, it says you have no clients, a bank needs the desktop app">
@@ -164,6 +172,9 @@ Then start a new chat.
   **ChatGPT:** [Settings, then Plugins](https://chatgpt.com/settings/plugins-settings), then **LedgerSync**,
   then **Uninstall**. To remove it completely, also open [Plugins](https://chatgpt.com/plugins), click **Personal**,
   then **LedgerSync**, then the **...** menu, then **Delete plugin**.
+
+  **Grok:** [Plugins, then Connectors](https://grok.com/connectors), then **LedgerSync**, then **Disconnect**.
+  Grok removes it at once, without asking you to confirm. To use it again, [add it again](/ai/setup-grok).
 
   </AiBox>
   <AiBox id="turn-off" title="Turn it off">

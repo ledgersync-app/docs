@@ -48,8 +48,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     then **Custom**, then **Web**). Members then open **Connectors**, find LedgerSync and click **Connect**. The
     Claude Free plan allows one custom connector. Once added, it also works in Claude Desktop, the Claude
     mobile apps, and Claude Code signed in with the same account.
-  - AI apps other than Claude and ChatGPT are not supported yet (they are blocked). Ask support if you need
-    one.
+  - Grok works on any Grok plan, even the free one, on grok.com in a web browser: open
+    [grok.com/connectors](https://grok.com/connectors), click **New Connector**, then **Custom**, and enter the
+    address. On Grok Business and Enterprise, xAI's docs say a team admin first adds it in the xAI console
+    ([console.x.ai](https://console.x.ai): **Grok Business**, then **Connectors**); each member then connects
+    their own account at grok.com/connectors. In our check, Grok called a tool that changes data
+    (`ledgersync_create_client`) without asking first. Claude and ChatGPT ask before they change something.
+  - AI apps other than Claude, ChatGPT and Grok are not supported yet (they are blocked). Ask support if you
+    need one.
 </Accordion>
 
 ## Tools <span className="lsai-badge">24</span>
@@ -182,7 +188,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       template later does not change that preview. Only the AI uses a template's email subject for now.
     - `ledgersync_get_desktop_app_status` checks the app live and returns the Windows and Mac download links
       and the setup steps.
-    - `ledgersync_pair_desktop_app` replaces any computer linked before, so the AI asks you to confirm first.
+    - `ledgersync_pair_desktop_app` replaces any computer linked before, so LedgerSync tells the AI to ask you to
+      confirm first.
     - A bank or connection that needs the desktop app for refreshes carries `requires_desktop_app: true` in
       the search, connection and refresh-status results; the field is left out otherwise. A connection that is
       not working on such a bank also gets a `next_step` that says so.
@@ -231,14 +238,16 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       The same rules apply when saving a template.
     - An email shows your text as written, with the names and link filled in and your line breaks kept. HTML
       in the text shows as plain text.
-    - Nothing is sent without a preview: the AI shows you who gets the message and a sample, and asks you
-      before it sends. A preview's confirmation works only for the person and the AI app that made it.
+    - Nothing is sent without a preview: LedgerSync tells the AI to show you who gets the message and a sample,
+      and to ask you before it sends. Claude and ChatGPT do. In Grok, ask it to show you the message first: in
+      our check, Grok tried to add a client without asking for approval. A preview's confirmation works only for
+      the person and the AI app that made it.
     - Each person messages only the clients they see in the LedgerSync app: an employee, the clients assigned
       to them.
     - On the sandbox connector, client messages are never delivered and no link is created for them: the send
       shows what would be sent (would send).
-    - Linking the desktop app needs the code the app shows, and the AI asks you to confirm first. The code is
-      never logged or repeated back.
+    - Linking the desktop app needs the code the app shows, and LedgerSync tells the AI to ask you to confirm
+      first. The code is never logged or repeated back.
     - The desktop app is linked to the firm owner's LedgerSync login. Only the owner can link it; a teammate's
       AI can check whether it is connected.
       Linking a computer replaces any computer linked before: only one computer is connected at a time.
@@ -280,11 +289,13 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       whether the code works or not. A code that is not 7 letters or digits is refused without counting.
   </Accordion>
 
-  <Accordion title="Tool updates: Claude and ChatGPT keep a copy of the tool list">
+  <Accordion title="Tool updates: Claude and ChatGPT keep a copy of the tool list, and Grok may too">
     - Claude and ChatGPT keep their own copy of the connector's tools: names, descriptions and settings. After
       LedgerSync adds a tool or a setting (for example `for_check_images` on 2026-10-07), reconnect in Claude
       or click **Refresh** in ChatGPT, then start a new chat. See
       [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+    - In Grok, load an update by connecting again: open [grok.com/connectors](https://grok.com/connectors), click
+      **LedgerSync**, then **Reauthenticate**. Then start a new chat.
     - What a tool returns always comes from the live server, so new result fields and messages work at once.
   </Accordion>
 
@@ -304,7 +315,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     | `access_not_active` | This sign-in has no working LedgerSync account yet: it is not set up, the sign-up is not finished, it is being checked, we need an answer, it was not approved, it closed, or it was turned off. For a firm that signs in with its app login: the login cannot connect (a sub-account login), the person's login or the firm's account is locked, the firm owner turned off AI assistants for the person, the login has access days and hours, the person no longer has access to the firm, LedgerSync is not active for the firm, or connecting AI assistants is turned off for the firm. | Follow the step the AI reads out. Firms: [connect again](/ai/troubleshooting#connect-again) and sign in with the LedgerSync app login. Developers apply at [portal.ledgersyncappv2.com](https://portal.ledgersyncappv2.com). |
     | `access_request_not_approved` | This sign-in has a LedgerSync account, but not for this environment yet: its application is still being reviewed, needs more information, or has not finished the payment step. Or its access for this environment was turned off. | Follow the step the AI reads out: wait for the review, answer the question in the portal, or finish the payment step. If access was turned off, email support. |
     | `billing_not_configured` | Live access is approved, but no card is on file (the payment step was not completed). | Complete the payment step in the portal. |
-    | `connector_app_pending_approval` | This AI app is not supported yet. Only Claude and ChatGPT are. | Use Claude or ChatGPT, or email support. |
+    | `connector_app_pending_approval` | This AI app is not supported yet. Only Claude, ChatGPT and Grok are. | Use Claude, ChatGPT or Grok, or email support. |
     | `connector_access_revoked` | This AI app was disconnected from your LedgerSync account, or the person who connected it changed their LedgerSync password or turned off two-step sign-in after it connected. | [Connect again](/ai/troubleshooting#connect-again) and sign in. |
     | `firm_under_review` | A new firm is still being reviewed by our team. It can add clients; bank connections open after the review. | Add clients now and connect banks after the review. |
     | `insufficient_scope` | This connection is read-only, or lacks permission for what you asked. | Ask for something the connection may do, or email support. |

@@ -485,12 +485,26 @@
   margin: 8px 0;
 }
 
-/* Choice cards (Start here) and two-up cards. */
+/* Two-up cards, and the three choice cards on Start here (one per AI app). */
 .lsai-grid-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin: 0 0 8px;
+}
+
+.lsai-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 0 0 8px;
+}
+
+/* With Mintlify's sidebar showing (1024px and up), three cards fit side by side only from 1100px. */
+@media (min-width: 1024px) and (max-width: 1099px) {
+  .lsai-grid-3 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .lsai-choice {
@@ -708,7 +722,8 @@
     font-size: 1.6rem;
   }
 
-  .lsai-grid-2 {
+  .lsai-grid-2,
+  .lsai-grid-3 {
     grid-template-columns: 1fr;
   }
 
