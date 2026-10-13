@@ -485,7 +485,7 @@
   margin: 8px 0;
 }
 
-/* Two-up cards, and the three choice cards on Start here (one per AI app). */
+/* Two-up cards (also the four choice cards on Start here, one per AI app), and three-up cards. */
 .lsai-grid-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
