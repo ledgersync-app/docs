@@ -54,8 +54,12 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     ([console.x.ai](https://console.x.ai): **Grok Business**, then **Connectors**); each member then connects
     their own account at grok.com/connectors. In our check, Grok called a tool that changes data
     (`ledgersync_create_client`) without asking first. Claude and ChatGPT ask before they change something.
-  - AI apps other than Claude, ChatGPT and Grok are not supported yet (they are blocked). Ask support if you
-    need one.
+  - Grok Bot, Grok's agent, adds LedgerSync when you ask it to: "Add a custom remote MCP server named LedgerSync
+    with URL https://api.ledgersyncappv2.com/mcp". It signs in with Cursor's client id
+    (`https://cursor.com/oauth/mcp-client.json`), so the sign-in asks you to allow **Cursor**. Every app that
+    signs in with that id, Cursor's own included, is approved too.
+  - Other AI apps are not supported yet (they are blocked): only Claude, ChatGPT, Grok and apps that sign in
+    with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
 ## Tools <span className="lsai-badge">24</span>
@@ -315,7 +319,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     | `access_not_active` | This sign-in has no working LedgerSync account yet: it is not set up, the sign-up is not finished, it is being checked, we need an answer, it was not approved, it closed, or it was turned off. For a firm that signs in with its app login: the login cannot connect (a sub-account login), the person's login or the firm's account is locked, the firm owner turned off AI assistants for the person, the login has access days and hours, the person no longer has access to the firm, LedgerSync is not active for the firm, or connecting AI assistants is turned off for the firm. | Follow the step the AI reads out. Firms: [connect again](/ai/troubleshooting#connect-again) and sign in with the LedgerSync app login. Developers apply at [portal.ledgersyncappv2.com](https://portal.ledgersyncappv2.com). |
     | `access_request_not_approved` | This sign-in has a LedgerSync account, but not for this environment yet: its application is still being reviewed, needs more information, or has not finished the payment step. Or its access for this environment was turned off. | Follow the step the AI reads out: wait for the review, answer the question in the portal, or finish the payment step. If access was turned off, email support. |
     | `billing_not_configured` | Live access is approved, but no card is on file (the payment step was not completed). | Complete the payment step in the portal. |
-    | `connector_app_pending_approval` | This AI app is not supported yet. Only Claude, ChatGPT and Grok are. | Use Claude, ChatGPT or Grok, or email support. |
+    | `connector_app_pending_approval` | This AI app is not supported yet. Only Claude, ChatGPT and Grok are, Grok Bot included (it signs in with Cursor's client id, which is approved too). | Use Claude, ChatGPT or Grok, or email support. |
     | `connector_access_revoked` | This AI app was disconnected from your LedgerSync account, or the person who connected it changed their LedgerSync password or turned off two-step sign-in after it connected. | [Connect again](/ai/troubleshooting#connect-again) and sign in. |
     | `firm_under_review` | A new firm is still being reviewed by our team. It can add clients; bank connections open after the review. | Add clients now and connect banks after the review. |
     | `insufficient_scope` | This connection is read-only, or lacks permission for what you asked. | Ask for something the connection may do, or email support. |

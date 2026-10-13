@@ -3,6 +3,21 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-13" tags={["AI connector"]}>
+  ## Use LedgerSync in Grok Bot
+
+  Grok Bot, Grok's agent with its own computer, can now use LedgerSync. Before, it could add LedgerSync and
+  sign in, but then it only got **This AI app is not supported yet**.
+
+  - Ask your bot: "Add a custom remote MCP server named LedgerSync with URL https://api.ledgersyncappv2.com/mcp".
+    Then sign in with your normal LedgerSync login.
+  - The sign-in asks you to allow **Cursor**. That's normal: Grok Bot signs in through Cursor.
+  - Grok Bot may change things in LedgerSync without asking you first, so tell it exactly what you want.
+  - Already added it and got that message? Ask your bot again. It works now, without adding it again.
+
+  See [Set up in Grok](/ai/setup-grok).
+</Update>
+
 <Update label="2026-10-12" tags={["AI connector"]}>
   ## Shorter download links for ChatGPT
 

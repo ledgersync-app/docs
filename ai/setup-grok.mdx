@@ -9,6 +9,46 @@ import AiAsk from "/snippets/ai-ask.mdx";
 
 <AiPage title="Set up in Grok" subtitle="5 steps · about 3 minutes · on grok.com in a web browser" video="/videos/setup-grok.mp4" poster="/videos/setup-grok-poster.jpg" stage={2}>
 
+<Accordion title="Using Grok Bot? Open this first">
+
+Grok Bot is Grok's agent with its own computer. You add LedgerSync by asking your bot, so you don't need the
+steps below.
+
+<AiCopy label="Your message to Grok Bot" text="Add a custom remote MCP server named LedgerSync with URL https://api.ledgersyncappv2.com/mcp" />
+
+1. Click **Copy** above.
+2. In your Grok Bot chat, click the message box. Press **Ctrl+V** (Windows) or **Command+V** (Mac), then press
+   **Enter**.
+3. Your bot adds LedgerSync and shows a card to sign in. Use it to sign in with your LedgerSync login.
+4. Type the email or username you use in the LedgerSync app. Click **Next**.
+
+<AiNote tone="yellow">
+
+**The page says Create your LedgerSync account?** No LedgerSync login uses that email. Click **Change** and type
+your LedgerSync username. Don't create a second account. Your firm has no LedgerSync account yet? Sign up at
+[ledgersyncappv2.com/sign-up](https://ledgersyncappv2.com/sign-up) first, then come back here.
+
+</AiNote>
+
+5. Type your password. Click **Sign in**. Asked for a code? Type the one from your Google Authenticator app,
+   then click **Verify**.
+6. You see your firm's name. Click **Allow**.
+7. Next you see **Cursor would like access to your account**. That's normal: Grok Bot signs in through
+   Cursor. Click **Allow access**. You only see this the first time.
+8. Ask your bot: **Use LedgerSync to check whether my account is ready.** It says your account is ready?
+   You're done.
+
+<AiNote tone="yellow">
+
+**Grok Bot may change things in LedgerSync without asking you first.** Tell it exactly what you want. Before it
+sends a message to a client, ask it to show you the message first.
+
+</AiNote>
+
+Anything else: see [Troubleshooting](/ai/troubleshooting).
+
+</Accordion>
+
 <Accordion title="On Grok Business or Enterprise? Open this first">
 
 Grok's maker, xAI, says your team admin adds LedgerSync for your team once, in the xAI console. Then each
