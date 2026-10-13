@@ -3,6 +3,21 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-13" tags={["Checks", "FDE"]}>
+  ## Correct a check's OCR readings
+
+  `PATCH /v3/accounts/{account_id}/checks/{check_id}` corrects what LedgerSync read off a check image:
+  the payee, amount, check number, check date, bank name and memo in the check's `ocr` object. The
+  correction is saved in LedgerSync, the same as when a firm fixes the check in the app.
+
+  - Send only the readings you want to change, inside `ocr`. Anything you leave out keeps its value, and `null` clears a reading.
+  - The bank-reported fields stay read-only.
+  - A correction is kept when the bank feed refreshes the check later, whether it was made through the API or in the app.
+  - Requires the new **`write:checks`** scope. Keys created in the developer portal have it from now on; add it to an existing key with `PATCH /v3/api-keys/{id}`.
+
+  See [Correct a check](/guides/checks#correct-a-check).
+</Update>
+
 <Update label="2026-10-13" tags={["AI connector"]}>
   ## Use LedgerSync in Grok Bot
 

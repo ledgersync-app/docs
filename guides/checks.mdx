@@ -1,6 +1,6 @@
 ---
 title: "Check images"
-description: "List an account's paper checks and download their images."
+description: "List an account's paper checks, download their images, and correct what OCR read."
 ---
 
 When a bank exposes scanned images of the paper checks written against an
@@ -9,9 +9,10 @@ transactions. Checks hang off an **account**, so every route below is nested
 under one:
 
 ```
-GET /v3/accounts/{account_id}/checks                      # list
-GET /v3/accounts/{account_id}/checks/{check_id}           # one check
-GET /v3/accounts/{account_id}/checks/{check_id}/download  # the image bytes
+GET   /v3/accounts/{account_id}/checks                      # list
+GET   /v3/accounts/{account_id}/checks/{check_id}           # one check
+GET   /v3/accounts/{account_id}/checks/{check_id}/download  # the image bytes
+PATCH /v3/accounts/{account_id}/checks/{check_id}           # correct the OCR readings
 ```
 
 <Info>
@@ -46,6 +47,17 @@ curl -X PATCH "https://api-sandbox.ledgersyncappv2.com/v3/api-keys/{id}" \
   keep, not just the new one. The secret itself never changes, so nothing you've
   already deployed stops working.
 </Warning>
+
+To [correct a check](#correct-a-check), the key also needs **`write:checks`**.
+Keys created in the developer portal carry it from now on; add it to an older
+key the same way, keeping every scope it already has:
+
+```bash Add write:checks to an existing key
+curl -X PATCH "https://api-sandbox.ledgersyncappv2.com/v3/api-keys/{id}" \
+  -H "Authorization: Bearer sk_test_..." \
+  -H "Content-Type: application/json" \
+  -d '{"scopes":["read:accounts","read:checks","write:checks"]}'
+```
 
 ## List an account's checks
 
@@ -120,7 +132,7 @@ Every check carries two independent readings of the same piece of paper, and
 | --- | --- |
 | `check_number`, `amount`, `pay_to`, `description` | What the **bank** reported for the check. |
 | `transaction_date` | The date of the bank transaction the check belongs to. |
-| `ocr.*` | What **OCR read off the image itself**. |
+| `ocr.*` | What **OCR read off the image itself**, or a person's [correction](#correct-a-check) of that reading. |
 
 The two routinely disagree, and individual `ocr` fields are often `null` where
 recognition failed — as `check_number` is above. OCR is best-effort on a
@@ -128,6 +140,42 @@ photograph of handwriting; the bank's own record is the authoritative one. Treat
 `ocr` as a hint (for search, prefill, or reconciliation review), never as ground
 truth for money movement. The whole `ocr` object is omitted when nothing at all
 was recognised.
+
+## Correct a check
+
+When OCR misread a check, fix it the same way a firm does in the LedgerSync
+app: send the corrected values inside `ocr`. Only the `ocr` readings can be
+corrected. The bank-reported fields stay exactly as the bank sent them.
+
+```bash Correct the payee and the amount
+curl -X PATCH "https://api-sandbox.ledgersyncappv2.com/v3/accounts/acc_FDE_77/checks/chk_FDE_742778?client_id=cli_..." \
+  -H "Authorization: Bearer sk_test_..." \
+  -H "Content-Type: application/json" \
+  -d '{"ocr":{"pay_to":"Parkway Business Solutions LLC","amount":424.87}}'
+```
+
+The response is the corrected check, in the same shape as `GET`.
+
+| You send | What happens |
+| --- | --- |
+| A field inside `ocr` | That reading changes. |
+| Nothing for a field | It keeps its current value. |
+| `null`, or `""` for a text field or `check_date` | That reading is cleared. |
+| A top-level field, or an unknown field inside `ocr` | `400 invalid_request`, with `error.param` naming the field. Nothing changes. |
+
+The fields you can send are `pay_to` and `memo` (up to 500 characters each),
+`check_number` (up to 100), `bank_name` (up to 255), `amount` (a number with at
+most 2 decimal places and 13 digits before the decimal point) and `check_date`
+(a date as `YYYY-MM-DD`). Leading and trailing spaces are removed from text.
+
+The correction is saved in LedgerSync, so the firm sees it in the app too, with
+the same effects as a correction made there: when the check has both an OCR
+amount and an OCR check date, LedgerSync matches it again to its bank
+transaction, and a corrected payee can also appear in the matched transaction's
+description. Later refreshes from the bank feed keep your correction: once any
+reading of a check is corrected, all six of its `ocr` readings stay as they are
+when the bank feed refreshes the check. A request that changes nothing leaves the
+check untouched.
 
 ## Sources without checks
 
@@ -149,7 +197,7 @@ has none" from "you asked wrong":
 ## Try it in sandbox
 
 The sandbox **Ledgersync Bank** (`ins_a7397a8d0656e1b7`) returns real check
-images, so you can exercise all three routes end-to-end without a live bank:
+images, so you can exercise all four routes end-to-end without a live bank:
 
 <Steps>
   <Step title="Connect Ledgersync Bank">
@@ -164,5 +212,5 @@ images, so you can exercise all three routes end-to-end without a live bank:
 </Steps>
 
 <Card title="Full reference" icon="code" href="/api-reference/checks/list-an-accounts-check-images">
-  Every parameter and response field for the three check routes.
+  Every parameter and response field for the four check routes.
 </Card>
