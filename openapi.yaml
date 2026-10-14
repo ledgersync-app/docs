@@ -1730,6 +1730,45 @@ paths:
               schema: { $ref: '#/components/schemas/Check' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Checks]
+      operationId: updateCheck
+      summary: Correct a check's OCR readings
+      description: |
+        Corrects what LedgerSync read off the check image: the values in
+        the check's `ocr` object. Use it when a reading is wrong, the same
+        way a firm fixes a check in the LedgerSync app.
+
+        Send only the values you want to change, inside `ocr`. Omitted
+        values stay as they are. `null` clears a value, and so does an
+        empty string for the text fields and `check_date`. The
+        bank-reported fields (`check_number`, `amount`, `pay_to` and the
+        rest of the top level) are read-only; sending one is a `400`.
+
+        The correction is saved in LedgerSync, where the firm sees it, and
+        the check is matched again to its bank transaction when it has
+        both an OCR amount and an OCR check date. Later refreshes from the
+        bank feed keep the correction: once any reading of a check is
+        corrected, all six of its `ocr` readings stay as they are.
+
+        Requires the `write:checks` scope.
+      parameters:
+        - $ref: '#/components/parameters/ClientId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CheckUpdateRequest' }
+      responses:
+        '200':
+          description: The corrected Check.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Check' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
 
   /accounts/{account_id}/checks/{check_id}/download:
     parameters:
@@ -2677,7 +2716,7 @@ components:
         The Client (`cli_…`) to scope the read to. Required on account,
         transaction, and statement reads — LedgerSync's backend data APIs
         are scoped per end-user, so these resources are resolved within a
-        single Client.
+        single Client. Check corrections are scoped the same way.
       schema:
         type: string
 
@@ -4019,9 +4058,9 @@ components:
         ocr:
           type: ['object', 'null']
           description: >-
-            What OCR read off the image, kept separate from the bank-reported
-            fields above so you can always tell the two apart. Absent when
-            nothing was recognised.
+            What OCR read off the image, or a person's correction of that
+            reading, kept separate from the bank-reported fields above so you
+            can always tell the two apart. Absent when nothing was recognised.
           properties:
             pay_to: { type: [string, 'null'] }
             amount: { type: [number, 'null'], format: double }
@@ -4029,6 +4068,37 @@ components:
             bank_name: { type: [string, 'null'] }
             check_date: { type: [string, 'null'], format: date }
             memo: { type: [string, 'null'] }
+
+    CheckUpdateRequest:
+      type: object
+      description: >-
+        A correction to a check's OCR readings. `ocr` is the only field
+        accepted; any other field is rejected with a `400`.
+      properties:
+        ocr:
+          type: object
+          description: >-
+            The readings to correct. Omitted fields keep their value and
+            `null` clears one; for the text fields and `check_date` an empty
+            string clears it too, and leading or trailing spaces are removed.
+            Any other field is rejected with a `400`.
+          properties:
+            pay_to: { type: [string, 'null'], maxLength: 500 }
+            amount:
+              type: [number, 'null']
+              description: At most 2 decimal places and 13 digits before the decimal point.
+            check_number: { type: [string, 'null'], maxLength: 100 }
+            bank_name: { type: [string, 'null'], maxLength: 255 }
+            check_date:
+              type: [string, 'null']
+              format: date
+              description: The date written on the check, as YYYY-MM-DD. An empty string also clears it.
+            memo: { type: [string, 'null'], maxLength: 500 }
+      example:
+        ocr:
+          pay_to: Parkway Business Solutions
+          amount: 424.87
+          check_date: '2026-07-14'
 
     # ---------- Webhook subscription ----------
     WebhookSubscription:
@@ -4133,6 +4203,7 @@ components:
               - read:statements
               - write:statements
               - read:checks
+              - write:checks
               - manage:webhooks
               - read:webhooks
               - write:webhooks
