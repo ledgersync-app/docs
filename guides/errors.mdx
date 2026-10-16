@@ -160,6 +160,7 @@ When it does, `error.accounts[]` lists each account with its own `status`
 | --- | --- | --- | --- |
 | `internal_error` | 500 | Something broke on our side (usually transient). | Retry once with backoff, reusing the same `Idempotency-Key` on a `POST`; escalate with the `trace_id`. |
 | `upstream_unavailable` | 502 | A service v3 depends on (the main LedgerSync backend behind the bridge) is unreachable. Distinct from `source_internal_error`, our platform leg, not the aggregator. | Retry with exponential backoff; escalate with the `trace_id` if it persists. |
+| `upstream_unknown` | 502 | LedgerSync MCP only, from `ledgersync_push_to_quickbooks`. The QuickBooks push was sent to the main LedgerSync backend, but no clear answer came back (a server error, a timeout or a dropped connection while waiting, or an answer that could not be read), so it may or may not be queued. `message` names the `push_id`. | Do not push again yet: check `ledgersync_get_quickbooks_push_status` with the `client_id` and `push_id` first. Pushing again with the same `confirmation_id` never posts twice. |
 
 ### Connection & source errors (the bank side)
 

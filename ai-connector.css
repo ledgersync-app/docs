@@ -617,6 +617,17 @@
   background: var(--lsai-fill-hover);
 }
 
+/* A copy box holding several lines of text (the instructions on Bookkeeping into QuickBooks): keep its line breaks
+   and blank lines, and keep the Copy button at the top instead of halfway down. */
+.lsai-prompt .lsai-copy-row {
+  align-items: flex-start;
+}
+
+.lsai-prompt .lsai-copy-text {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
 /* Last step box. */
 .lsai-test {
   display: flex;

@@ -3,6 +3,43 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-16" tags={["AI connector"]}>
+  ## Bookkeeping into QuickBooks from Claude, ChatGPT and Grok
+
+  For clients whose bank transactions do not come into QuickBooks through a bank feed. The AI picks a category
+  and a payee for each of the client's transactions waiting in LedgerSync, asks you only about the ones it is not
+  sure of, and shows you a preview. After you say yes, LedgerSync posts them into the client's QuickBooks, with
+  the same upload as a sync from the LedgerSync app. See
+  [Bookkeeping into QuickBooks](/ai/quickbooks-bookkeeping), which has the instructions to paste into your AI.
+
+  **Seven new AI connector tools, on the live and sandbox connectors:**
+
+  - `ledgersync_get_quickbooks_setup` checks the client's QuickBooks connection and which QuickBooks bank account
+    each account posts to.
+  - `ledgersync_list_transactions_to_categorize` lists an account's transactions waiting on the For review list,
+    with LedgerSync's suggestions.
+  - `ledgersync_list_quickbooks_categories` and `ledgersync_search_quickbooks_payees` read the client's
+    QuickBooks categories and payees.
+  - `ledgersync_preview_quickbooks_push` checks everything and shows what would be posted. It changes nothing.
+  - `ledgersync_push_to_quickbooks` posts a previewed set, only after you say yes.
+  - `ledgersync_get_quickbooks_push_status` says what was posted, skipped or failed, and why.
+
+  **Limits and safeguards:**
+
+  - Nothing is posted without a preview. A preview's confirmation works for 30 minutes, and only for the person
+    and the AI app that made it.
+  - One push takes up to 100 transactions, 10 new payees (added to QuickBooks as vendors) and 5 new account
+    mappings. Each connected AI app can make 120 previews an hour and 60 pushes a day.
+  - Not yet: transfers, splits, classes, bill or invoice payments, and accounts on LedgerSync's own bank
+    connection.
+  - On the sandbox connector, a push really posts, to an Intuit sandbox QuickBooks company.
+  - In Claude Code, the instructions are also a command: `quickbooks_bookkeeping`.
+  - To see the new tools, reconnect in Claude, click **Refresh** in ChatGPT, or reauthenticate in Grok, then start
+    a new chat. See [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+
+  See [For developers](/ai/developers).
+</Update>
+
 <Update label="2026-10-13" tags={["Checks", "FDE"]}>
   ## Correct a check's OCR readings
 

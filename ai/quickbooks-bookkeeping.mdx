@@ -1,0 +1,221 @@
+---
+title: "Bookkeeping into QuickBooks"
+description: "Your AI categorizes a client's bank transactions from LedgerSync. After you say yes, LedgerSync posts them into the client's QuickBooks."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="Bookkeeping into QuickBooks" subtitle="Your AI picks a category and a payee for each of a client's bank transactions in LedgerSync, and asks you about the ones it is not sure of. After you say yes, LedgerSync posts them into the client's QuickBooks.">
+
+<AiNote tone="green">
+
+**For clients with no QuickBooks bank feed.** With a bank feed, QuickBooks downloads the bank's transactions
+itself. If an account has one, leave that account out: QuickBooks would get each transaction twice.
+
+</AiNote>
+
+## Before you start
+
+- **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
+  a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the new
+  QuickBooks tools.
+- **The client is connected to QuickBooks in LedgerSync**, the same connection you use to sync transactions from
+  the LedgerSync app. The AI checks this first.
+- **The client uses QuickBooks Online.**
+
+## Start
+
+<AiStep id="copy" n={1} total={4} title="Copy the instructions">
+
+Click **Copy** next to the instructions below.
+
+<div className="lsai-prompt">
+  <AiCopy label="Instructions for your AI" text={`Bookkeeping into QuickBooks with LedgerSync
+
+Use this for a client whose bank transactions do not come into QuickBooks through a QuickBooks bank feed. LedgerSync already has the transactions. You categorize them, and LedgerSync posts them into the client's QuickBooks.
+
+1. Find the client with ledgersync_find_clients, then call ledgersync_get_quickbooks_setup. QuickBooks must be connected. If an account has no QuickBooks bank account yet, ask the user which one it posts to.
+2. Ask the user to confirm that these QuickBooks bank accounts do not have a QuickBooks bank feed. If one does, skip that account: posting next to a live bank feed creates duplicates.
+3. For each account, call ledgersync_list_transactions_to_categorize. Load the client's categories with ledgersync_list_quickbooks_categories and look up payees with ledgersync_search_quickbooks_payees. Only use categories and payees that exist. Create a new payee only when nothing matches, and say so.
+4. Show the user a table with a category and a payee for every transaction, and how sure you are. Ask only about the ones you are not sure of. Follow any rules the user gives you for this client.
+5. Leave out transfers between the client's own accounts, payments of an open bill or invoice, and anything LedgerSync flags as a possible duplicate. List them for the user instead.
+6. Call ledgersync_preview_quickbooks_push. Show the user the summary, the refused rows and the warnings. Nothing has changed yet.
+7. Only after the user says yes, call ledgersync_push_to_quickbooks. Then check ledgersync_get_quickbooks_push_status and tell the user what was posted, what failed and why.`} />
+</div>
+
+</AiStep>
+
+<AiStep id="new-chat" n={2} total={4} title="Start a new chat">
+
+In Claude, ChatGPT or Grok, start a new chat.
+
+</AiStep>
+
+<AiStep id="paste" n={3} total={4} title="Paste the instructions">
+
+Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
+
+</AiStep>
+
+<AiStep id="client" n={4} total={4} title="Name the client and the month">
+
+At the end, type the client's name and the month. For example: *Acme, September 2026*. Then press **Enter**.
+
+</AiStep>
+
+<AiNote tone="gray">
+
+**Using Claude Code?** The instructions are also a LedgerSync command there. Type **/**, pick
+**quickbooks_bookkeeping** (it says **(MCP)** next to it) and press **Enter**. Then tell it the client and the
+month.
+
+</AiNote>
+
+<AiNote tone="yellow">
+
+**Using Grok?** Grok may change things without asking you first. Tell it to wait for your yes before it posts
+anything.
+
+</AiNote>
+
+## What happens next
+
+1. The AI checks the client's QuickBooks connection. If it does not know which QuickBooks bank account one of the
+   client's bank accounts posts to, it asks you.
+2. It asks you to confirm that those QuickBooks accounts have no bank feed.
+3. It reads the client's transactions waiting in LedgerSync. It shows you a table with a category (the QuickBooks
+   account a transaction goes to, such as Office Supplies) and a payee (the vendor, customer or employee) for
+   each one, and how sure it is. It asks you only about the ones it is not sure of.
+4. It shows you a preview: what would be posted, the totals, any new payees, and anything LedgerSync refused, with
+   the reason. Nothing has changed yet.
+5. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right.
+6. LedgerSync posts the transactions into QuickBooks as expenses and deposits. No money moves. About a minute
+   later, the AI tells you what was posted, what was skipped and what failed, and why.
+
+<AiNote tone="gray">
+
+**Which transactions?** The ones waiting on the client's **For review** list in LedgerSync. Transactions still
+pending at the bank, and the ones your rules exclude, are left out. The AI starts from the suggestions LedgerSync
+already shows, such as your rules.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**What changes in LedgerSync.** The posted transactions move from **For review** to **Categorized**, as when you
+accept and sync them in the LedgerSync app. A QuickBooks bank account you named for an account is saved for next
+time, and LedgerSync also puts it on that account's other transactions. A new payee is added to QuickBooks as a
+vendor. If QuickBooks already has a payee with that name, LedgerSync uses it. LedgerSync also puts the new payee on
+the client's other transactions where it suggested that name, if they are not in QuickBooks yet. The LedgerSync app
+does the same.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**Tell the AI your rules for this client.** For example: *Anything from Shell is Fuel*, or *Ask me about anything
+over $1,000*. They apply in that chat only. They are not saved as LedgerSync rules.
+
+</AiNote>
+
+## What it does not do yet
+
+- Transfers between the client's own accounts.
+- Payments of an open bill or invoice in QuickBooks.
+- Splitting one transaction across several categories.
+- QuickBooks classes.
+- Bank accounts on LedgerSync's own bank connection, such as banks that need the LedgerSync desktop app.
+- Clients that use another accounting app, such as Zoho Books.
+
+The AI leaves out transfers, bill or invoice payments and possible duplicates, and lists them for you. LedgerSync also
+leaves out a transaction that already has a split, a class or a billable customer in LedgerSync, so nothing replaces
+it. Accept those in the LedgerSync app.
+
+## Your client's data
+
+<AiNote tone="yellow">
+
+**Your client's bank data goes through your AI account.** The AI app reads the client's transactions, payees and
+categories, and keeps the chat under your AI account's settings. Check that account's data settings before you
+start.
+
+</AiNote>
+
+## If something goes wrong
+
+| The AI says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| **QuickBooks is not connected for this client in LedgerSync.** | In the LedgerSync app, click **Rules Engine**, then **QuickBooks**. In the menu on the left, click **Manage Connections**. Find the client and click **Authorize**, then sign in to the client's QuickBooks. Then ask the AI again. |
+| **The client's QuickBooks connection in LedgerSync stopped working.** | Open **Manage Connections** the same way. At the top, next to the client's name, click **Reconnect** and sign in to QuickBooks again. Then ask the AI again. |
+| A category or a vendor does not exist, but you just added it in QuickBooks | LedgerSync keeps its own copy of the client's QuickBooks lists. In the LedgerSync app, select the client, click **Rules Engine**, then **QuickBooks**, then **Sync QuickBooks Data** at the bottom of the menu on the left. Then ask the AI again. |
+| Some transactions were refused in the preview | The AI says why for each one. Answer its questions, or leave them out, and ask it to preview again. Nothing has changed yet. |
+| A transaction may already be in QuickBooks (a possible duplicate) | LedgerSync does not post it. Check it in QuickBooks before you add anything by hand. |
+| A transaction already has a split or a class | LedgerSync leaves it alone, so the post does not replace it. Accept it in the LedgerSync app. |
+| A vendor name is too long | LedgerSync keeps vendor names of up to 80 characters. Give the AI a shorter new name. Or shorten the vendor's name in QuickBooks, click **Sync QuickBooks Data** in the LedgerSync app (as above), then ask the AI again. |
+| Some transactions failed | They stay in LedgerSync under **Categorized**. Fix the reason the AI gives, often in QuickBooks. Then, in the LedgerSync app, click **Rules Engine**, then **QuickBooks**, then **Transactions**. Pick **Categorized**, select them and click **Sync with QuickBooks**. |
+
+<Accordion title="More messages: QuickBooks account already used, preview expired, post not confirmed, LedgerSync busy, limits">
+
+| The AI says | Do this |
+| --- | --- |
+| A QuickBooks account is already used by another of the client's accounts | Each QuickBooks bank account goes with one bank account in LedgerSync. Tell the AI the right one, or change it on **Bank Accounts Mapping** (**Rules Engine**, then **QuickBooks**, in the menu on the left). |
+| **This confirmation is unknown or expired. Preview the push again.** | A preview works for 30 minutes. Ask the AI to preview again. |
+| LedgerSync **did not confirm** the push, so it may or may not be queued | Don't ask it to post again. Wait a minute, then ask it to check that push's status. |
+| **This push is already running.** | Wait a minute, then ask the AI for the push's status. |
+| **Another push is running; try again in a minute.** | LedgerSync was busy with other posts to QuickBooks, maybe not yours. Nothing was posted. Wait a minute, then ask the AI to post again with the same preview. A preview works for 30 minutes. |
+| Some transactions were skipped because the bank has not posted them yet | They stay in LedgerSync under **Categorized**. Once the bank posts them, sync them from the LedgerSync app, as for failed transactions above. |
+| A transaction was changed in LedgerSync after the preview | It was left out. Ask the AI to list the transactions again. |
+| This connection has used a QuickBooks tool too many times this hour or this day | Each AI app you connect can preview 120 times an hour and post 60 times a day. Try again next hour or tomorrow, as the AI says, or do it in the LedgerSync app. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+| Accounts from the LedgerSync desktop app are not supported yet | Not yet. Leave that account out. |
+| **This client has no bank accounts LedgerSync can post to QuickBooks.** | Check the client's bank connections in LedgerSync. Accounts from the LedgerSync desktop app are not supported yet. |
+| **Your LedgerSync login cannot do QuickBooks bookkeeping for this client.** | Email <AiEmail /> and say which client. |
+
+</Accordion>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the 7 tools and what they change">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_get_quickbooks_setup` | Is QuickBooks connected for the client; which QuickBooks bank account each account posts to; the client's QuickBooks bank and credit card accounts | No |
+    | `ledgersync_list_transactions_to_categorize` | One account's transactions waiting on the For review list, with LedgerSync's suggestions | No |
+    | `ledgersync_list_quickbooks_categories` | The client's QuickBooks categories | No |
+    | `ledgersync_search_quickbooks_payees` | Finds the client's QuickBooks vendors, customers and employees | No |
+    | `ledgersync_preview_quickbooks_push` | Checks up to 100 transactions with the categories and payees the AI picked, and shows what would be posted | No |
+    | `ledgersync_push_to_quickbooks` | Posts a previewed set of transactions into the client's QuickBooks | Yes |
+    | `ledgersync_get_quickbooks_push_status` | What a push posted, skipped or failed, and why | No |
+
+    - The push takes only the preview's `confirmation_id`. It works for 30 minutes, only for the person and the
+      AI app that made the preview, and posts only the rows and account mappings the preview accepted. Calling
+      the push again with the same confirmation returns the first answer; it never posts twice.
+    - The preview and the push need `write:accounting`; the other five tools need `read:accounting`. A read-only
+      connection can read but cannot preview or post.
+    - The instructions above are also an MCP prompt, `quickbooks_bookkeeping` ("Bookkeeping into QuickBooks"),
+      with optional `client` and `period` arguments. Claude Code lists it as a command.
+    - Accounts on LedgerSync's own connection (`acc_FDE_...`) are not supported yet and are refused with
+      `invalid_request`.
+    - On the sandbox connector, a push really posts, to the Intuit sandbox QuickBooks company the client is
+      connected to. There is no dry run.
+    - See [For developers](/ai/developers) for every field.
+  </Accordion>
+
+  <Accordion title="For developers: limits">
+    - One preview or push takes up to 100 transactions, 10 new payees and 5 new account mappings.
+    - Each connected AI app can make 120 previews an hour and 60 pushes a day. A push counts only when it reaches
+      LedgerSync.
+    - LedgerSync sends a few pushes at a time, shared by every firm. A push past that is refused as busy
+      (`rate_limit_exceeded`), is not counted, and can be sent again a minute later with the same
+      `confirmation_id`.
+    - A preview's confirmation works for 30 minutes. A push's answer is kept for 24 hours.
+    - Each person posts only for the clients they see in the LedgerSync app: an employee, the clients assigned to
+      them.
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>

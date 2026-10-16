@@ -8,14 +8,15 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (24 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (31 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
 
   Add `https://api-sandbox.ledgersyncappv2.com/mcp` as a second connector. Test with **FinBank**, **MX Bank**
   or **Ledgersync Bank** and the test sign-ins in [Testing in sandbox](/guides/testing). Desktop app tools
-  are live only.
+  are live only. A QuickBooks push on sandbox really posts, to the Intuit sandbox QuickBooks company the client
+  is connected to.
 
   </AiBox>
   <AiBox title="Who can connect">
@@ -62,7 +63,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">24</span>
+## Tools <span className="lsai-badge">31</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -88,11 +89,18 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_send_client_message` | Sends a previewed email or text, each with that client's own link | Yes |
 | `ledgersync_list_message_templates` | Your firm's saved Issue and Invitation templates, email and text | No |
 | `ledgersync_save_message_template` | Saves a message as a new firm template | Yes |
+| `ledgersync_get_quickbooks_setup` | Is QuickBooks connected for a client; which QuickBooks bank account each account posts to; the client's QuickBooks bank and credit card accounts | No |
+| `ledgersync_list_transactions_to_categorize` | One account's transactions waiting on the For review list, with LedgerSync's suggestions | No |
+| `ledgersync_list_quickbooks_categories` | A client's QuickBooks categories | No |
+| `ledgersync_search_quickbooks_payees` | Finds a client's QuickBooks vendors, customers and employees | No |
+| `ledgersync_preview_quickbooks_push` | Checks up to 100 transactions with the categories and payees the AI picked, and shows what would be posted to QuickBooks | No |
+| `ledgersync_push_to_quickbooks` | Posts a previewed set of transactions into the client's QuickBooks | Yes |
+| `ledgersync_get_quickbooks_push_status` | What a QuickBooks push posted, skipped or failed, and why | No |
 | `ledgersync_get_desktop_app_status` | Is the desktop app linked and connected (live only) | No |
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
 <AccordionGroup>
-  <Accordion title="Tool details: refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions">
+  <Accordion title="Tool details: refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions, QuickBooks bookkeeping">
     - `ledgersync_get_account_status` also says whether the connection is full or read-only. Refreshes left
       is your firm's shared daily budget, not the per-app cap.
     - When `access.status` is `active`, `ledgersync_get_account_status` also names the firm and the login the
@@ -213,9 +221,63 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - A conversion belongs to the person who made the upload link: the owner, an administrator or an employee.
       It also shows on that person's **PDF Converter** page in the LedgerSync app, where it can be exported
       again.
+    - QuickBooks bookkeeping is for clients whose bank transactions do not come into QuickBooks through a
+      QuickBooks bank feed. The AI categorizes the client's transactions waiting in LedgerSync and, after the user
+      approves a preview, LedgerSync posts them into the client's QuickBooks Online. See
+      [Bookkeeping into QuickBooks](/ai/quickbooks-bookkeeping). Accounts on LedgerSync's own connection
+      (`acc_FDE_...`) are not supported yet and are refused with `invalid_request`.
+    - `ledgersync_get_quickbooks_setup` says whether QuickBooks is `connected`, `not_connected` or `broken` (with
+      the reason) for a client. It lists the client's accounts with the QuickBooks bank account each posts to, and
+      the client's active QuickBooks Bank and Credit Card accounts. Its `next_step` tells the AI to ask the user
+      which QuickBooks account an account without one posts to, and to confirm those QuickBooks accounts have no
+      QuickBooks bank feed.
+    - `ledgersync_list_transactions_to_categorize` lists one account's transactions that are on the For review
+      list, posted (not pending), not yet sent to QuickBooks and not excluded by a rule, 50 at a time by default
+      (up to 100; pass `next_cursor` for more), between optional `from` and `to` dates. Each carries LedgerSync's
+      suggestion when it has one (category, payee, the rule that made it), `possible_duplicate` when LedgerSync
+      flagged it as possibly in QuickBooks already, and, on Finicity accounts, `possible_transfer`.
+    - `ledgersync_list_quickbooks_categories` lists the client's active QuickBooks categories from LedgerSync's
+      copy of the client's chart of accounts, a page at a time, narrowed by `query`.
+      `ledgersync_search_quickbooks_payees` finds active vendors (from LedgerSync's copy), customers and
+      employees (read from QuickBooks), 50 by default and up to 200, by `query` and `type` (`vendor`, `customer`
+      or `employee`), and says when more matched (`truncated`). A category or vendor added in QuickBooks shows
+      after **Sync QuickBooks Data** in the LedgerSync app.
+    - `ledgersync_preview_quickbooks_push` takes up to 100 `rows` (`transaction_id`, `category_id`, and
+      `payee_id` with `payee_type` or a `new_payee_name`) and up to 5 `account_mappings` (`account_id`,
+      `qbo_bank_account_id`). It checks every row and mapping and writes nothing. It returns the totals (money in,
+      money out), the totals by category, the new payees, the QuickBooks accounts used, every refused row with
+      its reason, a sample of up to 20 rows, a warning for each QuickBooks account used asking to confirm it has
+      no bank feed, and, when at least one row can be posted, a `confirmation_id` and its `expires_at`.
+    - A row is refused when it is not this client's, already categorized, sent or excluded, still pending,
+      excluded by a rule, flagged as a possible duplicate, on an unknown or inactive category or payee, without a
+      payee, a deposit with an employee as payee, or on an account with no QuickBooks bank account. A row whose
+      categorization in LedgerSync already has a split, or a line with a class, its own amount or a billable
+      customer, is refused as `has_split_or_class`, because the push would replace it with one line; accept it in
+      the LedgerSync app. A vendor name longer than 80 characters (a new payee name, or an existing vendor's name in
+      LedgerSync's copy) is refused as `payee_name_too_long`: use a shorter new name, or shorten the vendor's name
+      in QuickBooks and click **Sync QuickBooks Data** in the LedgerSync app before previewing again. A new payee
+      name that matches an existing payee uses that payee. A mapping is refused when the QuickBooks account is not
+      an active Bank or Credit Card account, or another of the client's accounts already posts to it: each
+      QuickBooks bank account goes with one account in LedgerSync.
+    - `ledgersync_push_to_quickbooks` takes only the `confirmation_id` and posts exactly what the preview
+      accepted. It saves the new account mappings, creates the new payees in QuickBooks as vendors, writes the
+      category and payee on each transaction, moves it to Categorized, and queues the same upload to QuickBooks
+      as the LedgerSync app's sync. As in the app, a new account mapping also goes on that account's other
+      transactions, and a new payee on the client's other transactions not yet in QuickBooks that carry that
+      name as a suggested payee (no payee id). A transaction that changed since the preview is refused. It
+      returns a `push_id` (`qbp_...`), a status (`queued`, `nothing_to_push` or `already_queued`), the number
+      queued, the refused transactions and the payees it created. Calling it again with the same confirmation
+      returns the same answer and never posts twice.
+    - `ledgersync_get_quickbooks_push_status` takes the `client_id` and the `push_id` and says `in_progress`,
+      `finished` or `failed`, with counts and, for each transaction, `synced` (with its QuickBooks id), `failed`
+      (with the reason), `skipped_possible_duplicate`, `skipped_not_posted`, `pending` or `not_pushed`, a page at
+      a time.
+    - The instructions on [Bookkeeping into QuickBooks](/ai/quickbooks-bookkeeping) are also an MCP prompt,
+      `quickbooks_bookkeeping` ("Bookkeeping into QuickBooks"), with optional `client` and `period` arguments.
+      Claude Code lists it as a command.
   </Accordion>
 
-  <Accordion title="Security: bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement links, 6-day invitation sign-in links, client messages carry only LedgerSync links">
+  <Accordion title="Security: bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview">
     - Bank sign-ins never happen in the chat. The account holder picks the bank on a LedgerSync page and signs
       in there, or on the bank-data partner's secure page it opens for some banks. Connect links expire after
       72 hours.
@@ -256,9 +318,15 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       AI can check whether it is connected.
       Linking a computer replaces any computer linked before: only one computer is connected at a time.
       Every link is recorded and the LedgerSync team is alerted at once.
+    - Nothing reaches QuickBooks without a preview. `ledgersync_push_to_quickbooks` takes only the preview's
+      `confirmation_id`, which works for 30 minutes and only for the person and the AI app that made it, and posts
+      only what the preview accepted. It is marked as changing data, so Claude and ChatGPT ask before it runs. In
+      Grok, ask it to wait for your yes.
+    - Each person posts to QuickBooks only for the clients they see in the LedgerSync app: an employee, the
+      clients assigned to them.
   </Accordion>
 
-  <Accordion title="Refreshes and limits: 50 AI refreshes a day on live, 20 on sandbox, 300 client messages a day per firm on live, per-minute and per-hour caps">
+  <Accordion title="Refreshes and limits: 50 AI refreshes a day on live, 20 on sandbox, 300 client messages a day per firm on live, 60 QuickBooks pushes a day per AI app, per-minute and per-hour caps">
     - LedgerSync refreshes every working connection about once a day. A refresh you ask for takes a few
       minutes; see [Keeping data fresh](/guides/data-freshness).
     - A connection refreshed in the last 30 minutes is skipped unless you ask for a new pull anyway.
@@ -291,6 +359,12 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       trying again.
     - Linking the desktop app: 10 tries an hour and 20 a day per LedgerSync account (UTC hours and days),
       whether the code works or not. A code that is not 7 letters or digits is refused without counting.
+    - QuickBooks bookkeeping: one preview or push takes up to 100 transactions, 10 new payees and 5 new account
+      mappings. Per connected AI app: 120 previews an hour and 60 pushes a day; a push counts only when it reaches
+      LedgerSync. A preview's confirmation works for 30 minutes, and a push's answer is kept for 24 hours.
+    - QuickBooks pushes: LedgerSync sends a few at a time, shared by every firm. A push past that is refused as
+      busy (`rate_limit_exceeded`, "Another push is running; try again in a minute."), is not counted, and can be
+      sent again a minute later with the same `confirmation_id`.
   </Accordion>
 
   <Accordion title="Tool updates: Claude and ChatGPT keep a copy of the tool list, and Grok may too">
@@ -312,7 +386,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     The 15 codes you are most likely to see are listed below. The connector can also answer
     `invalid_request`, `internal_error`, `idempotency_conflict` or `upstream_unavailable` (LedgerSync could not
     be reached or could not check the firm just now; try again in a minute. After saving a template, list the
-    templates first: it may already be saved).
+    templates first: it may already be saved). A QuickBooks push that got no clear answer from LedgerSync comes
+    back as `upstream_unknown`, with its `push_id`: check `ledgersync_get_quickbooks_push_status` before pushing
+    again.
 
     | Code | What it means | What to do |
     | --- | --- | --- |
