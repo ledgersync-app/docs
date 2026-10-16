@@ -235,7 +235,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       list, posted (not pending), not yet sent to QuickBooks and not excluded by a rule, 50 at a time by default
       (up to 100; pass `next_cursor` for more), between optional `from` and `to` dates. Each carries LedgerSync's
       suggestion when it has one (category, payee, the rule that made it), `possible_duplicate` when LedgerSync
-      flagged it as possibly in QuickBooks already, and, on Finicity accounts, `possible_transfer`.
+      flagged it as possibly in QuickBooks already, and, on Finicity accounts, `possible_transfer`. A row one of the
+      firm's global rules matched but could not file, because the client has no QuickBooks category mapped to the
+      rule's global category, carries `pending_global_rule` (`rule_name`, `global_category`). The tool's
+      `next_step` tells the AI to keep LedgerSync's suggestions and to ask the user about those rows.
     - `ledgersync_list_quickbooks_categories` lists the client's active QuickBooks categories from LedgerSync's
       copy of the client's chart of accounts, a page at a time, narrowed by `query`.
       `ledgersync_search_quickbooks_payees` finds active vendors (from LedgerSync's copy), customers and

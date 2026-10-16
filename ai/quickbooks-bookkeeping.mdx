@@ -38,10 +38,11 @@ Use this for a client whose bank transactions do not come into QuickBooks throug
 1. Find the client with ledgersync_find_clients, then call ledgersync_get_quickbooks_setup. QuickBooks must be connected. If an account has no QuickBooks bank account yet, ask the user which one it posts to.
 2. Ask the user to confirm that these QuickBooks bank accounts do not have a QuickBooks bank feed. If one does, skip that account: posting next to a live bank feed creates duplicates.
 3. For each account, call ledgersync_list_transactions_to_categorize. Load the client's categories with ledgersync_list_quickbooks_categories and look up payees with ledgersync_search_quickbooks_payees. Only use categories and payees that exist. Create a new payee only when nothing matches, and say so.
-4. Show the user a table with a category and a payee for every transaction, and how sure you are. Ask only about the ones you are not sure of. Follow any rules the user gives you for this client.
-5. Leave out transfers between the client's own accounts, payments of an open bill or invoice, and anything LedgerSync flags as a possible duplicate. List them for the user instead.
-6. Call ledgersync_preview_quickbooks_push. Show the user the summary, the refused rows and the warnings. Nothing has changed yet.
-7. Only after the user says yes, call ledgersync_push_to_quickbooks. Then check ledgersync_get_quickbooks_push_status and tell the user what was posted, what failed and why.`} />
+4. Show the user a table with a category and a payee for every transaction, and how sure you are. Keep the category and payee LedgerSync suggests unless the user changes them; if you think one is wrong, say so. Ask only about the ones you are not sure of. Follow any rules the user gives you for this client.
+5. A transaction with pending_global_rule matched one of the firm's global rules, but this client has no QuickBooks category mapped to the rule's global category. Ask the user which category to use instead of guessing, and suggest mapping it in LedgerSync's Categories Mapping, so the rule files these by itself next time.
+6. Leave out transfers between the client's own accounts, payments of an open bill or invoice, and anything LedgerSync flags as a possible duplicate. List them for the user instead.
+7. Call ledgersync_preview_quickbooks_push. Show the user the summary, the refused rows and the warnings. Nothing has changed yet.
+8. Only after the user says yes, call ledgersync_push_to_quickbooks. Then check ledgersync_get_quickbooks_push_status and tell the user what was posted, what failed and why.`} />
 </div>
 
 </AiStep>
@@ -86,7 +87,8 @@ anything.
 2. It asks you to confirm that those QuickBooks accounts have no bank feed.
 3. It reads the client's transactions waiting in LedgerSync. It shows you a table with a category (the QuickBooks
    account a transaction goes to, such as Office Supplies) and a payee (the vendor, customer or employee) for
-   each one, and how sure it is. It asks you only about the ones it is not sure of.
+   each one, and how sure it is. It keeps what your rules already chose, unless you change it. It asks you only
+   about the ones it is not sure of.
 4. It shows you a preview: what would be posted, the totals, any new payees, and anything LedgerSync refused, with
    the reason. Nothing has changed yet.
 5. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right.
@@ -96,8 +98,17 @@ anything.
 <AiNote tone="gray">
 
 **Which transactions?** The ones waiting on the client's **For review** list in LedgerSync. Transactions still
-pending at the bank, and the ones your rules exclude, are left out. The AI starts from the suggestions LedgerSync
-already shows, such as your rules.
+pending at the bank, and the ones your rules exclude, are left out. The AI keeps the suggestions LedgerSync
+already shows, such as your rules, unless you change them.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**A global rule is waiting for a category.** Sometimes one of your global rules matches a transaction, but this
+client has no QuickBooks category mapped to the rule's global category yet. The AI then asks you which category to
+use. To let the rule do it by itself next time, click **Rules Engine**, then **QuickBooks**, then **Categories
+Mapping** in the menu on the left. Click the global category and connect this client's QuickBooks category to it.
 
 </AiNote>
 
@@ -182,7 +193,7 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     | Tool | What it does | Changes data |
     | --- | --- | --- |
     | `ledgersync_get_quickbooks_setup` | Is QuickBooks connected for the client; which QuickBooks bank account each account posts to; the client's QuickBooks bank and credit card accounts | No |
-    | `ledgersync_list_transactions_to_categorize` | One account's transactions waiting on the For review list, with LedgerSync's suggestions | No |
+    | `ledgersync_list_transactions_to_categorize` | One account's transactions waiting on the For review list, with LedgerSync's suggestions and any global rule waiting for a category | No |
     | `ledgersync_list_quickbooks_categories` | The client's QuickBooks categories | No |
     | `ledgersync_search_quickbooks_payees` | Finds the client's QuickBooks vendors, customers and employees | No |
     | `ledgersync_preview_quickbooks_push` | Checks up to 100 transactions with the categories and payees the AI picked, and shows what would be posted | No |
