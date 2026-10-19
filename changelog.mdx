@@ -3,6 +3,22 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-18" tags={["Statements", "AI connector"]}>
+  ## Converted statements say why their transactions don't add up
+
+  A converted statement used to say only whether its transactions match the statement's balances. It now says
+  why when they don't.
+
+  - `POST /v3/statements/extract`: the operation result has a new `validation_status`: `balanced`,
+    `balance_mismatch`, `totals_mismatch`, `balance_missing` or `no_transactions`. `validation_message` says the
+    same in a short plain message for the person who uploaded the statement, and `validated` is `true` only for
+    `balanced`. Extractions completed before this change have no `validation_status`.
+  - AI connector: `ledgersync_get_statement_conversion` returns `validation_status` too, and asks the AI to
+    repeat `validation_message` when the transactions don't add up.
+  - Loan statements now add up when the balance moves by the principal of each payment, and an extra account
+    with no transactions and a missing balance no longer stops a statement from adding up.
+</Update>
+
 <Update label="2026-10-16" tags={["AI connector"]}>
   ## Bookkeeping into QuickBooks from Claude, ChatGPT and Grok
 

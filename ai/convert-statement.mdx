@@ -67,8 +67,9 @@ link. It works once, for 10 minutes. Link not working? Ask the AI for a new one.
 
 <AiNote tone="green">
 
-**The AI tells you when the totals can't be checked.** If the transactions don't match the statement's
-balances, or the balances could not be read, check them before you use them.
+**The AI tells you when the transactions don't add up.** LedgerSync checks them against the balances on the
+statement. If they don't add up, or a balance is missing, the AI says why. Then compare them with the statement
+before you use them.
 
 </AiNote>
 
@@ -94,6 +95,10 @@ Something went wrong? See [Troubleshooting](/ai/troubleshooting).
     (with the transactions, a page at a time), `failed`, `expired` or `deleted` (removed on the **PDF Converter**
     page). `ledgersync_get_conversion_download_link`
     makes a one-time link to the file: `csv`, `xlsx`, `qbo` or `ofx`.
+  - A completed conversion says whether its transactions add up to the statement's balances: `validated`,
+    `validation_status` (`balanced`, `balance_mismatch`, `totals_mismatch` or `balance_missing`) and
+    `validation_message`, a short message the AI can repeat to the person. A conversion with no transactions has
+    `transaction_count: 0` and none of these fields.
   - It is the same reader as the PDF Converter in the LedgerSync app and `POST /v3/statements/extract`.
   - Each person's conversions are their own: the owner, administrators and employees each see only the ones
     they made. A read-only connection can read conversions but cannot upload.
