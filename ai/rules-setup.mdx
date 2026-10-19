@@ -122,6 +122,14 @@ has its own preview and needs your yes.
 
 </AiNote>
 
+<AiNote tone="yellow">
+
+**Give each rule a vendor.** A rule puts its vendor on each transaction it fills, as the payee. In LedgerSync you can
+accept a transaction only when it has a payee, so for a rule without a vendor you add the payee yourself before you
+accept. Ask the AI for a vendor on every rule. For example: *Use Shell as the vendor.*
+
+</AiNote>
+
 ## Client rules and global rules
 
 For each rule, the AI asks you which kind it is. It suggests a global rule for vendors that mean the same for every
@@ -137,19 +145,32 @@ client, such as bank fees, software or fuel. You decide.
 
 - A client's own rules always come first. A global rule fills a transaction only when none of that client's rules
   match it.
-- When a client has no category linked to the global category, the transaction gets the global category and its
-  GL code.
 - To make global rules, your login needs **Manage Global Rules**, as in **Before you start**.
+
+### Link a global category to the client's own category
+
+A global rule puts the transaction in one of your firm's global categories. Each client can link one of its own
+categories to that global category:
+
+- **Linked:** LedgerSync shows and exports the client's own category and its GL code.
+- **Not linked:** LedgerSync uses the global category and its GL code.
+
+To link them, ask the AI. For example: *Link our global category Fuel to Acme's category Auto Fuel.* The AI adds the
+link to the preview, and LedgerSync saves it after your yes, marked LS-AI. A link works when the client has no link
+yet for that global category, and the client's category is not linked to another global category.
+
+You can also link them in the LedgerSync app: **Rules Engine**, **Manual**, then **Settings**, **Initial Setup**,
+**Categories Mapping**.
 
 ## What LedgerSync saves
 
 - The rules. Each one looks for words in the bank text (contains, doesn't contain or is exactly), for money in,
-  money out or both. It puts a category on the transaction and, if you chose one, a vendor.
+  money out or both. It puts a category on the transaction and, if you chose one, a vendor as the payee.
 - New categories and vendors, for the client or for your firm (global).
 - Links between one of the client's categories and a global category, where the client has no link for either one
   yet.
-- The category on each waiting transaction the rules fill. The transactions stay on **For review**, as when your
-  own rules fill them.
+- The category on each waiting transaction the rules fill and, when the rule has a vendor, that vendor as its payee.
+  The transactions stay on **For review**, as when your own rules fill them.
 
 <AiNote tone="green">
 
@@ -173,7 +194,8 @@ Changed your mind? Ask the AI to undo the setup. For example: *Undo the rules se
    because this check changes nothing. Then the AI shows you what the undo would remove and what it would keep,
    and why. Nothing has changed yet.
 2. You say yes. Claude and ChatGPT also ask you to allow it.
-3. LedgerSync deletes the rules the setup made. It takes their category off the waiting transactions they filled.
+3. LedgerSync deletes the rules the setup made. It takes their category and payee off the waiting transactions they
+   filled.
 4. It undoes the category links the setup made.
 5. It deletes the categories and vendors the setup made, unless something uses them now, such as another rule, a
    transaction or a linked category. Those stay, and the AI tells you which.
