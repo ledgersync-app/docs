@@ -3208,11 +3208,42 @@ components:
         validated:
           type: [boolean, 'null']
           description: |
-            Whether the extracted rows reconciled against the balances
-            printed on the statement. `null` when the statement carries
-            no reconcilable balances.
+            `true` only when `validation_status` is `balanced`: the
+            extracted rows add up to the balances printed on the
+            statement. `false` otherwise, including when a balance could
+            not be found, so the rows could not be checked.
+        validation_status:
+          type: string
+          enum: [balanced, balance_mismatch, totals_mismatch, balance_missing, no_transactions]
+          description: |
+            Why the rows are or are not validated. When a PDF holds several
+            accounts, the account with the worst result decides, in the
+            order `balance_mismatch`, `totals_mismatch`, `balance_missing`.
+            Absent on extractions completed before the reason was recorded;
+            use `validated` for those.
+
+            - `balanced`: every account's opening balance plus its rows
+              equals its closing balance, and any transaction count, totals
+              and running balances printed on the statement agree.
+            - `balance_mismatch`: for at least one account, the opening
+              balance plus the rows does not equal the closing balance, so a
+              row is likely missing, extra or misread.
+            - `totals_mismatch`: the balances agree, but the rows disagree
+              with another figure printed on the statement, such as the
+              transaction count, total deposits or withdrawals, or a
+              running balance.
+            - `balance_missing`: the opening or closing balance of at least
+              one account was not found, so its rows were not checked.
+            - `no_transactions`: no transactions were found in the PDF, for
+              example an unreadable scan or a document that is not a bank
+              statement.
         validation_message:
           type: [string, 'null']
+          description: |
+            A short plain message for the person who uploaded the statement:
+            what the check found and, when the rows don't add up, what to
+            do. Extractions completed before `validation_status` existed may
+            hold an older text; rely on `validated` for those.
         transactions:
           type: array
           items: { $ref: '#/components/schemas/ExtractedStatementTransaction' }
