@@ -37,14 +37,16 @@ Click **Copy** next to the instructions below.
 <div className="lsai-prompt">
   <AiCopy label="Instructions for your AI" text={`Set up categorization rules for a LedgerSync client.
 1. Find the client with ledgersync_find_clients, then call ledgersync_get_rules_setup.
-2. Read what exists: ledgersync_list_rules (client and global), ledgersync_list_setup_categories (client and firm) and, when you need one, ledgersync_list_setup_vendors.
+2. Read what exists: ledgersync_list_rules (client and global), ledgersync_list_setup_categories (client and firm) and ledgersync_list_setup_vendors (client and firm).
 3. Call ledgersync_list_uncategorized_transactions and work through the groups, largest first.
 4. For each group choose the category from the client's own categories or, for a global rule, from the firm's categories. Use names that exist, or propose new ones and say they are new. Never guess: ask the user when you are not sure.
-5. For each rule, ask the user whether it is for this client only (client rule) or for every client of the firm (global rule). Suggest global for vendors that mean the same for every client, such as bank fees, software or fuel.
-6. Follow the firm's naming pattern for rule names; you can see it in the existing rules.
-7. Preview with ledgersync_preview_rules_setup (up to 100 rules at a time). Show the user what will be created, how many transactions each rule fills for this client and for other clients, and every warning.
-8. Only after the user says yes, call ledgersync_apply_rules_setup. Then follow ledgersync_get_rules_setup_status until it finishes and report the result.
-9. Everything you create is marked LS-AI in LedgerSync for review. If the user wants it removed, use ledgersync_undo_rules_setup.`} />
+5. Give every rule a vendor the same way: one of the client's vendors for a client rule, one of the firm's vendors for a global rule, or a new one you say is new. The rule puts it on each transaction it fills as the payee, and the firm can accept a transaction only when it has a payee.
+6. For each rule, ask the user whether it is for this client only (client rule) or for every client of the firm (global rule). Suggest global for vendors that mean the same for every client, such as bank fees, software or fuel.
+7. For a global rule, check whether this client links one of its own categories to the rule's firm category (ledgersync_list_setup_categories, kind firm: mapped_here). If not, offer to link one in the same preview (mappings). Linked, the transactions use the GL code of the client's category (the firm category's, if the client's category has none); not linked, the firm category's GL code. The category name stays the firm's either way.
+8. Follow the firm's naming pattern for rule names; you can see it in the existing rules.
+9. Preview with ledgersync_preview_rules_setup (up to 100 rules at a time). Show the user what will be created, how many transactions each rule fills for this client and for other clients, and every warning.
+10. Only after the user says yes, call ledgersync_apply_rules_setup. Then follow ledgersync_get_rules_setup_status until it finishes and report the result.
+11. Everything you create is marked LS-AI in LedgerSync for review. If the user wants it removed, use ledgersync_undo_rules_setup.`} />
 </div>
 
 </AiStep>
@@ -85,13 +87,14 @@ anything.
 ## What happens next
 
 1. The AI checks that the client is a Manual client. It reads what the client already has: its categories,
-   vendors and rules. It also reads your firm's global categories and global rules.
+   vendors and rules. It also reads your firm's global categories, global vendors and global rules.
 2. It reads the client's waiting transactions that no rule has filled yet. It groups them by their bank text,
    largest groups first.
-3. For each group, it proposes a rule: the words to look for in the bank text, a category and, if you want one, a
-   vendor. It uses the categories and vendors you have, or proposes new ones and tells you they are new. It names
-   the rules like your existing ones. When it is not sure, it asks you.
-4. For each rule, it asks you: is it for this client only, or for every client of your firm?
+3. For each group, it proposes a rule: the words to look for in the bank text, a category and a vendor. It uses the
+   categories and vendors you have, or proposes new ones and tells you they are new. It names the rules like your
+   existing ones. When it is not sure, it asks you.
+4. For each rule, it asks you: is it for this client only, or for every client of your firm? For a global rule, when
+   the client has no category linked to the global category yet, it offers to link one.
 5. It shows you a preview: what would be created, how many waiting transactions each rule would fill for this
    client and for your other clients, and every warning. Nothing has changed yet.
 6. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right.
@@ -126,7 +129,7 @@ has its own preview and needs your yes.
 
 **Give each rule a vendor.** A rule puts its vendor on each transaction it fills, as the payee. In LedgerSync you can
 accept a transaction only when it has a payee, so for a rule without a vendor you add the payee yourself before you
-accept. Ask the AI for a vendor on every rule. For example: *Use Shell as the vendor.*
+accept. The AI gives every rule a vendor. To pick one yourself, tell the AI. For example: *Use Shell as the vendor.*
 
 </AiNote>
 
@@ -139,7 +142,7 @@ client, such as bank fees, software or fuel. You decide.
 | --- | --- | --- |
 | Works for | This client only | Every client of your firm |
 | Puts the transaction in | One of the client's categories | One of your firm's global categories |
-| Vendor, if any | One of the client's vendors | One of your firm's global vendors |
+| Payee | One of the client's vendors | One of your firm's global vendors |
 | Fills when it is saved | This client's waiting transactions | This client's waiting transactions, and the ones at your other Manual clients |
 | After that | This client's new transactions | New transactions at every client of your firm |
 
@@ -169,7 +172,7 @@ click **Save**.
 ## What LedgerSync saves
 
 - The rules. Each one looks for words in the bank text (contains, doesn't contain or is exactly), for money in,
-  money out or both. It puts a category on the transaction and, if you chose one, a vendor as the payee.
+  money out or both. It puts a category on the transaction and its vendor as the payee.
 - New categories and vendors, for the client or for your firm (global).
 - Links between one of the client's categories and a global category, where the client has no link for either one
   yet.
