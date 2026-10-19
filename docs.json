@@ -62,6 +62,7 @@
               "ai/setup-grok-bot",
               "ai/convert-statement",
               "ai/quickbooks-bookkeeping",
+              "ai/rules-setup",
               "ai/troubleshooting",
               "ai/desktop-app"
             ]

@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (31 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (40 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -63,7 +63,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">31</span>
+## Tools <span className="lsai-badge">40</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -96,11 +96,20 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_preview_quickbooks_push` | Checks up to 100 transactions with the categories and payees the AI picked, and shows what would be posted to QuickBooks | No |
 | `ledgersync_push_to_quickbooks` | Posts a previewed set of transactions into the client's QuickBooks | Yes |
 | `ledgersync_get_quickbooks_push_status` | What a QuickBooks push posted, skipped or failed, and why | No |
+| `ledgersync_get_rules_setup` | Can a client's rules be set up (Manual clients for now); counts of its categories, vendors, rules and waiting transactions; can you make global rules; the limits; the client's last setups | No |
+| `ledgersync_list_setup_categories` | A client's categories or the firm's global categories, with GL codes, links and the LS-AI mark | No |
+| `ledgersync_list_setup_vendors` | A client's vendors or the firm's global vendors, with the LS-AI mark | No |
+| `ledgersync_list_rules` | A client's rules or the firm's global rules, with conditions, category, vendor and the LS-AI mark | No |
+| `ledgersync_list_uncategorized_transactions` | A client's waiting transactions that no rule fills, grouped by bank text, largest groups first | No |
+| `ledgersync_preview_rules_setup` | Checks up to 100 rules with their new categories, links and vendors, and counts what each rule would fill for the client and at the firm's other clients | No |
+| `ledgersync_apply_rules_setup` | Saves a previewed rules setup and fills the waiting transactions, in the background | Yes |
+| `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created and filled; what failed and why | No |
+| `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove and keep; after a yes, undoes it | Yes |
 | `ledgersync_get_desktop_app_status` | Is the desktop app linked and connected (live only) | No |
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
 <AccordionGroup>
-  <Accordion title="Tool details: refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions, QuickBooks bookkeeping">
+  <Accordion title="Tool details: refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions, QuickBooks bookkeeping, rules setup">
     - `ledgersync_get_account_status` also says whether the connection is full or read-only. Refreshes left
       is your firm's shared daily budget, not the per-app cap.
     - When `access.status` is `active`, `ledgersync_get_account_status` also names the firm and the login the
@@ -279,9 +288,103 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - The instructions on [Bookkeeping into QuickBooks](/ai/quickbooks-bookkeeping) are also an MCP prompt,
       `quickbooks_bookkeeping` ("Bookkeeping into QuickBooks"), with optional `client` and `period` arguments.
       Claude Code lists it as a command.
+    - Rules setup lets the AI create a client's categorization rules in LedgerSync, with the new categories,
+      category links and vendors they need, after the user approves a preview. It works for Manual clients now.
+      For any other client, `ledgersync_get_rules_setup` answers `supported: false` with the reason in its
+      `next_step`, and a preview is refused with `invalid_request`; for a QuickBooks client, the `next_step` points
+      to the QuickBooks bookkeeping tools. See
+      [Set up rules for a client](/ai/rules-setup). An AI app connected before these tools came out must load the
+      new tool list first: reconnect in Claude, click **Refresh** in ChatGPT or reauthenticate in Grok, then start a
+      new chat (see Tool updates below).
+    - `ledgersync_get_rules_setup` takes the `client_id` and returns the client's `platform`, whether rules setup is
+      `supported` for it, `counts` (the client's and the firm's categories and how many have a GL code, their
+      vendors and rules, and the client's waiting transactions: all of them, the ones no rule holds, and the ones
+      an existing rule matches), `can_create_global_rules`, the `limits` and the client's last setups (`setup_id`,
+      `status`, `created_at`). Its `next_step` gives the AI the next steps, or says why the client is not
+      supported.
+    - `ledgersync_list_setup_categories` lists the client's categories (`kind: "client"`, ids `cat_c_...`, with
+      their `gl_code` and the global category each is linked to, `firm_category`) or the firm's global categories
+      (`kind: "firm"`, ids `cat_f_...`, with their `gl_code`, the client's category linked to it, `mapped_here`, and
+      how many clients link it, `clients_mapped`), narrowed by `query` (a name or GL code), 50 at a time by default
+      (up to 100).
+    - `ledgersync_list_setup_vendors` lists the client's vendors (`kind: "client"`, ids `ven_c_...`) or the firm's
+      global vendors (`kind: "firm"`, ids `ven_f_...`, with their `aliases`), narrowed by `query`, a page at a
+      time.
+    - `ledgersync_list_rules` lists the client's rules (`scope: "client"`, ids `rul_c_...`) or the firm's global
+      rules (`scope: "global"`, ids `rul_g_...`), narrowed by `query`, a page at a time. Each rule has `enabled`,
+      `priority`, `direction` (`money_in`, `money_out` or `both`), `match` (`all` or `any`), `rule_type`,
+      `conditions` (`field`, `operator`, `value`), `category` (`id`, `name`, `gl_code`), `payee` (`id`, `name`)
+      and `ai_generated`.
+    - Each category, vendor and rule that a rules setup created or linked carries `ai` (`setup_id`, `reviewed`):
+      the LS-AI mark.
+    - `ledgersync_list_uncategorized_transactions` lists the client's waiting transactions that no rule holds and
+      nobody categorized (not pending and not excluded), grouped by bank text, largest groups first, 50 groups at a
+      time by default (up to 100), between optional `from` and `to` dates, and only money in or money out when
+      `direction` is given. Each group has the bank text (`description`), `count`, `money_in`, `money_out`,
+      `total`, `first_date`, `last_date`, `sources`, up to 3 `examples` and, when an existing rule would already
+      fill it, `matched_by_rule`. `total_groups` and `total_rows` count everything.
+    - `ledgersync_preview_rules_setup` takes the `client_id` and up to 100 `rules`, 50 `firm_categories`, 50
+      `client_categories`, 100 `mappings` and 100 `vendors`. The AI gives each new rule, category and vendor a
+      `ref` (lowercase letters, digits, `_` or `-`, up to 32 characters, unique in the preview). An item points at
+      an existing object with `{"id": "..."}`, or at a new one in the same preview with `{"ref": "..."}`. A rule
+      has a `scope` (client or global), a `name`, a `direction`, a `match` (all or any), 1 to 5 `conditions` on
+      the bank text (an `operator` and a `value`), a `category` and an optional `payee`: a client category and
+      vendor for a client rule, a global category and vendor for a global rule. A mapping links a firm (global)
+      category to a client category. A vendor has a `scope` too.
+    - The preview writes nothing. For each rule it returns whether it is OK or refused, how many waiting
+      transactions it fills for this client (`fills_here`, with `examples`) and at the firm's other Manual clients
+      (`fills_other_clients`, at `other_clients` clients), and its `warnings` (`code`, `message`). It also returns
+      every refused item with its code and reason (and, for a name that is taken, `existing_id`: the id of the
+      category, vendor or rule that has it), the totals and, when at least one item is OK, a `confirmation_id`.
+    - A rule's warnings say when it fills nothing here or elsewhere, when some of its transactions go to a stronger
+      rule it names (an existing rule, an earlier proposed rule or, for a global rule, any proposed client rule),
+      when it shares transactions with other proposed rules, when its words
+      are found inside longer words, when it fills more than half of the client's waiting transactions or more
+      than 200 at other clients, when its category has no GL code, and, for a global rule, when this client has no
+      category linked to the global category (the global category's GL code is then used).
+    - An item is refused when: it is global and the login lacks the **Manage Global Rules** permission; a `ref` is
+      repeated or unknown; an `id` is unknown or not the client's or the firm's; a name is empty, too long, already
+      taken (a category or vendor whose name is taken comes back with `existing_id`, the id of the one that already
+      has it, so the AI can use it instead; a rule whose name is taken needs another name) or twice in the preview;
+      a global category is named like a GL code the firm already uses; a GL code is too long; a rule uses the wrong
+      kind of category or vendor; a link clashes with an existing one; a condition is invalid, or none of them looks
+      for words; LedgerSync's rule checks block the rule (the message says why); or it depends on a refused item.
+      Refused rules are left out of the counts.
+    - The preview's answer fits in 20,000 characters. When it would not, the preview leaves out the examples
+      first, then the warning messages (the codes stay), then the refused items' messages (the codes stay), then
+      some of the rules and refused items (counted in `more_rules` and `more_refused`), and says what it left out.
+      The summary and the totals always cover everything.
+    - `ledgersync_apply_rules_setup` takes only the `confirmation_id` and saves what the preview accepted, in the
+      background. It returns a `setup_id` (`rsu_...`) and the status. LedgerSync first checks every item again: an
+      item that is no longer valid fails with its reason, and a category or vendor whose name now exists is used
+      instead of a new one. Then it fills the client's waiting transactions that no rule holds and nobody
+      categorized, with the same rule order as for new transactions (the client's rules first, existing ones before
+      new ones). When the setup made global rules, it also fills the waiting transactions at the firm's other
+      Manual clients that one of those rules now wins. Calling it again with the same confirmation returns the
+      first answer and never applies twice.
+    - `ledgersync_get_rules_setup_status` takes the `client_id` and the `setup_id` and says where the setup is
+      (queued, running, done, done with some failed items, failed, being undone, undone, or undo failed), with its
+      phase and progress. A finished setup also gives what it created by type, how many transactions it filled for
+      the client, how many the existing rules filled, how many it filled at other clients and at how many clients,
+      and each failed item with its reason.
+    - `ledgersync_undo_rules_setup` takes the `client_id`, the `setup_id` and an optional `undo_id`. Without an
+      `undo_id`, it writes nothing: it says how many rules it would delete, how many waiting transactions it would
+      clear and at how many clients, how many links it would put back, and which created items it would delete or
+      keep (in use). It returns an `undo_id` that works for 15 minutes, only for the person and the AI app that
+      asked. Called again with that `undo_id`, it undoes the setup: it deletes the setup's rules and clears only
+      the For review transactions they hold, puts the links back, then deletes the created vendors and categories
+      that nothing uses. Categorized transactions are never touched. A setup can be undone once it has stopped:
+      done, done with some failed items, or failed (the undo then removes what it saved before it stopped), and
+      again after a failed undo. While another setup of the firm is running or being undone, the call with the
+      `undo_id` is refused with `invalid_request`: try it again when that one finishes.
+    - A rules setup apply or undo that got no clear answer from LedgerSync comes back as `upstream_unknown`,
+      naming the setup: check `ledgersync_get_rules_setup_status` before trying again.
+    - The instructions on [Set up rules for a client](/ai/rules-setup) are also an MCP prompt, `rules_setup`
+      ("Set up rules for a client"), with optional `client` and `focus` arguments. Claude Code lists it as a
+      command.
   </Accordion>
 
-  <Accordion title="Security: bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview">
+  <Accordion title="Security: bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview, rules saved only after a preview">
     - Bank sign-ins never happen in the chat. The account holder picks the bank on a LedgerSync page and signs
       in there, or on the bank-data partner's secure page it opens for some banks. Connect links expire after
       72 hours.
@@ -328,9 +431,16 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       Grok, ask it to wait for your yes.
     - Each person posts to QuickBooks only for the clients they see in the LedgerSync app: an employee, the
       clients assigned to them.
+    - Nothing is saved by a rules setup without a preview. `ledgersync_apply_rules_setup` takes only the preview's
+      `confirmation_id`, which works for 30 minutes and only for the person and the AI app that made it, and saves
+      only what the preview accepted. It and `ledgersync_undo_rules_setup` are marked as changing data, so Claude
+      and ChatGPT ask before they run. In Grok, ask it to wait for your yes.
+    - Each person sets up rules only for the clients they see in the LedgerSync app: an employee, the clients
+      assigned to them. Global rules, global categories and global vendors also need the **Manage Global Rules**
+      permission.
   </Accordion>
 
-  <Accordion title="Refreshes and limits: 50 AI refreshes a day on live, 20 on sandbox, 300 client messages a day per firm on live, 60 QuickBooks pushes a day per AI app, per-minute and per-hour caps">
+  <Accordion title="Refreshes and limits: 50 AI refreshes a day on live, 20 on sandbox, 300 client messages a day per firm on live, 60 QuickBooks pushes a day per AI app, 30 rules setups a day per AI app, per-minute and per-hour caps">
     - LedgerSync refreshes every working connection about once a day. A refresh you ask for takes a few
       minutes; see [Keeping data fresh](/guides/data-freshness).
     - A connection refreshed in the last 30 minutes is skipped unless you ask for a new pull anyway.
@@ -369,6 +479,19 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - QuickBooks pushes: LedgerSync sends a few at a time, shared by every firm. A push past that is refused as
       busy (`rate_limit_exceeded`, "Another push is running; try again in a minute."), is not counted, and can be
       sent again a minute later with the same `confirmation_id`.
+    - Rules setup: one preview takes up to 100 rules, 50 new global categories, 50 new client categories, 100
+      category links and 100 new vendors (client and firm vendors together). Per connected AI app: 60 previews an
+      hour, 30 applies a day and 10 undos a day; an apply counts only when it reaches LedgerSync. A preview's
+      confirmation works for 30 minutes, an apply's answer is kept for 24 hours, and an undo check works for 15
+      minutes.
+    - Rules setup conditions and names: a rule has 1 to 5 conditions on the bank text, each 1 to 200 characters,
+      at least one of them contains or is exactly; no amount conditions. Names: a client rule up to 100 characters, a global rule 64, a
+      global category 100, a client category 64, a client vendor 80, a global vendor 64 and a GL code 64.
+    - Rules setup applies: LedgerSync takes a few at a time, shared by every firm. An apply past that is refused as
+      busy, is not counted, and can be sent again a minute later with the same `confirmation_id`. A firm runs one
+      setup at a time; the next one waits until the one before it finishes. An undo does not wait: while another
+      setup of the firm is running or being undone, it is refused with `invalid_request`, and can be sent again when
+      that one finishes.
   </Accordion>
 
   <Accordion title="Tool updates: Claude and ChatGPT keep a copy of the tool list, and Grok may too">
@@ -392,7 +515,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     be reached or could not check the firm just now; try again in a minute. After saving a template, list the
     templates first: it may already be saved). A QuickBooks push that got no clear answer from LedgerSync comes
     back as `upstream_unknown`, with its `push_id`: check `ledgersync_get_quickbooks_push_status` before pushing
-    again.
+    again. A rules setup apply or undo that got no clear answer comes back as `upstream_unknown` too, naming the
+    setup: check `ledgersync_get_rules_setup_status` before trying again.
 
     | Code | What it means | What to do |
     | --- | --- | --- |
