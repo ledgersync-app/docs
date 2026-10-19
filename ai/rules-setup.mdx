@@ -152,15 +152,19 @@ client, such as bank fees, software or fuel. You decide.
 A global rule puts the transaction in one of your firm's global categories. Each client can link one of its own
 categories to that global category:
 
-- **Linked:** LedgerSync shows and exports the client's own category and its GL code.
+- **Linked:** LedgerSync uses the GL code of the client's own category, in the app and in the exports. The category
+  name stays the global one, shown with that GL code in front. If the client's category has no GL code, LedgerSync
+  uses the global one.
 - **Not linked:** LedgerSync uses the global category and its GL code.
 
 To link them, ask the AI. For example: *Link our global category Fuel to Acme's category Auto Fuel.* The AI adds the
 link to the preview, and LedgerSync saves it after your yes, marked LS-AI. A link works when the client has no link
 yet for that global category, and the client's category is not linked to another global category.
 
-You can also link them in the LedgerSync app: **Rules Engine**, **Manual**, then **Settings**, **Initial Setup**,
-**Categories Mapping**.
+You can also link them in the LedgerSync app. Click **Rules Engine**, then **Manual**. In the menu on the left, click
+**Settings**, then **Initial Setup**, then **Categories Mapping**. This opens the list of global categories. Click
+the global category. Under **Connect Client Categories**, pick the client's category next to the client's name, then
+click **Save**.
 
 ## What LedgerSync saves
 
@@ -195,7 +199,7 @@ Changed your mind? Ask the AI to undo the setup. For example: *Undo the rules se
    and why. Nothing has changed yet.
 2. You say yes. Claude and ChatGPT also ask you to allow it.
 3. LedgerSync deletes the rules the setup made. It takes their category and payee off the waiting transactions they
-   filled.
+   filled, even a payee or category you changed yourself on one of them.
 4. It undoes the category links the setup made.
 5. It deletes the categories and vendors the setup made, unless something uses them now, such as another rule, a
    transaction or a linked category. Those stay, and the AI tells you which.
@@ -247,7 +251,7 @@ transactions a global rule would fill.
 | The words are found inside longer words | For example, *Shell* also matches *Shellfish Grill*. Check the examples. If they are wrong, ask the AI for more specific words. |
 | A rule is very broad | It fills more than half of this client's waiting transactions, or more than 200 at your other clients. Make sure it is not too general. |
 | The category has no GL code | The transactions it fills get a category with no GL code. Pick a category that has one, or go ahead if that is fine. |
-| The client has no category linked to the global category | The transactions get the global category and its GL code. To use one of the client's categories instead, ask the AI to link it in the same setup. |
+| The client has no category linked to the global category | The transactions get the global category and its GL code. To use the GL code of one of the client's categories instead, ask the AI to link it in the same setup. |
 | Some items were refused in the preview | The AI says why for each one. Answer its questions, or leave them out, and ask it to preview again. Nothing has changed yet. |
 | Some items failed | The AI says which ones and why. The rest was saved. Fix the reason, then ask the AI to preview the missing ones again. |
 
