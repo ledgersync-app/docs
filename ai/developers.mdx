@@ -96,15 +96,15 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_preview_quickbooks_push` | Checks up to 100 transactions with the categories and payees the AI picked, and shows what would be posted to QuickBooks | No |
 | `ledgersync_push_to_quickbooks` | Posts a previewed set of transactions into the client's QuickBooks | Yes |
 | `ledgersync_get_quickbooks_push_status` | What a QuickBooks push posted, skipped or failed, and why | No |
-| `ledgersync_get_rules_setup` | Can a client's rules be set up (Manual clients for now); counts of its categories, vendors, rules and waiting transactions; can you make global rules; the limits; the client's last setups | No |
-| `ledgersync_list_setup_categories` | A client's categories or the firm's global categories, with GL codes, links and the LS-AI mark | No |
-| `ledgersync_list_setup_vendors` | A client's vendors or the firm's global vendors, with the LS-AI mark | No |
-| `ledgersync_list_rules` | A client's rules or the firm's global rules, with conditions, category, vendor and the LS-AI mark | No |
-| `ledgersync_list_uncategorized_transactions` | A client's waiting transactions that no rule fills, grouped by bank text, largest groups first | No |
-| `ledgersync_preview_rules_setup` | Checks up to 100 rules with their new categories, links and vendors, and counts what each rule would fill for the client and at the firm's other clients | No |
-| `ledgersync_apply_rules_setup` | Saves a previewed rules setup and fills the waiting transactions, in the background | Yes |
-| `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created and filled; what failed and why | No |
-| `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove and keep; after a yes, undoes it | Yes |
+| `ledgersync_get_rules_setup` | Can a client's rules be set up (Manual and QuickBooks Online clients); counts of its categories, vendors, rules and waiting transactions; for a QuickBooks client, its QuickBooks connection and the transactions waiting for a link; can you make global rules; the limits; the client's last setups | No |
+| `ledgersync_list_setup_categories` | A client's categories or the firm's global categories, with GL codes (Manual), links, a suggested link for each global category the client does not link, and the LS-AI mark | No |
+| `ledgersync_list_setup_vendors` | A client's vendors (and, for a QuickBooks client, its customers) or the firm's global vendors, with the LS-AI mark | No |
+| `ledgersync_list_rules` | A client's rules or the firm's global rules, with conditions, category, payee and the LS-AI mark | No |
+| `ledgersync_list_uncategorized_transactions` | A client's waiting transactions that no rule fills, grouped by bank text, largest groups first, and, at a QuickBooks client, the groups a global rule would file once a category is linked | No |
+| `ledgersync_preview_rules_setup` | Checks up to 100 rules with their new categories, links and vendors, and counts what each rule would fill for the client and at the firm's other clients; at a QuickBooks client, also what waits for a link and which other clients need one | No |
+| `ledgersync_apply_rules_setup` | Saves a previewed rules setup and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks | Yes |
+| `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created (in QuickBooks too) and filled; what failed and why | No |
+| `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove and keep (what it created in QuickBooks stays); after a yes, undoes it | Yes |
 | `ledgersync_get_desktop_app_status` | Is the desktop app linked and connected (live only) | No |
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
@@ -289,32 +289,66 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `quickbooks_bookkeeping` ("Bookkeeping into QuickBooks"), with optional `client` and `period` arguments.
       Claude Code lists it as a command.
     - Rules setup lets the AI create a client's categorization rules in LedgerSync, with the new categories,
-      category links and vendors they need, after the user approves a preview. It works for Manual clients now.
-      For any other client, `ledgersync_get_rules_setup` answers `supported: false` with the reason in its
-      `next_step`, and a preview is refused with `invalid_request`; for a QuickBooks client, the `next_step` points
-      to the QuickBooks bookkeeping tools. See
+      category links and vendors they need, after the user approves a preview. It works for Manual and QuickBooks
+      Online clients. For a client on another accounting app, such as Zoho Books, `ledgersync_get_rules_setup`
+      answers `supported: false` with the reason in its `next_step`, and a preview is refused with
+      `invalid_request`. See
       [Set up rules for a client](/ai/rules-setup). An AI app connected before these tools came out must load the
       new tool list first: reconnect in Claude, click **Refresh** in ChatGPT or reauthenticate in Grok, then start a
       new chat (see Tool updates below).
+    - For a QuickBooks client, a client rule files to one of the client's QuickBooks categories and pays one of its
+      QuickBooks vendors or customers, never an employee. A global rule files to a firm category through the
+      client's category linked to it: without a link, its transactions wait with the "map this category" badge. The
+      client's new categories and vendors are created in its QuickBooks when the setup runs, after the yes. A
+      category or vendor QuickBooks already has with that name is used instead (a category only when it is top level
+      and of the same type), and a deactivated one is never turned back on. A new client category needs an
+      `account_type` (a QuickBooks account type, such as `Expense`) and is created at the top level. LedgerSync keeps
+      no GL codes for QuickBooks: a `gl_code` sent with a new category is ignored.
     - `ledgersync_get_rules_setup` takes the `client_id` and returns the client's `platform`, whether rules setup is
       `supported` for it, `counts` (the client's and the firm's categories and how many have a GL code, their
       vendors and rules, and the client's waiting transactions: all of them, the ones no rule holds, and the ones
       an existing rule matches), `can_create_global_rules`, the `limits` and the client's last setups (`setup_id`,
       `status`, `created_at`). Its `next_step` gives the AI the next steps, or says why the client is not
-      supported.
+      supported. `counts` also says how many global categories the client does not link
+      (`firm_categories_not_linked`) and how many waiting transactions a global rule matches but cannot file for
+      lack of a link (`waiting_on_link`, always 0 for a Manual client). For a QuickBooks client,
+      `quickbooks_connection` says whether its QuickBooks connection works (`connected` or `broken`). When it is
+      broken, the `next_step` says to reconnect QuickBooks.
     - `ledgersync_list_setup_categories` lists the client's categories (`kind: "client"`, ids `cat_c_...`, with
       their `gl_code` and the global category each is linked to, `firm_category`) or the firm's global categories
       (`kind: "firm"`, ids `cat_f_...`, with their `gl_code`, the client's category linked to it, `mapped_here`, and
       how many clients link it, `clients_mapped`), narrowed by `query` (a name or GL code), 50 at a time by default
       (up to 100).
+    - A QuickBooks client's categories are its active QuickBooks categories, each with its `account_type`, its
+      `full_name` when that differs from its name (a sub-account's includes its parents), and no GL code. A link on
+      a deactivated category still shows in `mapped_here`, flagged with `active: false`.
+    - Global categories come in this order: the ones the client does not link that the firm's enabled global rules
+      use (`used_by_enabled_global_rules` counts those rules), then the other ones it does not link, then the
+      linked ones. Each one the client does not link carries a suggested link, `link_suggestion`: a `level` (`a`:
+      the client's booked transactions decide it; `b`: a best guess from the same name, or from the name the
+      firm's other clients link it to, with how many clients; `c`: nothing to go on), up to 5 `candidates` and the
+      client's categories that cannot take the link, `unavailable`. A candidate has its `id`, `name`, `full_name`,
+      `account_type` and `level`, and its evidence: `booked_rows` (with up to 3 `examples`), `same_name` (`exact`,
+      `leaf` or `contains`) and `firm_clients_linking_same_name`. An unavailable category has a `reason`:
+      `linked_elsewhere` (to the global category in `linked_to_firm_category`) or `inactive`. A candidate whose
+      `same_name` is `contains` is only an option, unless the client's booked transactions or the firm's links at
+      its other clients make it the suggestion: the first candidate at level `a` or `b`. This works for Manual
+      clients too. A page too long for one answer leaves out the examples first, then all but the first candidate,
+      counting the rest in `more_candidates` and `more_unavailable`.
     - `ledgersync_list_setup_vendors` lists the client's vendors (`kind: "client"`, ids `ven_c_...`) or the firm's
       global vendors (`kind: "firm"`, ids `ven_f_...`, with their `aliases`), narrowed by `query`, a page at a
-      time.
+      time. For a QuickBooks client, `kind: "client"` also lists its QuickBooks customers (ids `cus_c_...`), read
+      live from QuickBooks. Each row has a `type`: `vendor` or `customer`. When QuickBooks cannot be read, for
+      example because the connection is broken, the answer says the customers are missing
+      (`customers_unavailable: true`). Its `next_step` then says to reconnect QuickBooks only when
+      `quickbooks_connection` is broken, and otherwise to list them again in a few minutes.
     - `ledgersync_list_rules` lists the client's rules (`scope: "client"`, ids `rul_c_...`) or the firm's global
       rules (`scope: "global"`, ids `rul_g_...`), narrowed by `query`, a page at a time. Each rule has `enabled`,
       `priority`, `direction` (`money_in`, `money_out` or `both`), `match` (`all` or `any`), `rule_type`,
-      `conditions` (`field`, `operator`, `value`), `category` (`id`, `name`, `gl_code`), `payee` (`id`, `name`)
-      and `ai_generated`.
+      `conditions` (`field`, `operator`, `value`), `category` (`id`, `name`, `gl_code`), `payee` (`id`, `name`,
+      `type`) and `ai_generated`. A payee's `type` is `vendor`, `customer` or `employee` (an employee has no `id`).
+      A QuickBooks client rule split across several categories shows its first one, and how many more lines it has
+      (`more_lines`).
     - Each category, vendor and rule that a rules setup created or linked carries `ai` (`setup_id`, `reviewed`):
       the LS-AI mark.
     - `ledgersync_list_uncategorized_transactions` lists the client's waiting transactions that no rule holds and
@@ -322,26 +356,48 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       time by default (up to 100), between optional `from` and `to` dates, and only money in or money out when
       `direction` is given. Each group has the bank text (`description`), `count`, `money_in`, `money_out`,
       `total`, `first_date`, `last_date`, `sources`, up to 3 `examples` and, when an existing rule would already
-      fill it, `matched_by_rule`. `total_groups` and `total_rows` count everything.
+      fill it, `matched_by_rule`. `total_groups` and `total_rows` count everything. At a QuickBooks client, a group
+      that a global rule matches but cannot file, because the client has no category linked to the rule's global
+      category, says so in `waiting_on_link` and names that global category (`firm_category_id`,
+      `firm_category_name`). It has no `firm_category_id` when the global rule has no global category: no link
+      helps then, only fixing that rule in the LedgerSync app or a new rule.
     - `ledgersync_preview_rules_setup` takes the `client_id` and up to 100 `rules`, 50 `firm_categories`, 50
       `client_categories`, 100 `mappings` and 100 `vendors`. The AI gives each new rule, category and vendor a
       `ref` (lowercase letters, digits, `_` or `-`, up to 32 characters, unique in the preview). An item points at
       an existing object with `{"id": "..."}`, or at a new one in the same preview with `{"ref": "..."}`. A rule
       has a `scope` (client or global), a `name`, a `direction`, a `match` (all or any), 1 to 5 `conditions` on
-      the bank text (an `operator` and a `value`), a `category` and an optional `payee`: a client category and
-      vendor for a client rule, a global category and vendor for a global rule. A mapping links a firm (global)
-      category to a client category. A vendor has a `scope` too.
-    - The preview writes nothing. For each rule it returns whether it is OK or refused, how many waiting
-      transactions it fills for this client (`fills_here`, with `examples`) and at the firm's other Manual clients
+      the bank text (an `operator` and a `value`), a `category` and an optional `payee`: a client category and a
+      client vendor (or, at a QuickBooks client, a customer, `cus_c_...`) for a client rule, a global category and
+      vendor for a global rule. A mapping links a firm (global) category to a client category: up to 100 in one
+      preview, so all of a client's missing links can go in one. A vendor has a `scope` too.
+    - The preview writes nothing. It returns the client's `platform` (`manual` or `quickbooks`). For each rule it
+      returns whether it is OK or refused, how many waiting transactions it fills for this client (`fills_here`,
+      with `examples`) and at the firm's other clients on the same platform, Manual or QuickBooks
       (`fills_other_clients`, at `other_clients` clients), and its `warnings` (`code`, `message`). It also returns
-      every refused item with its code and reason (and, for a name that is taken, `existing_id`: the id of the
-      category, vendor or rule that has it), the totals and, when at least one item is OK, a `confirmation_id`.
+      the categories, links and vendors it keeps, in `items` (`ref`, `type`, `name` and `action`: `create`, `link`
+      or `reuse`, with `existing_id` for one it reuses), every refused item with its `name`, code and reason (and,
+      for a name that is taken, `existing_id`: the id of the category, vendor or rule that has it), the totals and,
+      when at least one item is OK, a `confirmation_id`.
+    - At a QuickBooks client, each global rule also says how many of its transactions would wait for a link here
+      (`waiting_on_link_here`) and at the firm's other QuickBooks clients (`waiting_on_link_other_clients`), and how
+      many other clients need a link (`clients_needing_link_count`, named or not). Each is left out when it is 0.
+      Those clients are named once for the whole preview, not per rule, in `clients_needing_link`, one entry per
+      global category: its `firm_category` (the `id`, or the `ref` and `name` of a new one), the `rules` (refs)
+      that need the link and the `clients` (`client_id`, `name`), only clients the person can see, up to 20 per
+      global category (fewer when the answer is trimmed), the names left out of that list counted in `more_named`.
+      LedgerSync names at most 20 clients per rule, so a client that no rule names (past those 20, or one the
+      person cannot see) is counted only in the rules' `clients_needing_link_count`, not in `more_named`. A link in
+      `items` has `fills_here`: how many waiting transactions the firm's existing global rules would fill here once
+      it is saved.
+      `summary.create_in_quickbooks` counts the new categories and vendors the client's QuickBooks would get.
     - A rule's warnings say when it fills nothing here or elsewhere, when some of its transactions go to a stronger
       rule it names (an existing rule, an earlier proposed rule or, for a global rule, any proposed client rule),
       when it shares transactions with other proposed rules, when its words
       are found inside longer words, when it fills more than half of the client's waiting transactions or more
-      than 200 at other clients, when its category has no GL code, and, for a global rule, when this client has no
-      category linked to the global category (the global category's GL code is then used).
+      than 200 at other clients, when its category has no GL code (Manual clients only), and, for a global rule,
+      when this client has no category linked to the global category. At a Manual client, the global category's GL
+      code is then used. At a QuickBooks client, the transactions wait with the "map this category" badge, and a rule
+      whose transactions only wait for a link is not reported as filling nothing.
     - An item is refused when: it is global and the login lacks the **Manage Global Rules** permission; a `ref` is
       repeated or unknown; an `id` is unknown or not the client's or the firm's; a name is empty, too long, already
       taken (a category or vendor whose name is taken comes back with `existing_id`, the id of the one that already
@@ -350,33 +406,59 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       kind of category or vendor; a link clashes with an existing one; a condition is invalid, or none of them looks
       for words; LedgerSync's rule checks block the rule (the message says why); or it depends on a refused item.
       Refused rules are left out of the counts.
+    - At a QuickBooks client, an item is also refused when: a new name belongs to a deactivated category or vendor,
+      to a category of another type or under another category, or to one of the client's customers; a new
+      category has no QuickBooks account type, or `:` in its name; a rule or a link uses a deactivated category; a
+      client rule pays a deactivated vendor; a bank text holds `%`, `_` or `\`; a payee is an employee, or a
+      customer on a global rule; or it needs QuickBooks (a new client category, a new client vendor or a customer
+      payee) while QuickBooks cannot be reached (`quickbooks_broken`): the connection is broken, or QuickBooks could
+      not be read just now, and the message says which. The `next_step` says to reconnect QuickBooks only for a
+      broken connection, and otherwise to preview again in a few minutes.
     - The preview's answer fits in 20,000 characters. When it would not, the preview leaves out the examples
-      first, then the warning messages (the codes stay), then the refused items' messages (the codes stay), then
-      some of the rules and refused items (counted in `more_rules` and `more_refused`), and says what it left out.
-      The summary and the totals always cover everything.
+      first, then all but 5 of the clients named for each global category (counted in `more_named`), then the
+      warning messages (the codes stay), then the refused items' messages (the codes stay), then those names
+      altogether, then some of the rules, items and refused items (counted in `more_rules`, `more_items` and
+      `more_refused`), and says what it left out. The summary, the totals and each rule's counts always cover
+      everything.
     - `ledgersync_apply_rules_setup` takes only the `confirmation_id` and saves what the preview accepted, in the
       background. It returns a `setup_id` (`rsu_...`) and the status. LedgerSync first checks every item again: an
       item that is no longer valid fails with its reason, and a category or vendor whose name now exists is used
       instead of a new one. Then it fills the client's waiting transactions that no rule holds and nobody
       categorized, with the same rule order as for new transactions (the client's rules first, existing ones before
       new ones). When the setup made global rules, it also fills the waiting transactions at the firm's other
-      Manual clients that one of those rules now wins. Calling it again with the same confirmation returns the
-      first answer and never applies twice.
+      clients on the same platform that one of those rules now wins. Calling it again with the same confirmation
+      returns the first answer and never applies twice.
+    - For a QuickBooks client, the setup first creates the client's new categories and vendors in its QuickBooks,
+      then saves the links and rules. At the firm's other QuickBooks clients that do not link a new global rule's
+      category, the transactions it matches get the "map this category" badge. When QuickBooks does not answer or
+      the connection is broken, the setup stays running and tries again every few minutes, 5 runs in all. Then
+      what still needs QuickBooks fails, with `quickbooks_broken` when the connection is broken or refused, or
+      `write_failed` when QuickBooks did not answer, and the setup ends done with some failed items.
     - `ledgersync_get_rules_setup_status` takes the `client_id` and the `setup_id` and says where the setup is
       (queued, running, done, done with some failed items, failed, being undone, undone, or undo failed), with its
       phase and progress. A finished setup also gives what it created by type, how many transactions it filled for
       the client, how many the existing rules filled, how many it filled at other clients and at how many clients,
-      and each failed item with its reason.
+      and each failed item with its reason. It also gives the setup's `platform`. For a QuickBooks client, its
+      `result` also lists the categories and vendors it created in QuickBooks (`created_in_quickbooks`, each with
+      its `type` and `name`), how many transactions the firm's existing global rules filled through its new links
+      (`filled_through_links`) and how many other clients still need a link (`other_clients_needing_link`).
     - `ledgersync_undo_rules_setup` takes the `client_id`, the `setup_id` and an optional `undo_id`. Without an
       `undo_id`, it writes nothing: it says how many rules it would delete, how many waiting transactions it would
       clear and at how many clients, how many links it would put back, and which created items it would delete or
-      keep (in use). It returns an `undo_id` that works for 15 minutes, only for the person and the AI app that
-      asked. Called again with that `undo_id`, it undoes the setup: it deletes the setup's rules and clears only
-      the For review transactions they hold, puts the links back, then deletes the created vendors and categories
-      that nothing uses. Categorized transactions are never touched. A setup can be undone once it has stopped:
-      done, done with some failed items, or failed (the undo then removes what it saved before it stopped), and
-      again after a failed undo. While another setup of the firm is running or being undone, the call with the
-      `undo_id` is refused with `invalid_request`: try it again when that one finishes.
+      keep (in use, or made in QuickBooks). It returns an `undo_id` that works for 15 minutes, only for the person
+      and the AI app that asked. Called again with that `undo_id`, it undoes the setup: it deletes the setup's
+      rules and clears only the For review transactions they hold, puts the links back, then deletes the created
+      vendors and categories that nothing uses. Categorized transactions are never touched. A setup can be undone
+      once it has stopped: done, done with some failed items, or failed (the undo then removes what it saved before
+      it stopped), and again after a failed undo. While another setup of the firm is running or being undone, the
+      call with the `undo_id` is refused with `invalid_request`: try it again when that one finishes.
+    - For a QuickBooks client, the categories and vendors the setup created in QuickBooks are always kept, in
+      QuickBooks and in LedgerSync, and the undo names them: nothing is deleted in QuickBooks. The links the setup
+      made, including the link it gave a category it created, are taken back. The For review transactions the
+      firm's global rules filed through those links, even after the setup, are reset and decided again, so the "map
+      this category" badge comes back where no other rule takes them; the check says how many
+      (`link_filled_rows_to_reset`). A kept item's `reason` is `in_quickbooks` when it was made in QuickBooks, or
+      `in_use`. The badges the setup's global rules left are cleared.
     - A rules setup apply or undo that got no clear answer from LedgerSync comes back as `upstream_unknown`,
       naming the setup: check `ledgersync_get_rules_setup_status` before trying again.
     - The instructions on [Set up rules for a client](/ai/rules-setup) are also an MCP prompt, `rules_setup`
@@ -431,9 +513,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       Grok, ask it to wait for your yes.
     - Each person posts to QuickBooks only for the clients they see in the LedgerSync app: an employee, the
       clients assigned to them.
-    - Nothing is saved by a rules setup without a preview. `ledgersync_apply_rules_setup` takes only the preview's
-      `confirmation_id`, which works for 30 minutes and only for the person and the AI app that made it, and saves
-      only what the preview accepted. It and `ledgersync_undo_rules_setup` are marked as changing data, so Claude
+    - Nothing is saved by a rules setup without a preview, and nothing is created in a client's QuickBooks without
+      one. `ledgersync_apply_rules_setup` takes only the preview's `confirmation_id`, which works for 30 minutes and
+      only for the person and the AI app that made it, and saves only what the preview accepted. It and `ledgersync_undo_rules_setup` are marked as changing data, so Claude
       and ChatGPT ask before they run. In Grok, ask it to wait for your yes.
     - Each person sets up rules only for the clients they see in the LedgerSync app: an employee, the clients
       assigned to them. Global rules, global categories and global vendors also need the **Manage Global Rules**

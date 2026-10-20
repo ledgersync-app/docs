@@ -3,6 +3,39 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-20" tags={["AI connector"]}>
+  ## Set up a QuickBooks client's rules from Claude, ChatGPT and Grok
+
+  Rules setup now works for QuickBooks Online clients too, with the same nine tools. The AI proposes rules for the
+  client's waiting transactions and, after you say yes, LedgerSync saves them and fills the transactions. See
+  [Set up rules for a client](/ai/rules-setup).
+
+  - **All the missing links in one preview.** For each global category the client has no category linked to, the
+    AI proposes a link: from the client's own history (where its past transactions were booked), from a best guess
+    (the same name, or the category your other clients link it to), or it asks you when there is nothing to go on.
+    This works for Manual clients too.
+  - **Why links matter at a QuickBooks client.** A global rule files a QuickBooks client's transaction only through
+    the client's category linked to the global category. Without a link, the transaction waits with the "map this
+    category" badge. The preview says how many transactions each link lets your global rules fill, and names your
+    other QuickBooks clients that still need a link: only the ones you can see in LedgerSync.
+  - **Created in QuickBooks after your yes.** The client's new categories and vendors are created in its
+    QuickBooks before the rules are saved. A name QuickBooks already has is used instead, and a deactivated
+    category or vendor is never turned back on.
+  - **Customers as payees.** A client rule can pay one of the client's QuickBooks customers. Not employees.
+  - **Undo.** It removes the setup's rules and links. The transactions your global rules filed through those links
+    go back to waiting. Categories and vendors created in QuickBooks stay there.
+  - **A broken QuickBooks connection.** Links and rules still work. New categories, new vendors and customers as
+    payees wait until you reconnect QuickBooks.
+  - **Then post them into QuickBooks.** When the setup is done, the AI offers to post the filled transactions with
+    [Bookkeeping into QuickBooks](/ai/quickbooks-bookkeeping).
+  - No new tools. New result fields: the link suggestions on `ledgersync_list_setup_categories`, the customers on
+    `ledgersync_list_setup_vendors`, and the waiting-for-a-link counts and other clients in the preview and the
+    status. See [For developers](/ai/developers).
+  - Your AI keeps working without reconnecting. To get the updated tool descriptions, reconnect in Claude, click
+    **Refresh** in ChatGPT, or reauthenticate in Grok, then start a new chat. See
+    [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+</Update>
+
 <Update label="2026-10-19" tags={["AI connector"]}>
   ## Set up a client's rules from Claude, ChatGPT and Grok
 
