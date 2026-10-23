@@ -76,7 +76,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_get_connection` | Checks one bank connection | No |
 | `ledgersync_list_connections_needing_attention` | Broken connections across all clients, and the firm's own | No |
 | `ledgersync_list_accounts` | A client's accounts with balances | No |
-| `ledgersync_list_transactions` | An account's transactions (last 30 days by default) | No |
+| `ledgersync_list_transactions` | An account's transactions (last 30 days by default); for a Manual or QuickBooks Online client, how many of its transactions have no rule yet | No |
 | `ledgersync_list_statements` | An account's statements | No |
 | `ledgersync_get_statement_download_link` | One-time link to a statement PDF | No |
 | `ledgersync_create_statement_upload_link` | Secure page where you upload a bank statement PDF to turn it into transactions | Yes |
@@ -297,6 +297,13 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       [Set up rules for a client](/ai/rules-setup). An AI app connected before these tools came out must load the
       new tool list first: reconnect in Claude, click **Refresh** in ChatGPT or reauthenticate in Grok, then start a
       new chat (see Tool updates below).
+    - The AI offers rules without being asked. For a Manual or QuickBooks Online client, the first page of
+      `ledgersync_list_transactions` also answers `transactions_without_rule`: how many of the client's transactions
+      no rule and nobody filled yet (all of its accounts and dates, the transactions rules setup works on), when
+      there are any. Its `next_step` then tells the AI to offer rules and, after the user's yes, to call
+      `ledgersync_get_rules_setup`. `ledgersync_list_transactions_to_categorize` offers the same after a push, when
+      a transaction it lists has no rule and no `pending_global_rule`. Neither offers on a read-only connection. In
+      a setup, the AI picks client or global for each rule itself and proposes each rule by name for a yes or no.
     - For a QuickBooks client, a client rule files to one of the client's QuickBooks categories and pays one of its
       QuickBooks vendors or customers, never an employee. A global rule files to a firm category through the
       client's category linked to it: without a link, its transactions wait with the "map this category" badge. The

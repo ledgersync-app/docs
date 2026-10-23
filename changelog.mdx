@@ -4,6 +4,31 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-10-23" tags={["AI connector"]}>
+  ## The AI offers rules on its own
+
+  You no longer need to ask your AI for rules, or for a global rule. When you ask it to show a client's bank
+  transactions and some of the client's transactions have no rule yet, it offers to suggest rules for them. Say yes,
+  and it sets them up with you. See [Set up rules for a client](/ai/rules-setup).
+
+  - **It names each rule.** The AI proposes each rule by name and says what it does and for whom, for example:
+    *Can I create a global rule 'Square' that leaves Square deposits out of the books for every client?* You say yes,
+    no, or what to change.
+  - **It picks client or global.** A global rule for vendors that mean the same for every client, such as bank fees,
+    software or fuel, and a client rule otherwise. A global rule still needs **Manage Global Rules**.
+  - **Exclusion rules too.** When transactions look like they should be left out of the books, such as transfers
+    between the client's own accounts, it proposes an exclusion rule itself.
+  - **After a QuickBooks push.** In [Bookkeeping into QuickBooks](/ai/quickbooks-bookkeeping), when some of the
+    transactions had no rule, the AI offers rules so transactions like them file themselves next time.
+  - **Nothing changes before your yes.** As before, the AI shows you a preview first and saves nothing until you say
+    yes.
+  - New result field: `transactions_without_rule` on `ledgersync_list_transactions`, for Manual and QuickBooks
+    Online clients. See [For developers](/ai/developers).
+  - Your AI keeps working without reconnecting. To get the updated tool descriptions, reconnect in Claude, click
+    **Refresh** in ChatGPT, or reauthenticate in Grok, then start a new chat. See
+    [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+</Update>
+
+<Update label="2026-10-23" tags={["AI connector"]}>
   ## Export categorized transactions on a schedule from Claude
 
   For Manual clients. Your AI gives you a link to a file of the transactions you accepted in LedgerSync that were
