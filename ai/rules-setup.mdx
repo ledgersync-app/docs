@@ -1,12 +1,12 @@
 ---
 title: "Set up rules for a client"
-description: "Your AI proposes rules that categorize a client's waiting bank transactions, for Manual and QuickBooks Online clients. After you say yes, LedgerSync saves them and fills the transactions."
+description: "Your AI proposes rules that categorize a client's waiting bank transactions, or mark the ones to leave out (exclusion rules), for Manual and QuickBooks Online clients. After you say yes, LedgerSync saves them and fills the transactions."
 mode: "frame"
 ---
 
 import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
 
-<AiPage title="Set up rules for a client" subtitle="Your AI looks at a client's bank transactions waiting in LedgerSync and proposes rules to categorize them. For each rule, you choose: this client only, or every client of your firm. After you say yes, LedgerSync saves the rules and fills the waiting transactions.">
+<AiPage title="Set up rules for a client" subtitle="Your AI looks at a client's bank transactions waiting in LedgerSync and proposes rules to categorize them, or to mark the ones to leave out (exclusion rules). For each rule, you choose: this client only, or every client of your firm. After you say yes, LedgerSync saves the rules and fills the waiting transactions.">
 
 <AiNote tone="green">
 
@@ -41,13 +41,13 @@ Click **Copy** next to the instructions below.
 2. Read what exists: ledgersync_list_rules (client and global), ledgersync_list_setup_categories (client and firm) and ledgersync_list_setup_vendors (client and firm).
 3. Link the firm's categories. ledgersync_list_setup_categories (kind firm) lists first the ones this client does not link yet, each with a link_suggestion. Level a: the client's own transactions decide it, so propose its first candidate. Level b: propose the first candidate as your best guess and show the user the other candidates. Level c: ask the user which of the client's categories to link. Put all these links in one preview (mappings); if there are more than one preview takes, start with the ones the firm's global rules use and ask before the rest. For a QuickBooks client a link is what lets the firm's global rules file its transactions at all; for a Manual client it sets the GL code they use.
 4. Call ledgersync_list_uncategorized_transactions and work through the groups, largest first. A group with waiting_on_link needs the link from step 3, not a new rule.
-5. For each group choose the category from the client's own categories or, for a global rule, from the firm's categories. Use names that exist, or propose new ones and say they are new. Never guess: ask the user when you are not sure.
-6. Give every rule a payee the same way: one of the client's vendors (for a QuickBooks client, also one of its customers) for a client rule, one of the firm's vendors for a global rule, or a new vendor you say is new. The rule puts it on each transaction it fills as the payee, and the firm can accept a transaction only when it has a payee.
+5. For each group choose the category from the client's own categories or, for a global rule, from the firm's categories. Use names that exist, or propose new ones and say they are new. Never guess: ask the user when you are not sure. If the user wants a group left out of the books instead (for example transfers between the client's own accounts), ask, then propose an exclusion rule (rule_type exclusion): it still files to a category, and LedgerSync marks the transactions it matches for exclusion instead of categorizing them.
+6. Give every rule a payee the same way: one of the client's vendors (for a QuickBooks client, also one of its customers) for a client rule, one of the firm's vendors for a global rule, or a new vendor you say is new. The rule puts it on each transaction it fills as the payee, and the firm can accept a transaction only when it has a payee. An exclusion rule needs no payee: accepting its transactions moves them to Excluded.
 7. For each rule, ask the user whether it is for this client only (client rule) or for every client of the firm (global rule). Suggest global for vendors that mean the same for every client, such as bank fees, software or fuel.
 8. Follow the firm's naming pattern for rule names; you can see it in the existing rules.
-9. Preview with ledgersync_preview_rules_setup (up to 100 rules at a time). Show the user what will be created (for a QuickBooks client, new categories and vendors are created in its QuickBooks after the yes), how many transactions each rule fills for this client and for other clients, which other clients still need a link, and every warning.
+9. Preview with ledgersync_preview_rules_setup (up to 100 rules at a time). Show the user what will be created (for a QuickBooks client, new categories and vendors are created in its QuickBooks after the yes), how many transactions each rule fills for this client and for other clients (for an exclusion rule, how many it marks for exclusion), which other clients still need a link, and every warning.
 10. Only after the user says yes, call ledgersync_apply_rules_setup. Then follow ledgersync_get_rules_setup_status until it finishes and report the result. For a QuickBooks client, offer to post the filled transactions into its QuickBooks with the QuickBooks bookkeeping tools, as the status's next_step says.
-11. Everything you create is marked LS-AI in LedgerSync for review. If the user wants it removed, use ledgersync_undo_rules_setup; categories and vendors created in QuickBooks stay there.`} />
+11. Everything you create is marked LS-AI in LedgerSync for review. If the user wants it removed, use ledgersync_undo_rules_setup; categories and vendors created in QuickBooks stay there, and an undo also puts back on For review the transactions the user moved to Excluded because of the setup's exclusion rules.`} />
 </div>
 
 </AiStep>
@@ -94,18 +94,21 @@ anything. For a QuickBooks client, saving also creates the new categories and ve
    largest groups first.
 3. For each group, it proposes a rule: the words to look for in the bank text, a category and a vendor. It uses the
    categories and vendors you have, or proposes new ones and tells you they are new. It names the rules like your
-   existing ones. When it is not sure, it asks you.
+   existing ones. When it is not sure, it asks you. For transactions you want left out of the books, such as
+   transfers between the client's own accounts, it can propose an exclusion rule instead: the words and a category,
+   with no vendor needed. It asks you first.
 4. For each rule, it asks you: is it for this client only, or for every client of your firm?
 5. It proposes a link for each of your global categories that the client has no category linked to yet, all at
    once. See [Link your global categories](#link-your-global-categories).
-6. It shows you a preview: what would be created and linked, how many waiting transactions each rule would fill for
-   this client and for your other clients, and every warning. For a QuickBooks client, it also names your other
-   QuickBooks clients that still need a link. Nothing has changed yet.
+6. It shows you a preview: what would be created and linked, how many waiting transactions each rule would fill (or,
+   for an exclusion rule, mark for exclusion) for this client and for your other clients, and every warning. For a
+   QuickBooks client, it also names your other QuickBooks clients that still need a link. Nothing has changed yet.
 7. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right.
 8. LedgerSync saves the rules, the links, and any new categories and vendors. For a QuickBooks client, it first
-   creates the new categories and vendors in the client's QuickBooks. Then it fills the waiting transactions. The
-   AI checks until it is done. Then it tells you what was created, how many transactions were filled, and what
-   failed, with the reason.
+   creates the new categories and vendors in the client's QuickBooks. Then it fills the waiting transactions. An
+   exclusion rule's transactions are also marked for exclusion: they stay on **For review**, and move to
+   **Excluded** when you accept them. The AI checks until it is done. Then it tells you what was created, how many
+   transactions were filled, and what failed, with the reason.
 9. For a QuickBooks client, the AI then offers to post the filled transactions into QuickBooks, with
    [Bookkeeping into QuickBooks](/ai/quickbooks-bookkeeping).
 
@@ -138,7 +141,8 @@ has its own preview and needs your yes.
 **Give each rule a vendor.** A rule puts its vendor on each transaction it fills, as the payee. In LedgerSync you can
 accept a transaction only when it has a payee, so for a rule without a vendor you add the payee yourself before you
 accept. The AI gives every rule a vendor. To pick one yourself, tell the AI. For example: *Use Shell as the vendor.*
-For a QuickBooks client, a client rule's payee can also be one of the client's customers.
+For a QuickBooks client, a client rule's payee can also be one of the client's customers. An exclusion rule needs no
+vendor: accepting its transactions moves them to **Excluded**.
 
 </AiNote>
 
@@ -158,6 +162,8 @@ client, such as bank fees, software or fuel. You decide.
 - A client's own rules always come first. A global rule fills a transaction only when none of that client's rules
   match it.
 - To make global rules, your login needs **Manage Global Rules**, as in **Before you start**.
+- Either kind can be an exclusion rule, as in the LedgerSync app. A global exclusion rule at a QuickBooks client
+  works only through the client's category linked to its global category, like any global rule.
 
 <div id="link-your-global-categories" />
 
@@ -238,6 +244,9 @@ For a QuickBooks Online client, rules setup works the same way, with these diffe
   yet.
 - The category on each waiting transaction the rules fill and, when the rule has a vendor, that vendor as its payee.
   The transactions stay on **For review**, as when your own rules fill them.
+- For an exclusion rule, the waiting transactions it fills are also marked for exclusion, and stay on **For review**.
+  In the LedgerSync app they are highlighted, and the **Exclusion Rule** filter shows them. When you accept them,
+  they move to **Excluded** instead of **Categorized**, and they are never posted to QuickBooks.
 
 <AiNote tone="green">
 
@@ -262,10 +271,12 @@ Changed your mind? Ask the AI to undo the setup. For example: *Undo the rules se
    because this check changes nothing. Then the AI shows you what the undo would remove and what it would keep,
    and why. Nothing has changed yet.
 2. You say yes. Claude and ChatGPT also ask you to allow it.
-3. LedgerSync deletes the rules the setup made. It takes their category and payee off the waiting transactions they
-   filled, even a payee or category you changed yourself on one of them.
-4. It undoes the category links the setup made.
-5. It deletes the categories and vendors the setup made, unless something uses them now, such as another rule, a
+3. LedgerSync deletes the rules the setup made. It takes their category and payee (and, for an exclusion rule, its
+   mark) off the waiting transactions they filled, even a payee or category you changed yourself on one of them.
+4. Transactions you moved to **Excluded** because of the setup's exclusion rules go back to **For review**. The AI
+   says how many before you say yes.
+5. It undoes the category links the setup made.
+6. It deletes the categories and vendors the setup made, unless something uses them now, such as another rule, a
    transaction or a linked category. Those stay, and the AI tells you which.
 
 For a QuickBooks client, three things are different:
@@ -318,6 +329,8 @@ LedgerSync.
 | The AI says | Do this |
 | --- | --- |
 | It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| It cannot make an exclusion rule | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| An exclusion rule's transactions are still on **For review** | That is how exclusion rules work: the rule marks them, and you decide. Accept them in LedgerSync to move them to **Excluded**. |
 | The client's QuickBooks connection stopped working | Links and rules still work. The client's new categories, its new vendors and customers as payees need QuickBooks: reconnect it, as in [QuickBooks clients](#quickbooks-clients), then ask the AI to preview again. |
 | QuickBooks could not be read just now | Links and rules still work. The client's new categories, its new vendors and customers as payees need QuickBooks: wait a few minutes, then ask the AI to preview again. If it keeps happening, reconnect QuickBooks, as in [QuickBooks clients](#quickbooks-clients). |
 | The client uses another accounting app, such as Zoho Books | Not yet. Set up its rules in the LedgerSync app. |
@@ -378,9 +391,9 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     | `ledgersync_get_rules_setup` | Can the client's rules be set up (Manual and QuickBooks Online clients); counts of its categories, vendors, rules and waiting transactions; for a QuickBooks client, its QuickBooks connection and the transactions waiting for a link; can you make global rules; the limits; the client's last setups | No |
     | `ledgersync_list_setup_categories` | The client's categories or the firm's global categories, with GL codes (Manual), links, a suggested link for each global category the client does not link, and the LS-AI mark | No |
     | `ledgersync_list_setup_vendors` | The client's vendors (and, for a QuickBooks client, its customers) or the firm's global vendors, with the LS-AI mark | No |
-    | `ledgersync_list_rules` | The client's rules or the firm's global rules, with conditions, category, payee and the LS-AI mark | No |
+    | `ledgersync_list_rules` | The client's rules or the firm's global rules, with conditions, category, payee, rule type (`rule_type`: inclusion or exclusion) and the LS-AI mark | No |
     | `ledgersync_list_uncategorized_transactions` | The client's waiting transactions that no rule fills, grouped by bank text, largest groups first, and, at a QuickBooks client, the groups a global rule would file once a category is linked | No |
-    | `ledgersync_preview_rules_setup` | Checks up to 100 rules with their new categories, links and vendors, and counts what each rule would fill here and at the firm's other clients; at a QuickBooks client, also what waits for a link and which other clients need one | No |
+    | `ledgersync_preview_rules_setup` | Checks up to 100 rules (inclusion or exclusion rules, `rule_type`) with their new categories, links and vendors, and counts what each rule would fill here and at the firm's other clients (for an exclusion rule, what it would mark for exclusion); at a QuickBooks client, also what waits for a link and which other clients need one | No |
     | `ledgersync_apply_rules_setup` | Saves a previewed setup and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks | Yes |
     | `ledgersync_get_rules_setup_status` | How a setup is going; what it created (in QuickBooks too) and filled; what failed and why | No |
     | `ledgersync_undo_rules_setup` | Shows what undoing a setup would remove and keep (what it created in QuickBooks stays); after a yes, undoes it | Yes |

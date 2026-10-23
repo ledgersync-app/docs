@@ -344,9 +344,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `quickbooks_connection` is broken, and otherwise to list them again in a few minutes.
     - `ledgersync_list_rules` lists the client's rules (`scope: "client"`, ids `rul_c_...`) or the firm's global
       rules (`scope: "global"`, ids `rul_g_...`), narrowed by `query`, a page at a time. Each rule has `enabled`,
-      `priority`, `direction` (`money_in`, `money_out` or `both`), `match` (`all` or `any`), `rule_type`,
-      `conditions` (`field`, `operator`, `value`), `category` (`id`, `name`, `gl_code`), `payee` (`id`, `name`,
-      `type`) and `ai_generated`. A payee's `type` is `vendor`, `customer` or `employee` (an employee has no `id`).
+      `priority`, `direction` (`money_in`, `money_out` or `both`), `match` (`all` or `any`), `rule_type`
+      (`inclusion` or `exclusion`), `conditions` (`field`, `operator`, `value`), `category` (`id`, `name`,
+      `gl_code`), `payee` (`id`, `name`, `type`) and `ai_generated`. A payee's `type` is `vendor`, `customer` or
+      `employee` (an employee has no `id`).
       A QuickBooks client rule split across several categories shows its first one, and how many more lines it has
       (`more_lines`).
     - Each category, vendor and rule that a rules setup created or linked carries `ai` (`setup_id`, `reviewed`):
@@ -368,16 +369,25 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       has a `scope` (client or global), a `name`, a `direction`, a `match` (all or any), 1 to 5 `conditions` on
       the bank text (an `operator` and a `value`), a `category` and an optional `payee`: a client category and a
       client vendor (or, at a QuickBooks client, a customer, `cus_c_...`) for a client rule, a global category and
-      vendor for a global rule. A mapping links a firm (global) category to a client category: up to 100 in one
-      preview, so all of a client's missing links can go in one. A vendor has a `scope` too.
+      vendor for a global rule. A rule may also have a `rule_type`: `inclusion` (the default) or `exclusion`. An
+      exclusion rule marks the transactions it matches for exclusion instead of filing them: they wait on For review
+      and move to Excluded when the user accepts them. It still needs a `category`, and its `payee` is optional. Any
+      other `rule_type` is refused with `invalid_request` on `rules[i].rule_type`. A mapping links a firm (global)
+      category to a client category: up to 100 in one preview, so all of a client's missing links can go in one. A
+      vendor has a `scope` too.
     - The preview writes nothing. It returns the client's `platform` (`manual` or `quickbooks`). For each rule it
-      returns whether it is OK or refused, how many waiting transactions it fills for this client (`fills_here`,
-      with `examples`) and at the firm's other clients on the same platform, Manual or QuickBooks
+      returns whether it is OK or refused, its `rule_type` (`inclusion` or `exclusion`), how many waiting
+      transactions it fills for this client (`fills_here`, with `examples`) and at the firm's other clients on the
+      same platform, Manual or QuickBooks
       (`fills_other_clients`, at `other_clients` clients), and its `warnings` (`code`, `message`). It also returns
       the categories, links and vendors it keeps, in `items` (`ref`, `type`, `name` and `action`: `create`, `link`
       or `reuse`, with `existing_id` for one it reuses), every refused item with its `name`, code and reason (and,
       for a name that is taken, `existing_id`: the id of the category, vendor or rule that has it), the totals and,
       when at least one item is OK, a `confirmation_id`.
+    - For an exclusion rule, `fills_here` and `fills_other_clients` count the transactions it would mark for
+      exclusion. The totals count them too: `excluded_by_new_rules` is the part of `filled_by_new_rules`, and
+      `excludes_other_clients` the part of `fills_other_clients`, that the new exclusion rules would mark. Each is
+      left out when it is 0.
     - At a QuickBooks client, each global rule also says how many of its transactions would wait for a link here
       (`waiting_on_link_here`) and at the firm's other QuickBooks clients (`waiting_on_link_other_clients`), and how
       many other clients need a link (`clients_needing_link_count`, named or not). Each is left out when it is 0.
@@ -397,7 +407,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       than 200 at other clients, when its category has no GL code (Manual clients only), and, for a global rule,
       when this client has no category linked to the global category. At a Manual client, the global category's GL
       code is then used. At a QuickBooks client, the transactions wait with the "map this category" badge, and a rule
-      whose transactions only wait for a link is not reported as filling nothing.
+      whose transactions only wait for a link is not reported as filling nothing. For an exclusion rule, the
+      warning that every transaction it matches goes to another rule, and the warning that it is broad, say what it
+      marks for exclusion instead of what it fills.
     - An item is refused when: it is global and the login lacks the **Manage Global Rules** permission; a `ref` is
       repeated or unknown; an `id` is unknown or not the client's or the firm's; a name is empty, too long, already
       taken (a category or vendor whose name is taken comes back with `existing_id`, the id of the one that already
@@ -438,20 +450,25 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       (queued, running, done, done with some failed items, failed, being undone, undone, or undo failed), with its
       phase and progress. A finished setup also gives what it created by type, how many transactions it filled for
       the client, how many the existing rules filled, how many it filled at other clients and at how many clients,
-      and each failed item with its reason. It also gives the setup's `platform`. For a QuickBooks client, its
-      `result` also lists the categories and vendors it created in QuickBooks (`created_in_quickbooks`, each with
-      its `type` and `name`), how many transactions the firm's existing global rules filled through its new links
-      (`filled_through_links`) and how many other clients still need a link (`other_clients_needing_link`).
+      and each failed item with its reason. Its `result` also says how many of the filled transactions its exclusion
+      rules marked for exclusion: `excluded_here`, part of `filled_here`, and `excluded_other_clients`, part of
+      `filled_other_clients`, each left out when it is 0. It also gives the setup's `platform`. For a QuickBooks
+      client, its `result` also lists the categories and vendors it created in QuickBooks (`created_in_quickbooks`,
+      each with its `type` and `name`), how many transactions the firm's existing global rules filled through its
+      new links (`filled_through_links`) and how many other clients still need a link (`other_clients_needing_link`).
     - `ledgersync_undo_rules_setup` takes the `client_id`, the `setup_id` and an optional `undo_id`. Without an
       `undo_id`, it writes nothing: it says how many rules it would delete, how many waiting transactions it would
       clear and at how many clients, how many links it would put back, and which created items it would delete or
-      keep (in use, or made in QuickBooks). It returns an `undo_id` that works for 15 minutes, only for the person
-      and the AI app that asked. Called again with that `undo_id`, it undoes the setup: it deletes the setup's
-      rules and clears only the For review transactions they hold, puts the links back, then deletes the created
-      vendors and categories that nothing uses. Categorized transactions are never touched. A setup can be undone
-      once it has stopped: done, done with some failed items, or failed (the undo then removes what it saved before
-      it stopped), and again after a failed undo. While another setup of the firm is running or being undone, the
-      call with the `undo_id` is refused with `invalid_request`: try it again when that one finishes.
+      keep (in use, or made in QuickBooks). It also says how many of those transactions a person moved to Excluded
+      because of the setup's exclusion rules (`excluded_rows_to_restore`, part of `rows_to_reset`, left out when it
+      is 0). It returns an `undo_id` that works for 15 minutes, only for the person and the AI app that asked.
+      Called again with that `undo_id`, it undoes the setup: it deletes the setup's rules and clears only the For
+      review transactions they hold, puts the links back, then deletes the created vendors and categories that
+      nothing uses. Categorized transactions are never touched. The transactions a person moved to Excluded because
+      of the setup's exclusion rules go back from Excluded to For review. A setup can be undone once it has stopped:
+      done, done with some failed items, or failed (the undo then removes what it saved before it stopped), and
+      again after a failed undo. While another setup of the firm is running or being undone, the call with the
+      `undo_id` is refused with `invalid_request`: try it again when that one finishes.
     - For a QuickBooks client, the categories and vendors the setup created in QuickBooks are always kept, in
       QuickBooks and in LedgerSync, and the undo names them: nothing is deleted in QuickBooks. The links the setup
       made, including the link it gave a category it created, are taken back. The For review transactions the

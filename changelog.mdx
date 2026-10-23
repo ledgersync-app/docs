@@ -3,6 +3,31 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-22" tags={["AI connector"]}>
+  ## The AI can set up exclusion rules
+
+  Rules setup can now make exclusion rules too, for the transactions you want left out of the books, such as
+  transfers between the client's own accounts. The AI asks you first, and they go in the same preview as your other
+  rules. See [Set up rules for a client](/ai/rules-setup).
+
+  - **Like the exclusion rules you make in the app.** An exclusion rule looks for words in the bank text and has a
+    category, but needs no vendor. It can be a client rule or a global rule, for Manual and QuickBooks Online
+    clients.
+  - **Marked, then excluded when you accept.** The waiting transactions an exclusion rule fills stay on
+    **For review**, marked for exclusion. When you accept them, they move to **Excluded** instead of
+    **Categorized**.
+  - **The preview and the result count them.** The preview says how many waiting transactions each exclusion rule
+    would mark, for this client and at your other clients, and the result says how many it marked.
+  - **Undo puts them back.** Transactions you moved to **Excluded** because of the setup's exclusion rules go back
+    to **For review**. The AI says how many before you say yes.
+  - New field: `rule_type` (`inclusion`, the default, or `exclusion`) on `ledgersync_preview_rules_setup`. New
+    result fields: the rule type and the exclusion counts in the preview, the status and the undo check. See
+    [For developers](/ai/developers).
+  - Your AI keeps working without reconnecting. To get the updated tool descriptions, reconnect in Claude, click
+    **Refresh** in ChatGPT, or reauthenticate in Grok, then start a new chat. See
+    [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+</Update>
+
 <Update label="2026-10-20" tags={["AI connector"]}>
   ## Set up a QuickBooks client's rules from Claude, ChatGPT and Grok
 
