@@ -63,6 +63,7 @@
               "ai/convert-statement",
               "ai/quickbooks-bookkeeping",
               "ai/rules-setup",
+              "ai/categorized-export",
               "ai/troubleshooting",
               "ai/desktop-app"
             ]

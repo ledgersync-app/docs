@@ -3,6 +3,39 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-23" tags={["AI connector"]}>
+  ## Export categorized transactions on a schedule from Claude
+
+  For Manual clients. Your AI gives you a link to a file of the transactions you accepted in LedgerSync that were
+  not exported yet: the same file as **Export Transactions** in the LedgerSync app, Default or ACS. Make it a
+  scheduled task in Claude, for example every weekday at 3 PM. In ChatGPT, you may need to ask in a chat: its
+  scheduled tasks may not reach LedgerSync yet. LedgerSync marks the transactions Synced when you click
+  **Download**, so the next file has only the new ones. See
+  [Export categorized transactions on a schedule](/ai/categorized-export), which has the instructions to paste into
+  your AI.
+
+  **One new AI connector tool, on the live and sandbox connectors:**
+
+  - `ledgersync_get_categorized_export_link` says how many categorized transactions are waiting, for every Manual
+    client you manage or for one client, and gives a link to them as the app's Default (CSV) or ACS (Excel) file.
+    Calling it changes nothing.
+
+  **Limits and safeguards:**
+
+  - Nothing is marked Synced until a person clicks **Download** on the link's page. A link nobody opens changes
+    nothing, and the next link has those transactions too.
+  - A link works for 24 hours. Clicking **Download** again gives the same file. Each click checks the connection
+    again. Anyone with the link can download the file, so don't forward it.
+  - One file holds up to 10,000 transactions. Each connected AI app can make 30 links an hour, and each link takes
+    5 clicks a minute.
+  - Clients connected to QuickBooks, Zoho Books or another accounting app are left out.
+  - Claude runs the schedule, on paid plans: LedgerSync stores none.
+  - To see the new tool, reconnect in Claude, click **Refresh** in ChatGPT, or reauthenticate in Grok, then start
+    a new chat. See [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+
+  See [For developers](/ai/developers).
+</Update>
+
 <Update label="2026-10-22" tags={["AI connector"]}>
   ## The AI can set up exclusion rules
 

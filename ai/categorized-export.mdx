@@ -1,0 +1,279 @@
+---
+title: "Export categorized transactions on a schedule"
+sidebarTitle: "Export categorized transactions"
+description: "At the time you choose, Claude gives you a link to a file of your Manual clients' categorized transactions that were not exported yet: the same file as Export Transactions in the LedgerSync app. In ChatGPT, you may need to ask for it in a chat."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="Export categorized transactions on a schedule" subtitle="At the time you choose, Claude gives you a link to a file of the transactions you accepted in LedgerSync that were not exported yet. It is the same file as Export Transactions in the LedgerSync app. In ChatGPT, you may need to ask for it in a chat.">
+
+<AiNote tone="green">
+
+**For Manual clients.** A Manual client is not set up with an accounting app in LedgerSync. In the LedgerSync app,
+you work on these clients under **Rules Engine**, then **Manual**. Clients connected to QuickBooks or another
+accounting app are left out.
+
+</AiNote>
+
+## Before you start
+
+- **LedgerSync is in your AI app:** Claude or ChatGPT. Not yet? Go to [Start here](/ai/start-here). Added it a
+  while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the new
+  export tool. On ChatGPT Business, Enterprise or Edu, your workspace admin refreshes LedgerSync's tools first. On
+  Enterprise and Edu, they also turn on the new export tool: **Workspace settings**, then **Apps**, then **...**
+  next to LedgerSync, then **Action control**.
+- **A paid AI plan.** Claude runs scheduled tasks on Pro, Max, Team and Enterprise, not on Free. In ChatGPT,
+  LedgerSync needs Plus or higher.
+- **You accept the transactions in LedgerSync, as usual.** Accepted transactions move to **Categorized**. The file
+  has the ones that were not exported yet.
+
+## Start
+
+<AiStep id="copy" n={1} total={4} title="Copy the instructions">
+
+Click **Copy** next to the instructions below.
+
+<div className="lsai-prompt">
+  <AiCopy label="Instructions for your AI" text={`Export my categorized transactions from LedgerSync that were not exported yet.
+
+1. Call ledgersync_get_categorized_export_link. Use format acs_xlsx (the ACS file), unless I ask below for the Default file: then use default_csv. It covers all my Manual clients. If I name one client below, find it first with ledgersync_find_clients and pass its client_id.
+2. If it returns a download_url, reply with how many transactions are ready and the link, nothing else. Do not open the link yourself.
+3. If nothing is ready, reply in one line: Nothing new to export.`} />
+</div>
+
+The file is the app's **ACS** export, an Excel file. For the app's **Default** export, a CSV file, add *Default file*
+at the end. Only one client? Add its name. For example: *Default file, only Acme.*
+
+</AiStep>
+
+<AiStep id="claude" n={2} total={4} label="Step 2 of 4 · in Claude" title="Schedule it in Claude">
+
+1. In Claude, click **Scheduled** in the left sidebar. Then click **New task**, then **Set up manually**.
+2. Type a name, such as *LedgerSync export*. Paste the instructions as the task's prompt: press **Ctrl+V**
+   (**Command+V** on a Mac).
+3. For approval, choose **Auto** (it may say **Automatically approve**), so the run does not wait for you.
+4. Choose how often it runs: daily, on weekdays, weekly or hourly. Then save the task.
+
+Want a set time, such as 3 PM? Start a new chat instead. Type *Every weekday at 3 PM,* then paste the instructions
+and press **Enter**. Claude makes the task. Check it under **Scheduled**: its approval should be **Auto**.
+
+</AiStep>
+
+<AiStep id="chatgpt" n={2} total={4} label="Step 2 of 4 · or in ChatGPT" title="Or schedule it in ChatGPT">
+
+1. On chatgpt.com, start a new chat. Type **@** and pick **LedgerSync**.
+2. Type when it should run, such as *Every weekday at 3 PM,* then press **Ctrl+V** (**Command+V** on a Mac) and
+   **Enter**. ChatGPT makes a scheduled task.
+3. To see your tasks later, go to **Scheduled**. Or, in the chat, click **...**, then **See scheduled tasks**.
+
+</AiStep>
+
+<AiNote tone="gray">
+
+**Claude: good to know.** On Pro and Max, the task runs in Claude's cloud, even when your computer is off. On Team
+too, unless your Claude Owner turned it off. On Enterprise, your Claude Owner must first turn on running tasks in
+the cloud and give you access to it.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**ChatGPT: good to know.** An exact time, and runs every hour, need a paid ChatGPT plan. ChatGPT Plus can have 5
+active scheduled tasks, Business and Edu 10, Pro and Enterprise 15. ChatGPT's help names Gmail, Slack and GitHub as
+apps a scheduled task can use. It does not say yet whether that includes an app you add yourself, like LedgerSync.
+If a run cannot use LedgerSync, paste the instructions in a new chat when you want the file.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**Using Grok?** Paste the instructions in a new chat when you want the file.
+
+</AiNote>
+
+<AiStep id="open" n={3} total={4} title="Open the run">
+
+When a run is done, open it. In Claude, click **Scheduled** in the left sidebar. In ChatGPT, go to **Scheduled**.
+
+The run says how many transactions are ready and gives you a link. Nothing new? It says so, with no link.
+
+Claude can tell you on your phone when a run is done. In ChatGPT, turn on task notifications in **Settings**, then
+**Notifications**: push, email or both.
+
+</AiStep>
+
+<AiStep id="download" n={4} total={4} title="Click the link, then Download">
+
+Click the link. A LedgerSync page opens: **Download your categorized transactions**. Click **Download**. Your
+browser saves the file.
+
+LedgerSync marks those transactions **Synced**, as when you export them in the app.
+
+</AiStep>
+
+<AiNote tone="green">
+
+**Nothing is marked until you click Download.** A link nobody opens changes nothing. The next link has those
+transactions too.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**Need the file again?** Click the same link, then **Download**, within 24 hours. You get the same transactions,
+under the same file name, and nothing new is marked. After 24 hours the link stops working, and a new link has only
+transactions not exported yet, so it does not have these. To get them again, export them in the LedgerSync app:
+click **Rules Engine**, then **Manual**, then **Transactions**. Pick **Categorized** and **Synced**, select the
+transactions, click **Export Transactions**, then **ACS** or **Default**.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**Want the file now?** Paste the instructions in a new chat. The AI gives you the link right away.
+
+</AiNote>
+
+## What happens next
+
+1. At the time you chose, your AI asks LedgerSync how many of your Manual clients' categorized transactions were
+   not exported yet. Nothing changes in LedgerSync.
+2. It tells you that number and gives you a link that works for 24 hours. If none are waiting, it says so, with no
+   link.
+3. You click the link, then **Download**. LedgerSync makes the file, the same one **Export Transactions** makes in
+   the app, and marks those transactions **Synced**.
+4. The next run gives you only the transactions that were not exported yet: the ones you accepted after that, and
+   any from a link nobody clicked **Download** on.
+
+<AiNote tone="gray">
+
+**Which transactions?** The ones the LedgerSync app shows when you click **Rules Engine**, then **Manual**, then
+**Transactions**, and pick **Categorized** and **Not Synced**. They come from every Manual client you see in
+LedgerSync, or from the one client you named. Not the firm owner or an administrator? You see only the clients
+assigned to you. Clients connected to QuickBooks or another accounting app are left out.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**The file holds what is waiting when you first click Download.** If you accepted or exported transactions after
+the run, the file can have a different number than the AI said.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**One list with the app.** When you export transactions with **Export Transactions** in the LedgerSync app, they
+are marked **Synced** too, so the next link leaves them out. And the transactions you download with a link leave
+the app's **Not Synced** list.
+
+</AiNote>
+
+## What it does not do yet
+
+- Email the file, or save it to a cloud folder. You download it from the link.
+- Keep the schedule in LedgerSync. Claude or ChatGPT runs it: you find it under **Scheduled** there.
+- Choose dates, accounts, payees or categories. The file has every categorized transaction not exported yet.
+- More than 10,000 transactions in one file. Export a big backlog once in the LedgerSync app first, as in the table
+  below.
+- Clients on QuickBooks, Zoho Books or another accounting app. For QuickBooks Online clients, see
+  [Bookkeeping into QuickBooks](/ai/quickbooks-bookkeeping).
+
+## Your client's data
+
+<AiNote tone="yellow">
+
+**Don't forward the link.** Anyone who has it can download the file while it works, for 24 hours. It stops working
+sooner if your LedgerSync password is changed, or if your login can no longer use LedgerSync in AI apps. Removing
+LedgerSync from your AI app does not stop it. Forwarded it by mistake? Change your LedgerSync password: see
+[Turn it off](/ai/troubleshooting#turn-off).
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**Your AI does not see the transactions.** It sees how many are ready, and the link. The file goes from LedgerSync
+to your browser, not through the AI.
+
+</AiNote>
+
+## If something goes wrong
+
+| The AI or the page says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. On ChatGPT Business, Enterprise or Edu, ask your workspace admin to refresh LedgerSync's tools. On Enterprise and Edu, also ask them to turn on the new export tool under **Action control**. |
+| **Nothing new to export** | No categorized transaction is waiting: they were exported already, in the app or with an earlier link, or none were accepted yet. Nothing was marked. Accept transactions in LedgerSync first (they move to **Categorized**), then ask again. |
+| More than 10,000 transactions are waiting. Or the page says **Too many transactions for one file** | That is more than one file holds. Export them once in the LedgerSync app: click **Rules Engine**, then **Manual**, then **Transactions**. Pick **Categorized** and **Not Synced**, select the transactions, click **Export Transactions**, then **ACS** or **Default**. Or ask the AI for one client at a time. After that, each link has only the new ones. |
+| **This link no longer works** | The link is more than 24 hours old, your LedgerSync password was changed, or your login can no longer use it. Go back to your chat and ask the AI for a new link: it has every transaction not exported yet. |
+| A run waits for your approval | In Claude, open the run under **Scheduled** and allow it, then check that the task's approval is **Auto**. In ChatGPT, go to **Scheduled** and review the approval there. |
+| A client is missing | Only Manual clients are in the file. Clients connected to QuickBooks or another accounting app are left out. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+| **LedgerSync is busy** Or: **This file could not be downloaded** | Wait a minute, then click **Download** again. If the first try got through, you get the same file. |
+
+<Accordion title="More messages: read-only connection, limits, the link's page, a client on another accounting app, the same transactions twice">
+
+| The AI or the page says | Do this |
+| --- | --- |
+| **This connection is read-only or lacks permission for this action.** | The export needs a LedgerSync connection that can change data, because **Download** marks transactions **Synced**. Email <AiEmail />. |
+| **Your LedgerSync login cannot export these transactions.** | Email <AiEmail />. |
+| This connection has used the export tool too many times this hour | Each AI app you connect can make 30 export links an hour. Try again next hour. |
+| **Too many tries** | A link takes 5 clicks on **Download** a minute. Wait a minute, then click **Download** again. |
+| **This link could not be opened** | Wait a minute, then reload the page. |
+| **This client is connected to an accounting platform, so its transactions are not exported as a file.** Or the page says **This client is not a Manual client** | Its transactions go to its accounting app instead. For a QuickBooks Online client, see [Bookkeeping into QuickBooks](/ai/quickbooks-bookkeeping). For another accounting app, use the LedgerSync app. |
+| **None of the clients this LedgerSync login manages is a Manual client.** Or the page says **No Manual clients** | Every client you see in LedgerSync uses an accounting app, or no client is assigned to you yet. Ask your firm's LedgerSync owner. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+| The same transactions came in two files | LedgerSync could not mark them **Synced** after the first download, so the next link had them again. Import them only once. Clicking **Download** again on the first link, within 24 hours, marks them. |
+
+</Accordion>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the tool and what it changes">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_get_categorized_export_link` | How many of the Manual clients' categorized transactions are not exported yet, and a 24-hour link to them as the LedgerSync app's Default or ACS export file | No: pressing **Download** on the link's page marks them Synced |
+
+    - `format` is `default_csv` (the app's Default export, a CSV file) or `acs_xlsx` (its ACS export, an Accounting
+      CS Excel file). The optional `client_id` (`cli_...`) names one Manual client. Without it, the tool covers
+      every Manual client the person manages: an employee, the clients assigned to them.
+    - It returns `ready_transactions`, `manual_clients` and `clients_left_out` (the clients with a QuickBooks, Zoho
+      Books or other accounting connection, which it leaves out). When at least one transaction is ready, it also
+      returns `download_url` and `expires_at`, and its `next_step` tells the AI to hand over the link without
+      opening it. With nothing waiting there is no link. With more than 10,000 waiting the tool refuses, and its
+      `next_step` says to export once in the app or to name one client.
+    - A named client with an accounting connection is refused with `invalid_request` and a `next_step`, and so is a
+      login that manages no Manual client.
+    - Calling the tool changes nothing, so it is annotated read-only, and a scheduled task with approval set to Auto
+      runs it without asking. It still needs `write:accounting`, because the link's **Download** marks the
+      transactions: a read-only connection gets `insufficient_scope`.
+    - Opening the link changes nothing: it shows a page whose **Download** button sends a POST. The first press
+      checks the connection again, takes the transactions waiting at that moment, builds the file with the app's
+      own export code and file name, and marks them Synced, with the same mark as the app's Manual export. Later
+      presses within 24 hours return the same transactions under the same file name and mark nothing new. Nothing
+      spends the link.
+    - If marking fails, the file is still returned, the transactions stay Not Synced, and the next press on that
+      link tries again.
+    - The app and the tool share one queue: an export from the app marks the same transactions, so the next link
+      leaves them out. LedgerSync stores no schedule: Claude's own scheduled tasks call the tool (ChatGPT's are not
+      confirmed yet).
+    - No new error codes: `invalid_request`, `not_found`, `insufficient_scope`, `rate_limit_exceeded`,
+      `upstream_unavailable` and `internal_error`.
+    - See [For developers](/ai/developers) for every tool.
+  </Accordion>
+
+  <Accordion title="For developers: limits">
+    - One file holds up to 10,000 transactions.
+    - Each connected AI app can make 30 export links an hour. A call that could not reach LedgerSync is not counted.
+    - A link works for 24 hours and takes 5 presses of **Download** a minute.
+    - A firm's downloads run one at a time. A press that waits more than a minute gets a page that says to try
+      again.
+    - Each person exports only the clients they see in the LedgerSync app: an employee, the clients assigned to
+      them.
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>

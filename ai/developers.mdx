@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (40 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (41 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -63,7 +63,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">40</span>
+## Tools <span className="lsai-badge">41</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -105,11 +105,12 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_apply_rules_setup` | Saves a previewed rules setup and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks | Yes |
 | `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created (in QuickBooks too) and filled; what failed and why | No |
 | `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove and keep (what it created in QuickBooks stays); after a yes, undoes it | Yes |
+| `ledgersync_get_categorized_export_link` | How many of the Manual clients' categorized transactions are not exported yet, and a 24-hour link to them as the LedgerSync app's Default or ACS export file | No (pressing **Download** on the link's page marks them Synced) |
 | `ledgersync_get_desktop_app_status` | Is the desktop app linked and connected (live only) | No |
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
 <AccordionGroup>
-  <Accordion title="Tool details: refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions, QuickBooks bookkeeping, rules setup">
+  <Accordion title="Tool details: refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions, QuickBooks bookkeeping, rules setup, categorized export">
     - `ledgersync_get_account_status` also says whether the connection is full or read-only. Refreshes left
       is your firm's shared daily budget, not the per-app cap.
     - When `access.status` is `active`, `ledgersync_get_account_status` also names the firm and the login the
@@ -481,9 +482,34 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - The instructions on [Set up rules for a client](/ai/rules-setup) are also an MCP prompt, `rules_setup`
       ("Set up rules for a client"), with optional `client` and `focus` arguments. Claude Code lists it as a
       command.
+    - Categorized export gives a firm's Manual clients' categorized transactions that are not exported yet (the
+      LedgerSync app's **Categorized** list with **Not Synced**) as a file: the one the app's
+      **Export Transactions** makes, Default or ACS. Claude's own scheduled tasks call it (ChatGPT's are not
+      confirmed yet); LedgerSync stores no schedule. See
+      [Export categorized transactions on a schedule](/ai/categorized-export).
+    - `ledgersync_get_categorized_export_link` takes a `format`, `default_csv` (the app's Default export, a CSV
+      file) or `acs_xlsx` (its ACS export, an Accounting CS Excel file), and an optional `client_id`. Without one,
+      it covers every Manual client the person manages (an employee, the clients assigned to them). Clients with a
+      QuickBooks, Zoho Books or other accounting connection are left out and counted in `clients_left_out`. A
+      named client with one is refused with `invalid_request` and a `next_step`, and so is a login that manages
+      no Manual client.
+    - It returns `ready_transactions`, `manual_clients`, `clients_left_out` and, when at least one transaction is
+      ready, `download_url` and `expires_at`. Its `next_step` tells the AI to hand over the link without opening
+      it. With nothing waiting there is no link. With more than 10,000 waiting the tool refuses, and its
+      `next_step` says to export once in the app or to name one client.
+    - The call changes nothing, so the tool is annotated read-only, and a scheduled task with approval set to Auto
+      runs it without asking. It still needs `write:accounting`, because the link's **Download** marks the
+      transactions: a read-only connection gets `insufficient_scope`.
+    - The link works for 24 hours. Opening it shows a LedgerSync page and changes nothing; its **Download** button
+      sends a POST. The first press checks the connection again, takes the transactions waiting at that moment,
+      builds the file with the app's own export code and file name, and marks them Synced, with the same mark as
+      the app's Manual export. Later presses within 24 hours return the same transactions under the same file
+      name and mark nothing new. Nothing spends the link.
+    - If marking fails, the file is still returned, the transactions stay Not Synced, and the next press on that
+      link tries again. An export from the app marks the same transactions, so the next link leaves them out.
   </Accordion>
 
-  <Accordion title="Security: bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview, rules saved only after a preview">
+  <Accordion title="Security: bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview, rules saved only after a preview, 24-hour export links that export only on Download">
     - Bank sign-ins never happen in the chat. The account holder picks the bank on a LedgerSync page and signs
       in there, or on the bank-data partner's secure page it opens for some banks. Connect links expire after
       72 hours.
@@ -537,9 +563,16 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - Each person sets up rules only for the clients they see in the LedgerSync app: an employee, the clients
       assigned to them. Global rules, global categories and global vendors also need the **Manage Global Rules**
       permission.
+    - Categorized export links work for 24 hours. Opening one only shows a page: the file is built, and the
+      transactions are marked Synced, only when a person presses **Download** there, so a link preview cannot do it.
+      Each press checks the connection again. The link stops working when the connection is disconnected or made
+      read-only, when the person's LedgerSync login can no longer connect, or when the connector is turned off.
+    - Anyone with an export link can download its file while the link works, so the tool tells the AI to hand it
+      over without opening it. Each link takes 5 presses a minute, and each person exports only the clients they
+      see in the LedgerSync app: an employee, the clients assigned to them.
   </Accordion>
 
-  <Accordion title="Refreshes and limits: 50 AI refreshes a day on live, 20 on sandbox, 300 client messages a day per firm on live, 60 QuickBooks pushes a day per AI app, 30 rules setups a day per AI app, per-minute and per-hour caps">
+  <Accordion title="Refreshes and limits: 50 AI refreshes a day on live, 20 on sandbox, 300 client messages a day per firm on live, 60 QuickBooks pushes a day per AI app, 30 rules setups a day per AI app, 30 export links an hour per AI app, per-minute and per-hour caps">
     - LedgerSync refreshes every working connection about once a day. A refresh you ask for takes a few
       minutes; see [Keeping data fresh](/guides/data-freshness).
     - A connection refreshed in the last 30 minutes is skipped unless you ask for a new pull anyway.
@@ -591,6 +624,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       setup at a time; the next one waits until the one before it finishes. An undo does not wait: while another
       setup of the firm is running or being undone, it is refused with `invalid_request`, and can be sent again when
       that one finishes.
+    - Categorized export: one file holds up to 10,000 transactions. Per connected AI app: 30 export links an hour;
+      a call that could not reach LedgerSync is not counted. A link works for 24 hours and takes 5 presses of
+      **Download** a minute. A firm's downloads run one at a time; a press that waits more than a minute gets a
+      page that says to try again.
   </Accordion>
 
   <Accordion title="Tool updates: Claude and ChatGPT keep a copy of the tool list, and Grok may too">
