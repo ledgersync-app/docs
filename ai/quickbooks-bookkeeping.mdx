@@ -6,7 +6,7 @@ mode: "frame"
 
 import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
 
-<AiPage title="Bookkeeping into QuickBooks" subtitle="Ask your AI. It categorizes a client's bank transactions, and after your yes, LedgerSync posts them into the client's QuickBooks.">
+<AiPage title="Bookkeeping into QuickBooks" video="/videos/quickbooks-bookkeeping.mp4" poster="/videos/quickbooks-bookkeeping-poster.jpg" subtitle="Ask your AI. It categorizes a client's bank transactions, and after your yes, LedgerSync posts them into the client's QuickBooks.">
 
 <AiNote tone="green">
 
@@ -23,23 +23,23 @@ In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
 
 </AiStep>
 
-<AiStep id="ask" n={2} total={4} title="Ask the AI">
+<AiStep id="ask" n={2} total={4} title="Ask the AI" img="/images/ai-bookkeeping/books-1-ask.png" caption="Your request">
 
 Type *"Categorize Acme's September transactions and post them to QuickBooks"*, with your client's name and the
 month, and press **Enter**.
 
 </AiStep>
 
-<AiStep id="answer" n={3} total={4} title="Answer its questions">
+<AiStep id="answer" n={3} total={4} title="Answer its questions" img="/images/ai-bookkeeping/books-2-questions.png" caption="Its suggestions and questions">
 
 The AI shows a category and a payee for each transaction, and asks about the ones it is not sure of. Say what to
 change.
 
 </AiStep>
 
-<AiStep id="preview" n={4} total={4} title="Say yes to the preview">
+<AiStep id="preview" n={4} total={4} title="Say yes to the preview" imgs={[{ src: "/images/ai-bookkeeping/books-3-preview.png", caption: "The preview" }, { src: "/images/ai-bookkeeping/books-4-allow.png", caption: "Allow once circled" }]}>
 
-The AI shows what it will post. Say yes, and allow it if Claude or ChatGPT asks. Nothing changes before that.
+The AI shows what it will post. Say yes, and allow it each time Claude or ChatGPT asks. Nothing changes before that.
 
 </AiStep>
 
@@ -76,7 +76,8 @@ The AI shows what it will post. Say yes, and allow it if Claude or ChatGPT asks.
    about the ones it is not sure of.
 4. It shows you a preview: what would be posted, the totals, any new payees, and anything LedgerSync refused, with
    the reason. Nothing has changed yet.
-5. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right.
+5. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right. One post can
+   create at most 10 new payees, so with more the AI posts in parts, and Claude asks once for each part.
 6. LedgerSync posts the transactions into QuickBooks as expenses and deposits. No money moves. About a minute
    later, the AI tells you what was posted, what was skipped and what failed, and why.
 7. If some of the transactions had no rule, the AI offers to suggest rules, so transactions like them file
