@@ -18,9 +18,10 @@ import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-u
 
 ## Start
 
-<AiStep id="new-chat" n={1} total={5} title="Start a new chat">
+<AiStep id="new-task" n={1} total={5} title="Open a new task" img="/images/ai-export/export-1-new-task.png" caption="Create with Claude circled">
 
-In Claude or ChatGPT. In ChatGPT, also type **@** and pick **LedgerSync**.
+In Claude, click **Scheduled** on the left, then **New task**, then **Create with Claude**. In ChatGPT, start a new
+chat, type **@** and pick **LedgerSync**.
 
 </AiStep>
 
@@ -30,10 +31,10 @@ Type *"Every weekday at 3 PM, get me my new categorized transactions from Ledger
 
 </AiStep>
 
-<AiStep id="check" n={3} total={5} title="Check the task">
+<AiStep id="schedule" n={3} total={5} title="Click Schedule" img="/images/ai-export/export-3-schedule.png" caption="Schedule circled">
 
-In Claude, click **Scheduled** on the left and check that the task's approval is **Auto**, so runs don't wait for
-you.
+Claude shows the task. Check that it says **Auto**, so runs don't wait for you, then click **Schedule**. In
+ChatGPT, confirm the task if it asks.
 
 </AiStep>
 
@@ -72,7 +73,7 @@ A LedgerSync page opens. Click **Download**, and your browser saves the file. Le
 
 <AccordionGroup>
 
-<Accordion title="Or set it up under Scheduled in Claude">
+<Accordion title="Or set it up by hand in Claude">
 
 1. In Claude, click **Scheduled** in the left sidebar. Then click **New task**, then **Set up manually**.
 2. Type a name, such as *LedgerSync export*. As the task's prompt, type *"Get me my new categorized transactions from LedgerSync, as the ACS file."*
@@ -236,9 +237,11 @@ The file is the app's **ACS** export, an Excel file. For the app's **Default** e
 at the end. Only one client? Add its name. For example: *Default file, only Acme.*
 
 1. Click **Copy** above.
-2. Start a new chat. In ChatGPT, type **@** and pick **LedgerSync**.
+2. In Claude, click **Scheduled**, then **New task**, then **Create with Claude**. In ChatGPT, start a new chat, type
+   **@** and pick **LedgerSync**.
 3. Type when it should run, such as *Every weekday at 3 PM,* then press **Ctrl+V** (**Command+V** on a Mac) and
    **Enter**.
+4. In Claude, check that the task says **Auto**, then click **Schedule**.
 
 </Accordion>
 
