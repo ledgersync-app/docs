@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (41 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (42 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -63,7 +63,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">41</span>
+## Tools <span className="lsai-badge">42</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -100,11 +100,12 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_list_setup_categories` | A client's categories or the firm's global categories, with GL codes (Manual), links, a suggested link for each global category the client does not link, and the LS-AI mark | No |
 | `ledgersync_list_setup_vendors` | A client's vendors (and, for a QuickBooks client, its customers) or the firm's global vendors, with the LS-AI mark | No |
 | `ledgersync_list_rules` | A client's rules or the firm's global rules, with conditions, category, payee and the LS-AI mark | No |
+| `ledgersync_get_rule` | One of a client's rules or the firm's global rules in full: every condition, every category line of a client rule, its payee, whether it is on, and the rules just before and after it | No |
 | `ledgersync_list_uncategorized_transactions` | A client's waiting transactions that no rule fills, grouped by bank text, largest groups first, and, at a QuickBooks client, the groups a global rule would file once a category is linked | No |
-| `ledgersync_preview_rules_setup` | Checks up to 100 rules with their new categories, links and vendors, and counts what each rule would fill for the client and at the firm's other clients; at a QuickBooks client, also what waits for a link and which other clients need one | No |
-| `ledgersync_apply_rules_setup` | Saves a previewed rules setup and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks | Yes |
-| `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created (in QuickBooks too) and filled; what failed and why | No |
-| `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove and keep (what it created in QuickBooks stays); after a yes, undoes it | Yes |
+| `ledgersync_preview_rules_setup` | Checks up to 100 rules with their new categories, links and vendors, and up to 50 changes to existing rules (edit, turn off, turn on, move, delete), and counts what each rule would fill and what each change would put back, keep or fill, for the client and at the firm's other clients; at a QuickBooks client, also what waits for a link and which other clients need one | No |
+| `ledgersync_apply_rules_setup` | Saves a previewed rules setup, makes its changes to existing rules and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks | Yes |
+| `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created (in QuickBooks too), changed and filled; what failed and why | No |
+| `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove, put back and keep (what it created in QuickBooks stays); after a yes, undoes it | Yes |
 | `ledgersync_get_categorized_export_link` | How many of the Manual clients' categorized transactions are not exported yet, and a 24-hour link to them as the LedgerSync app's Default or ACS export file | No (pressing **Download** on the link's page marks them Synced) |
 | `ledgersync_get_desktop_app_status` | Is the desktop app linked and connected (live only) | No |
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
@@ -290,10 +291,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `quickbooks_bookkeeping` ("Bookkeeping into QuickBooks"), with optional `client` and `period` arguments.
       Claude Code lists it as a command.
     - Rules setup lets the AI create a client's categorization rules in LedgerSync, with the new categories,
-      category links and vendors they need, after the user approves a preview. It works for Manual and QuickBooks
-      Online clients. For a client on another accounting app, such as Zoho Books, `ledgersync_get_rules_setup`
-      answers `supported: false` with the reason in its `next_step`, and a preview is refused with
-      `invalid_request`. See
+      category links and vendors they need, and change the rules that exist, after the user approves a preview. It
+      works for Manual and QuickBooks Online clients. For a client on another accounting app, such as Zoho Books,
+      `ledgersync_get_rules_setup` answers `supported: false` with the reason in its `next_step`, and a preview is
+      refused with `invalid_request`. See
       [Set up rules for a client](/ai/rules-setup). An AI app connected before these tools came out must load the
       new tool list first: reconnect in Claude, click **Refresh** in ChatGPT or reauthenticate in Grok, then start a
       new chat (see Tool updates below).
@@ -360,6 +361,15 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       (`more_lines`).
     - Each category, vendor and rule that a rules setup created or linked carries `ai` (`setup_id`, `reviewed`):
       the LS-AI mark.
+    - `ledgersync_get_rule` takes the `client_id` and a `rule_id` (`rul_c_...` or `rul_g_...`) and shows one rule in
+      full: the `rule` as `ledgersync_list_rules` lists it, its `transaction_type`, a client rule's categorization
+      `lines` (each with its `category`: `id`, `name`, `gl_code` and `full_name` when it differs from the name; its
+      `class`, `customer`, `amount` and `allocation_type`: `percentage` or `amount`), and the rules just before and
+      after it in its list (`neighbours`: `before` and `after`, each with `id` and `name`). Its `next_step` says how
+      to change the rule and what a rules setup cannot change on it yet: a global rule can only be turned off or
+      on, and a rule split over several lines keeps its category. A change keeps the rule's `rule_type`. A
+      `rule_id` that is not one of the client's rules, or not one of the firm's global rules on the client's
+      platform, answers `not_found`. It changes nothing.
     - `ledgersync_list_uncategorized_transactions` lists the client's waiting transactions that no rule holds and
       nobody categorized (not pending and not excluded), grouped by bank text, largest groups first, 50 groups at a
       time by default (up to 100), between optional `from` and `to` dates, and only money in or money out when
@@ -371,11 +381,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `firm_category_name`). It has no `firm_category_id` when the global rule has no global category: no link
       helps then, only fixing that rule in the LedgerSync app or a new rule.
     - `ledgersync_preview_rules_setup` takes the `client_id` and up to 100 `rules`, 50 `firm_categories`, 50
-      `client_categories`, 100 `mappings` and 100 `vendors`. The AI gives each new rule, category and vendor a
+      `client_categories`, 100 `mappings`, 100 `vendors` and 50 `changes` (see below). The AI gives each new rule, category and vendor a
       `ref` (lowercase letters, digits, `_` or `-`, up to 32 characters, unique in the preview). An item points at
       an existing object with `{"id": "..."}`, or at a new one in the same preview with `{"ref": "..."}`. A rule
       has a `scope` (client or global), a `name`, a `direction`, a `match` (all or any), 1 to 5 `conditions` on
-      the bank text (an `operator` and a `value`), a `category` and an optional `payee`: a client category and a
+      the bank text or the amount (an `operator` and a `value`), a `category` and an optional `payee`: a client category and a
       client vendor (or, at a QuickBooks client, a customer, `cus_c_...`) for a client rule, a global category and
       vendor for a global rule. A rule may also have a `rule_type`: `inclusion` (the default) or `exclusion`. An
       exclusion rule marks the transactions it matches for exclusion instead of filing them: they wait on For review
@@ -395,7 +405,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - For an exclusion rule, `fills_here` and `fills_other_clients` count the transactions it would mark for
       exclusion. The totals count them too: `excluded_by_new_rules` is the part of `filled_by_new_rules`, and
       `excludes_other_clients` the part of `fills_other_clients`, that the new exclusion rules would mark. Each is
-      left out when it is 0.
+      left out when it is 0. A changed exclusion rule's marks, the ones it keeps and the ones it fills, count only
+      with its change: in its `changes` entry and in the totals' `restamped_here` and `filled_by_changed_rules`,
+      never in `excluded_by_new_rules` or `excludes_other_clients`.
     - At a QuickBooks client, each global rule also says how many of its transactions would wait for a link here
       (`waiting_on_link_here`) and at the firm's other QuickBooks clients (`waiting_on_link_other_clients`), and how
       many other clients need a link (`clients_needing_link_count`, named or not). Each is left out when it is 0.
@@ -434,12 +446,60 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       payee) while QuickBooks cannot be reached (`quickbooks_broken`): the connection is broken, or QuickBooks could
       not be read just now, and the message says which. The `next_step` says to reconnect QuickBooks only for a
       broken connection, and otherwise to preview again in a few minutes.
+    - `changes` change rules that exist, one change per rule, next to new items or on their own. Each has a `ref`
+      (as for new items), an `action` (`edit`, `turn_off`, `turn_on`, `move` or `delete`) and the rule's `rule_id`
+      (`rul_c_...` or `rul_g_...`, from `ledgersync_list_rules` or `ledgersync_get_rule`). An `edit` gives the parts
+      it changes, any of `name`, `direction`, `match`, `conditions`, `category` and `payee`: a part left out stays as
+      it is, `conditions` replace all of the rule's, and `category` and `payee` take the same ids and refs as a new
+      rule of the same scope. A `move` gives a `position`: a `place`, `before` or `after` another rule of the same
+      list (its `rule_id`), or `first` or `last`. For now a global rule can only be turned off or on. A change has
+      no `rule_type`: it keeps the rule's type, so an exclusion rule changes like any rule and stays an exclusion
+      rule, and the transactions it keeps or fills are marked for exclusion.
+    - Conditions, in new rules and in edits, look at the bank text (`contains`, `doesnt_contain`, `is_exactly`) or
+      at the amount (`equals`, `doesnt_equal`, `is_greater_than`, `is_less_than`). An amount `value` is a plain
+      amount: up to 9 digits and 2 decimals, with no sign, currency symbol or thousands separator, such as
+      `1200.50`. Any other is refused with `invalid_request` before the preview is counted, naming the plain amount
+      it meant when there is one (`$1,200.50` is `1200.50`). Amounts are compared without their sign: the rule's
+      `direction` says money in or out. A rule still needs a `contains` or `is_exactly` condition, and amount
+      conditions that could never match, or that repeat each other, are refused.
+    - A change is refused when: its rule is not one of the client's rules, or not one of the firm's global rules on
+      the client's platform; the proposal changes the rule twice (`conflicting_changes`); it edits, moves or deletes
+      a global rule (`not_available_yet`); an edit gives a new category to a rule that splits a transaction over
+      several lines (`split_rule`); it would leave the rule as it is, such as turning on a rule that is on
+      (`no_change`); a move's place is not valid
+      (`move_anchor_invalid`) or lies among rules that share a priority (`priority_ties`); or it is global and the
+      login lacks **Manage Global Rules**. An edit is checked like a new rule (name, conditions, category, payee): a
+      problem it brings in refuses it, and one the rule already had is only a warning. A payee can be set or
+      replaced, never removed.
+    - With `changes`, the preview also answers `changes`, one entry per change, refused ones too: its `ref`,
+      `rule_id`, `scope`, `action`, the rule's `name`, its `status` (`ok`, or `refused` with the `code`; the reason
+      is in `refused`), the rule `before` and `after` the change (as `ledgersync_list_rules` shows a rule, with its
+      `neighbours`; no `after` for a delete), and what it does to the client's waiting transactions:
+      `released_here` (put back, for the client's other rules to file again; `taken_by` names those rules, with how
+      many each takes, and `released_waiting` counts the ones left waiting), `restamped_here` (kept by an edited
+      rule, stamped again with it), `fills_here` and `kept_for_person_edit` (the rule's transactions a person
+      changed, left as they are). For a global rule it adds `released_other_clients`, `restamped_other_clients`,
+      `fills_other_clients`, `other_clients` and `badges_cleared` (the "map this category" badges a turned-off rule
+      takes off), each left out when it is 0. A change also has its `warnings` and `examples` (each with an
+      `effect`: `released`, `restamped` or `filled`). `summary.change` counts the kept changes by action, with
+      `changes_ok` and `changes_refused`, and the totals add `released_here`, `restamped_here`,
+      `filled_by_changed_rules` and `kept_for_person_edit`. If LedgerSync cannot take changes just then, a preview
+      with `changes` is refused with `internal_error` and stores nothing: preview the new items without `changes`.
+    - A change touches only the transactions its rule owns: stamped by that rule and no other, still for review
+      (not accepted into Categorized), not posted, with the category lines and payee the rule gives. The rule's
+      transactions still for review and not posted that a person changed, or that carry another rule's stamp too,
+      are counted in `kept_for_person_edit` and left as they are. Ones accepted into Categorized or posted are left
+      as they are too, and not counted. A transaction a person moved to Excluded under an exclusion rule's mark is
+      left as it is too, and not counted. One a person excluded while it carries an inclusion rule's stamp, by hand
+      or with its bank account, is owned, counted and changed like a waiting one: it stays in Excluded, and once put
+      back no rule files it again (it counts in `released_waiting`).
     - The preview's answer fits in 20,000 characters. When it would not, the preview leaves out the examples
       first, then all but 5 of the clients named for each global category (counted in `more_named`), then the
       warning messages (the codes stay), then the refused items' messages (the codes stay), then those names
-      altogether, then some of the rules, items and refused items (counted in `more_rules`, `more_items` and
-      `more_refused`), and says what it left out. The summary, the totals and each rule's counts always cover
-      everything.
+      altogether, then, in the changes other than edits, the parts of the rule `after` the change that stay as
+      before, then some of the rules, changes, items and refused items (counted in `more_rules`, `more_changes`,
+      `more_items` and `more_refused`), and says what it left out. The summary, the totals and each rule's and
+      change's counts always cover everything.
     - `ledgersync_apply_rules_setup` takes only the `confirmation_id` and saves what the preview accepted, in the
       background. It returns a `setup_id` (`rsu_...`) and the status. LedgerSync first checks every item again: an
       item that is no longer valid fails with its reason, and a category or vendor whose name now exists is used
@@ -448,6 +508,15 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       new ones). When the setup made global rules, it also fills the waiting transactions at the firm's other
       clients on the same platform that one of those rules now wins. Calling it again with the same confirmation
       returns the first answer and never applies twice.
+    - With changes, the apply first checks that each rule it changes is still as the preview showed it. If one
+      changed or was deleted since, nothing is saved: the apply is refused with `invalid_request` ("These rules
+      changed since the preview: ... Preview again."). The setup then writes the changes, checking each rule again
+      first: a change whose rule changed or was deleted meanwhile fails with `rule_changed` or `rule_gone`, and when
+      that is found before anything was written, the whole setup fails and writes nothing. Then it puts back the
+      transactions a turned-off, deleted or edited rule owns (an edited rule keeps the ones it still matches,
+      stamped again), and the client's other rules decide them again at once, as for new transactions; for a
+      changed global rule, at the firm's other clients on the same platform too. A changed rule gets an entry in its
+      Rule History in the LedgerSync app, not the LS-AI mark (a deleted rule has no page to open its history from).
     - For a QuickBooks client, the setup first creates the client's new categories and vendors in its QuickBooks,
       then saves the links and rules. At the firm's other QuickBooks clients that do not link a new global rule's
       category, the transactions it matches get the "map this category" badge. When QuickBooks does not answer or
@@ -458,9 +527,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       (queued, running, done, done with some failed items, failed, being undone, undone, or undo failed), with its
       phase and progress. A finished setup also gives what it created by type, how many transactions it filled for
       the client, how many the existing rules filled, how many it filled at other clients and at how many clients,
-      and each failed item with its reason. Its `result` also says how many of the filled transactions its exclusion
-      rules marked for exclusion: `excluded_here`, part of `filled_here`, and `excluded_other_clients`, part of
-      `filled_other_clients`, each left out when it is 0. It also gives the setup's `platform`. For a QuickBooks
+      and each failed item with its reason. Its `result` also says how many of the filled transactions its new
+      exclusion rules marked for exclusion: `excluded_here`, part of `filled_here`, and `excluded_other_clients`, part
+      of `filled_other_clients`, each left out when it is 0. It also gives the setup's `platform`. For a QuickBooks
       client, its `result` also lists the categories and vendors it created in QuickBooks (`created_in_quickbooks`,
       each with its `type` and `name`), how many transactions the firm's existing global rules filled through its
       new links (`filled_through_links`) and how many other clients still need a link (`other_clients_needing_link`).
@@ -484,6 +553,32 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       this category" badge comes back where no other rule takes them; the check says how many
       (`link_filled_rows_to_reset`). A kept item's `reason` is `in_quickbooks` when it was made in QuickBooks, or
       `in_use`. The badges the setup's global rules left are cleared.
+    - For a setup with changes, the status's `result.changes` says what they did: how many rules it `edited`,
+      `turned_off`, `turned_on`, `moved` and `deleted`, then the transactions the changes `released` (put back for
+      the other rules to decide again) and `restamped`, the ones the changed rules filled (`filled_here` and
+      `filled_other_clients`), `badges_cleared` and `kept_for_person_edit`. Each of these counts this client's and
+      the firm's other clients' transactions together, except `filled_here` and `filled_other_clients`.
+      `other_clients` counts the other clients where the changes put back, stamped again or filled at least one
+      transaction, so it does not say where the fills are. The changed rules' fills are counted only in
+      `result.changes`, never in the result's own `filled_here`, `filled_by_existing_rules`, `filled_other_clients`,
+      `excluded_here` or `excluded_other_clients`: a changed exclusion rule's fills, and the ones it keeps, are the
+      transactions it marked for exclusion. For such a setup, the undo check adds `restore` (the changes it reverts,
+      latest first: `ref`, `type` `client_rule_change` or `global_rule_change`, `name` and `action`) and
+      `rows_to_restore`. The undo puts each changed rule back as it was (a deleted rule comes back with its old id),
+      and each transaction the setup wrote back as it was before the setup, only while it still holds what the setup
+      left; the transactions of the rules the setup created go back the same way. When the rules around a moved or
+      deleted rule changed since, it goes back as close to its old place as it can, and its `restore` entry then has a
+      `placement`: `between_neighbours` (between the same two rules, at another priority number) or, for a deleted
+      rule, `before_successor` (just before the rule that came after it), `after_predecessor` (just after the rule
+      that came before it) or `last` (after every other rule of its list). What it leaves is in `keep`, with a
+      `reason`: `changed_since` (the rule changed since), `order_changed` (the rules around a moved rule moved),
+      `category_gone` (the category it used before was deleted) or `touched_since` (some of its transactions changed
+      since). An undone setup's `undo` adds `changes_restored`, `rows_restored`, `rows_kept` and
+      `restored_elsewhere`, the moved or deleted rules it put back but not exactly where they were (`ref`, `type`,
+      `name`, `placement`). `more_restore` and `more_restored_elsewhere` count the entries left out to fit one
+      answer. While a later setup that changed the same rules or transactions is still in place, the undo is
+      refused with `invalid_request`, naming that setup: undo it first. Undoing changes to global rules needs
+      **Manage Global Rules**.
     - A rules setup apply or undo that got no clear answer from LedgerSync comes back as `upstream_unknown`,
       naming the setup: check `ledgersync_get_rules_setup_status` before trying again.
     - The instructions on [Set up rules for a client](/ai/rules-setup) are also an MCP prompt, `rules_setup`
@@ -619,13 +714,19 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       busy (`rate_limit_exceeded`, "Another push is running; try again in a minute."), is not counted, and can be
       sent again a minute later with the same `confirmation_id`.
     - Rules setup: one preview takes up to 100 rules, 50 new global categories, 50 new client categories, 100
-      category links and 100 new vendors (client and firm vendors together). Per connected AI app: 60 previews an
-      hour, 30 applies a day and 10 undos a day; an apply counts only when it reaches LedgerSync. A preview's
+      category links, 100 new vendors (client and firm vendors together) and 50 changes to existing rules, one per
+      rule. Per connected AI app: 60 previews an hour, 30 applies a day and 10 undos a day; an apply counts only
+      when it reaches LedgerSync. A preview's
       confirmation works for 30 minutes, an apply's answer is kept for 24 hours, and an undo check works for 15
       minutes.
-    - Rules setup conditions and names: a rule has 1 to 5 conditions on the bank text, each 1 to 200 characters,
-      at least one of them contains or is exactly; no amount conditions. Names: a client rule up to 100 characters, a global rule 64, a
-      global category 100, a client category 64, a client vendor 80, a global vendor 64 and a GL code 64.
+    - Rules setup conditions and names: a rule has 1 to 5 conditions, at least one of them contains or is exactly.
+      A condition looks at the bank text, 1 to 200 characters, or at the amount, a plain amount of up to 9 digits and
+      2 decimals with no sign, currency symbol or thousands separator, compared without its sign. Names: a client
+      rule up to 100 characters, a global rule 64, a global category 100, a client category 64, a client vendor 80, a
+      global vendor 64 and a GL code 64.
+    - Rules setup changes: one change per rule. For now a global rule can only be turned off or on; the category of
+      a rule split over several lines cannot be changed; and a payee can be set or replaced but not removed. A
+      change keeps the rule's type: an exclusion rule changes like any rule and stays an exclusion rule.
     - Rules setup applies: LedgerSync takes a few at a time, shared by every firm. An apply past that is refused as
       busy, is not counted, and can be sent again a minute later with the same `confirmation_id`. A firm runs one
       setup at a time; the next one waits until the one before it finishes. An undo does not wait: while another
@@ -671,7 +772,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     | `firm_under_review` | A new firm is still being reviewed by our team. It can add clients; bank connections open after the review. | Add clients now and connect banks after the review. |
     | `insufficient_scope` | This connection is read-only, or lacks permission for what you asked. | Ask for something the connection may do, or email support. |
     | `rate_limit_exceeded` | A limit was reached. | Try again when the AI says you can, or tomorrow for a daily limit. |
-    | `not_found` | No client, connection, account, statement or conversion matches, or it belongs to another account. A conversion belongs to the person who made its upload link. | Ask the AI to find the client first, then try again. For a conversion, use the `conversion_id` from an upload link you made yourself. |
+    | `not_found` | No client, connection, account, statement, conversion or rule matches, or it belongs to another account. A conversion belongs to the person who made its upload link. A client rule (`rul_c_...`) is found only for its own client, and a global rule (`rul_g_...`) only for the firm's clients on its accounting platform; a deleted rule is not found. | Ask the AI to find the client first, then try again. For a conversion, use the `conversion_id` from an upload link you made yourself. For a rule, list the rules again and use a `rule_id` from there. |
     | `desktop_app_required` | This bank needs the LedgerSync desktop app for refreshes, and the app is not connected right now. The bank was not called. | Open the desktop app on the computer it is set up on, then refresh again. The account holder has nothing to do. |
     | `desktop_app_route_choice` | The refresh is waiting for someone to choose whether LedgerSync reaches the bank through the desktop app. The bank was not called. | The AI gives you a fix link for the account holder. They make the choice on that LedgerSync page. Then refresh again. |
     | `pairing_code_invalid` | The desktop app code did not work: it is wrong, expired or already used. | Get a new code in the desktop app (**Settings**, **Connect with: AI chat**) and tell it to the AI. |

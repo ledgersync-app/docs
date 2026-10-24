@@ -3,6 +3,40 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-24" tags={["AI connector"]}>
+  ## Change a client's rules from Claude, ChatGPT and Grok
+
+  Your AI can now change the rules you already have, not only add new ones. Ask it to edit a rule, turn it off or
+  on, move it or delete it. It shows you a preview first and saves nothing until you say yes. See
+  [Changing your rules](/ai/rules-setup#changing-your-rules).
+
+  - **Client rules: every change.** Edit a rule's name, money in or out, conditions, category or vendor, turn it off
+    or on, move it in the list, or delete it. For Manual and QuickBooks Online clients.
+  - **Global rules: off or on.** For now, the AI can turn a global rule off or on. Edit, move or delete global rules
+    in the LedgerSync app.
+  - **Exclusion rules too.** You can change an exclusion rule the same way. It stays an exclusion rule: the waiting
+    transactions it keeps or fills are marked for exclusion, and move to **Excluded** when you accept them.
+  - **Transactions follow the change.** When you turn a rule off, delete it, or edit it so it no longer matches some
+    of its waiting transactions, the client's other rules file those again right away, as they do new transactions.
+    Transactions someone changed by hand stay as they are. The preview shows the rule before and after, and what
+    happens to its transactions.
+  - **Rules on the amount.** A rule can now also look at the amount: equals, doesn't equal, is greater than or is
+    less than. For example: *a rule for Shell over 500*. In new rules and in changes. A rule still needs words to
+    look for in the bank text.
+  - **One-step undo.** Undoing the setup puts the rules back as they were, a deleted rule included, and their
+    waiting transactions too, unless someone changed them since.
+  - **History, not LS-AI.** A changed rule is not marked LS-AI. Its Rule History in the LedgerSync app shows the
+    change (a deleted rule has no page to open its history from).
+  - Not yet: editing, moving or deleting global rules, changing the category of a rule split over several
+    categories, and taking a rule's vendor off.
+  - New tool: `ledgersync_get_rule`, which shows one rule in full. New input on `ledgersync_preview_rules_setup`:
+    `changes` and the amount operators. New result fields: the changes in the preview, the status and the undo
+    check. See [For developers](/ai/developers).
+  - Your AI keeps working as before. To change rules, it needs the new tool list: reconnect in Claude, click
+    **Refresh** in ChatGPT, or reauthenticate in Grok, then start a new chat. See
+    [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+</Update>
+
 <Update label="2026-10-23" tags={["AI connector"]}>
   ## The AI offers rules on its own
 

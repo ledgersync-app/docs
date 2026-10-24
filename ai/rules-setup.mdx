@@ -1,12 +1,12 @@
 ---
 title: "Set up rules for a client"
-description: "Your AI proposes rules that categorize a client's waiting bank transactions, or mark the ones to leave out (exclusion rules), for Manual and QuickBooks Online clients. After you say yes, LedgerSync saves them and fills the transactions."
+description: "Your AI proposes rules that categorize a client's waiting bank transactions, or mark the ones to leave out (exclusion rules), for Manual and QuickBooks Online clients. After you say yes, LedgerSync saves them and fills the transactions. It can also change your existing rules."
 mode: "frame"
 ---
 
 import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
 
-<AiPage title="Set up rules for a client" video="/videos/rules-setup.mp4" poster="/videos/rules-setup-poster.jpg" subtitle="Ask your AI. It suggests rules, you say yes or no, and LedgerSync fills the client's waiting transactions.">
+<AiPage title="Set up rules for a client" video="/videos/rules-setup.mp4" poster="/videos/rules-setup-poster.jpg" subtitle="Ask your AI. It suggests rules, you say yes or no, and LedgerSync fills the client's waiting transactions. It can also change the rules you have.">
 
 <AiNote tone="green">
 
@@ -52,6 +52,13 @@ The AI shows what it will save. Say yes, and allow it if Claude or ChatGPT asks.
 
 **Or let the AI offer.** Ask it to show a client's transactions. If some have no rule yet, it offers to suggest
 rules.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**Change a rule you have.** Ask, for example: *"Turn off Acme's Shell rule."* The AI shows you a preview first. See
+[Changing your rules](#changing-your-rules).
 
 </AiNote>
 
@@ -110,18 +117,19 @@ and nobody has given a category. Transactions still pending at the bank, and exc
 
 <AiNote tone="gray">
 
-**Your existing rules stay as they are.** LedgerSync never changes a transaction that a rule already filled or that
-someone gave a category. New rules go at the end of the list, after the rules you have. If one of your existing
-rules matches one of this client's waiting transactions that it had not filled yet, LedgerSync fills that one too.
-At a QuickBooks client, that includes the ones your global rules can file once a new link is saved. The preview and
-the result show how many.
+**Your existing rules stay as they are, unless you ask for a change.** New rules never take a transaction that a rule
+already filled or that someone gave a category. New rules go at the end of the list, after the rules you have. If
+one of your existing rules matches one of this client's waiting transactions that it had not filled yet, LedgerSync
+fills that one too. At a QuickBooks client, that includes the ones your global rules can file once a new link is
+saved. The preview and the result show how many. To change a rule you have, see
+[Changing your rules](#changing-your-rules).
 
 </AiNote>
 
 <AiNote tone="gray">
 
-**A big setup goes in batches.** One preview takes up to 100 rules. For more, the AI works in batches. Each batch
-has its own preview and needs your yes.
+**A big setup goes in batches.** One preview takes up to 100 rules and 50 changes to existing rules. For more, the
+AI works in batches. Each batch has its own preview and needs your yes.
 
 </AiNote>
 
@@ -228,12 +236,70 @@ For a QuickBooks Online client, rules setup works the same way, with these diffe
 
 </Accordion>
 
+<Accordion title="Changing your rules" id="changing-your-rules">
+
+Your AI can also change the rules you already have, for Manual and QuickBooks Online clients. Ask it in your own
+words. For example: *Turn off Acme's Shell rule*, *Change Acme's Amazon rule to Office Supplies* or *Move Acme's Uber
+rule to the top*.
+
+1. The AI finds the rule and reads all of it: its conditions, category, vendor, whether it is on, and its place in
+   the list.
+2. It shows you a preview: the rule before and after the change, and what happens to the client's waiting
+   transactions. Nothing has changed yet.
+3. You say yes. Claude and ChatGPT also ask you to allow it. LedgerSync changes the rule, then its waiting
+   transactions, and the AI tells you what changed.
+
+| You ask to | The rule | Its waiting transactions |
+| --- | --- | --- |
+| Edit it | Gets the name, money in or out, conditions, category or vendor you asked for. The rest stays as it is. | The ones it still matches get its new category and vendor. The others go back to your other rules. It can also fill waiting transactions that no rule has filled yet. |
+| Turn it off | Stays in the list, turned off. | They go back to your other rules. |
+| Turn it on | Is turned on again. | It fills the waiting transactions it matches that no rule has filled yet, as a new rule does. |
+| Move it | Goes before or after another rule, or first or last in the list. | They keep their rule. New transactions follow the new order. |
+| Delete it | Is deleted. | They go back to your other rules. |
+
+- **Transactions that go back are filed again at once.** Your other rules decide them the way they decide new
+  transactions. The ones no other rule matches wait on **For review** with no category. The preview names the rules
+  that take them.
+- **Transactions someone changed stay as they are.** A change touches only the transactions the rule filled that
+  nobody gave another category or payee since, and that are not posted yet. The ones someone changed that way, and
+  the ones you already moved to **Categorized**, stay as they are, and so do the ones on **Excluded** that an
+  exclusion rule marked. The preview counts the ones someone changed.
+- **Transactions you excluded yourself are changed too.** When a rule that is not an exclusion rule filled a
+  transaction that someone then excluded, by hand or with its bank account, a change to that rule changes it like a
+  waiting one. It stays on **Excluded**, but the change takes the rule's category and vendor off it, or gives it the
+  edited rule's, and your other rules do not file it again.
+- **Global rules: only off or on, for now.** Turning off a global rule puts back its waiting transactions at every
+  client of your firm with the same accounting app. At your QuickBooks clients, it also takes off its "map this
+  category" badges. Turning one on fills waiting transactions here and at your other clients, as a new global rule
+  does. To edit, move or delete a global rule, use the LedgerSync app. Turning global rules off or on needs
+  **Manage Global Rules**.
+- **Exclusion rules change the same way.** You can change an exclusion rule like any other rule. It stays an
+  exclusion rule: the waiting transactions it keeps or fills are marked for exclusion, and move to **Excluded**
+  when you accept them. The preview and the result count them with the change, apart from what new exclusion rules
+  mark. A change cannot make a rule an exclusion rule, or the other way around.
+- **Rules can look at the amount.** A condition can also check the amount: equals, doesn't equal, is greater than or
+  is less than. For example: *Make a rule for Shell over 500*. Write a plain amount, such as 1200.50, with no $ sign,
+  commas or minus sign. The amount is compared without its sign: money in or money out is set on the rule. A rule
+  still needs words to look for in the bank text. This works in new rules too.
+- **Changes and new rules can go together.** One preview takes up to 50 changes, one per rule, along with new rules.
+- **If a rule changes after the preview,** for example in the LedgerSync app, LedgerSync does not make the change to
+  it. If it finds this before it saves anything, nothing is saved. If it finds it while it saves, only that change
+  fails, and the rest is saved. Either way, ask the AI to read the rule again and preview the change again.
+- **A changed rule is not marked LS-AI.** Its history shows the change instead: in the LedgerSync app, open the rule
+  and click the **Rule History** button at the top right. A deleted rule has no page to open its history from.
+- **Changed your mind?** Undo the setup, as for new rules. It puts the rules back as they were, and their waiting
+  transactions too. See [Undo](#undo).
+
+</Accordion>
+
 <Accordion title="What LedgerSync saves">
 
-- The rules. Each one looks for words in the bank text (contains, doesn't contain or is exactly), for money in,
-  money out or both. It puts a category on the transaction and its vendor as the payee.
+- The rules. Each one looks for words in the bank text (contains, doesn't contain or is exactly) and, if you want,
+  at the amount, for money in, money out or both. It puts a category on the transaction and its vendor as the payee.
 - New categories and vendors, for the client or for your firm (global). For a QuickBooks client, the client's new
   categories and vendors are also created in its QuickBooks. Global ones live in LedgerSync only.
+- The changes to your existing rules that you said yes to, and what they do to the rules' waiting transactions, as
+  in [Changing your rules](#changing-your-rules).
 - Links between one of the client's categories and a global category, where the client has no link for either one
   yet.
 - The category on each waiting transaction the rules fill and, when the rule has a vendor, that vendor as its payee.
@@ -268,7 +334,9 @@ Changed your mind? Ask the AI to undo the setup. For example: *Undo the rules se
    and why. Nothing has changed yet.
 2. You say yes. Claude and ChatGPT also ask you to allow it.
 3. LedgerSync deletes the rules the setup made. It takes their category and payee (and, for an exclusion rule, its
-   mark) off the waiting transactions they filled, even a payee or category you changed yourself on one of them.
+   mark) off the waiting transactions they filled. When the setup had no changes to your existing rules, that
+   includes a payee or category you changed yourself on one of them. When it had some, a transaction you changed
+   yourself stays as it is: see **When the setup changed your existing rules** below.
 4. Transactions you moved to **Excluded** because of the setup's exclusion rules go back to **For review**. The AI
    says how many before you say yes.
 5. It undoes the category links the setup made.
@@ -285,26 +353,46 @@ For a QuickBooks client, three things are different:
 - **The "map this category" badges the setup's global rules put on transactions go away**, at this client and at
   your other QuickBooks clients.
 
+**When the setup changed your existing rules.** The undo also puts back what the setup changed, as it was before the
+setup:
+
+- **The rules.** Each rule goes back to how it was: its name, conditions, category, vendor, whether it is on, and its
+  place in the list. A rule the setup deleted comes back, in its old place or as close to it as it can.
+- **The transactions.** Each waiting transaction the setup changed goes back to how it was before the setup. That
+  includes the ones it put back for your other rules, and the ones the rules filled during the setup.
+- **What changed since stays.** A rule someone changed after the setup stays as it is now, and so does a rule whose
+  old category was deleted. A moved rule goes back to its old place, or between its old neighbours. If those were
+  moved apart since, it stays where it is. A transaction someone changed after the setup stays as it is too, even
+  one the setup's new rules filled. Transactions you moved to **Excluded** because of the setup's new exclusion
+  rules still go back to **For review**, as in step 4 above. Before you say yes, the AI tells you which.
+- **A later setup goes first.** If a later setup changed the same rules or transactions, undo that one first. The AI
+  offers to.
+
 <AiNote tone="gray">
 
-**An undo never changes** the transactions you already moved to **Categorized**, or your own rules. It also leaves
-alone the transactions your existing rules filled during the setup, except, at a QuickBooks client, the ones your
-global rules filed through a link the setup made.
+**An undo never changes** the transactions you already moved to **Categorized**, or your own rules, except the ones
+the setup changed. When the setup had no changes to your rules, it also leaves alone the transactions your existing
+rules filled during the setup, except, at a QuickBooks client, the ones your global rules filed through a link the
+setup made.
 
 </AiNote>
 
 An undo works once the setup is no longer running, whether it is done, partly done or failed. It removes only what
-the setup saved. If an undo could not finish, ask the AI to undo the setup again. While another setup of your firm is
-running or being undone, an undo cannot start: ask the AI again when that one finishes. Undoing global rules, global
-categories or global vendors needs **Manage Global Rules**.
+the setup saved, and puts back only what it changed. If an undo could not finish, ask the AI to undo the setup again.
+While another setup of your firm is running or being undone, an undo cannot start: ask the AI again when that one
+finishes. Undoing global rules, global categories, global vendors or changes to global rules needs
+**Manage Global Rules**.
 
 </Accordion>
 
 <Accordion title="What it does not do yet">
 
 - Clients that use another accounting app, such as Zoho Books.
-- Changing, turning off or deleting your existing rules. It only adds new ones.
-- Rules on the amount, such as *over $500*. A rule looks at the bank text only.
+- Editing, moving or deleting a global rule. A setup can turn a global rule off or on. For the rest, use the
+  LedgerSync app.
+- Changing the category of a rule that splits each transaction over several categories.
+- Taking a rule's vendor off. A change can give a rule a vendor or replace it.
+- A rule on the amount alone. A rule also needs words to look for in the bank text.
 - New QuickBooks categories under another category, or with a detail type. New ones are made at the top level.
 - Employees as payees, and new customers.
 - Turning a deactivated QuickBooks category or vendor back on.
@@ -315,15 +403,17 @@ categories or global vendors needs **Manage Global Rules**.
 
 - **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
   a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the new
-  rules tools.
+  rules tools. On ChatGPT Business, Enterprise or Edu, your workspace admin refreshes LedgerSync's tools first. On
+  Enterprise and Edu, they also turn on the new tool that shows one rule: **Workspace settings**, then **Apps**,
+  then **...** next to LedgerSync, then **Action control**.
 - **The client is a Manual client or a QuickBooks Online client.** A Manual client is not set up with an accounting
   app in LedgerSync. A QuickBooks client is connected to QuickBooks in LedgerSync. In the LedgerSync app, you work on
   these clients under **Rules Engine**, then **Manual** or **QuickBooks**.
 - **The client does not need its own categories yet.** The AI can propose new ones, or use your firm's global
   categories.
-- **Global rules need permission.** To make a global rule, your LedgerSync login needs **Manage Global Rules**.
-  The firm owner and administrators always have it. Employees have it unless the owner or an administrator turned
-  it off. They do that in the LedgerSync app: they click their name at the top, then **Permissions**.
+- **Global rules need permission.** To make a global rule, or turn one off or on, your LedgerSync login needs
+  **Manage Global Rules**. The firm owner and administrators always have it. Employees have it unless the owner or
+  an administrator turned it off. They do that in the LedgerSync app: they click their name at the top, then **Permissions**.
 
 </Accordion>
 
@@ -348,7 +438,7 @@ You don't need these: LedgerSync already gives your AI the same steps. If your A
 them, give it these instructions.
 
 <div className="lsai-prompt">
-  <AiCopy label="Instructions for your AI" text={`Set up categorization rules for a LedgerSync client.
+  <AiCopy label="Instructions for your AI" text={`Set up or change categorization rules for a LedgerSync client.
 1. Find the client with ledgersync_find_clients, then call ledgersync_get_rules_setup. It works for QuickBooks Online and Manual clients; follow its next_step.
 2. Read what exists: ledgersync_list_rules (client and global), ledgersync_list_setup_categories (client and firm) and ledgersync_list_setup_vendors (client and firm).
 3. Link the firm's categories. ledgersync_list_setup_categories (kind firm) lists first the ones this client does not link yet, each with a link_suggestion. Level a: the client's own transactions decide it, so propose its first candidate. Level b: propose the first candidate as your best guess and show the user the other candidates. Level c: ask the user which of the client's categories to link. Put all these links in one preview (mappings); if there are more than one preview takes, start with the ones the firm's global rules use and ask before the rest. For a QuickBooks client a link is what lets the firm's global rules file its transactions at all; for a Manual client it sets the GL code they use.
@@ -357,16 +447,18 @@ them, give it these instructions.
 6. Give every rule a payee the same way: one of the client's vendors (for a QuickBooks client, also one of its customers) for a client rule, one of the firm's vendors for a global rule, or a new vendor you say is new. The rule puts it on each transaction it fills as the payee, and the firm can accept a transaction only when it has a payee. An exclusion rule needs no payee: accepting its transactions moves them to Excluded.
 7. Pick the kind of each rule yourself: a global rule (every client of the firm) for vendors that mean the same for every client, such as bank fees, software or fuel, otherwise a client rule (this client only). Then propose each rule to the user by its name, saying what it does and for whom, and ask yes or no, for example: "Can I create a global rule 'Square' that leaves Square deposits out of the books for every client?" The user answers yes, no or what to change, so they never have to ask for a client or global rule.
 8. Follow the firm's naming pattern for rule names; you can see it in the existing rules.
-9. Preview with ledgersync_preview_rules_setup (up to 100 rules at a time). Show the user what will be created (for a QuickBooks client, new categories and vendors are created in its QuickBooks after the yes), how many transactions each rule fills for this client and for other clients (for an exclusion rule, how many it marks for exclusion), which other clients still need a link, and every warning.
-10. Only after the user says yes, call ledgersync_apply_rules_setup. Then follow ledgersync_get_rules_setup_status until it finishes and report the result. For a QuickBooks client, offer to post the filled transactions into its QuickBooks with the QuickBooks bookkeeping tools, as the status's next_step says.
-11. Everything you create is marked LS-AI in LedgerSync for review. If the user wants it removed, use ledgersync_undo_rules_setup; categories and vendors created in QuickBooks stay there, and an undo also puts back on For review the transactions the user moved to Excluded because of the setup's exclusion rules.`} />
+9. To change a rule that exists, read it first with ledgersync_get_rule, then put the change in the preview's changes, one per rule: edit (its name, money in or out, conditions, category or payee), turn_off, turn_on, move (before or after another rule of its list, or first or last) or delete. A change keeps the rule's type: an exclusion rule stays an exclusion rule. A global rule can only be turned off or on for now. Conditions, in new rules and edits, can also test the amount (equals, doesnt_equal, is_greater_than, is_less_than) with a plain amount such as 1200.50.
+10. Preview with ledgersync_preview_rules_setup (up to 100 rules and 50 changes at a time). Show the user what will be created (for a QuickBooks client, new categories and vendors are created in its QuickBooks after the yes), how many transactions each rule fills for this client and for other clients (for an exclusion rule, how many it marks for exclusion), which other clients still need a link, for each change the rule before and after and the transactions it puts back for the client's other rules to file, and every warning.
+11. Only after the user says yes, call ledgersync_apply_rules_setup. Then follow ledgersync_get_rules_setup_status until it finishes and report the result. For a QuickBooks client, offer to post the filled transactions into its QuickBooks with the QuickBooks bookkeeping tools, as the status's next_step says.
+12. Everything you create is marked LS-AI in LedgerSync for review, and a rule you change shows the change in its history. If the user wants a setup taken back, use ledgersync_undo_rules_setup: it removes what the setup created and puts the rules it changed back as they were; categories and vendors created in QuickBooks stay there, and an undo also puts back on For review the transactions the user moved to Excluded because of the setup's exclusion rules.`} />
 </div>
 
 1. Click **Copy** above.
 2. In Claude, ChatGPT or Grok, start a new chat.
 3. Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
 4. At the end, type the client's name. For example: *Acme*. To start with some of the transactions, say which. For
-   example: *Acme, start with bank fees and software*. Then press **Enter**.
+   example: *Acme, start with bank fees and software*. To change a rule you have, say which and how. For example:
+   *Acme, turn off the Shell rule*. Then press **Enter**.
 
 <AiNote tone="gray">
 
@@ -387,7 +479,7 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 
 | The AI says | Do this |
 | --- | --- |
-| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. On ChatGPT Business, Enterprise or Edu, ask your workspace admin to refresh LedgerSync's tools. On Enterprise and Edu, also ask them to turn on the new tool that shows one rule under **Action control**. |
 | It cannot make an exclusion rule | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
 | An exclusion rule's transactions are still on **For review** | That is how exclusion rules work: the rule marks them, and you decide. Accept them in LedgerSync to move them to **Excluded**. |
 | The client's QuickBooks connection stopped working | Links and rules still work. The client's new categories, its new vendors and customers as payees need QuickBooks: reconnect it, as in [QuickBooks clients](#quickbooks-clients), then ask the AI to preview again. |
@@ -398,6 +490,8 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 | Some items were refused in the preview | The AI says why for each one. Answer its questions, or leave them out, and ask it to preview again. Nothing has changed yet. |
 | Some items failed | The AI says which ones and why. The rest was saved. Fix the reason, then ask the AI to preview the missing ones again. |
 | QuickBooks did not answer while the setup ran, or its connection stopped working | The setup keeps running, and LedgerSync tries again every few minutes, 5 tries in all. If the connection stopped working, reconnect it. After the last try, what still needs QuickBooks fails, and the rest of the setup is saved: ask the AI to preview the failed items again. |
+| A global rule can only be turned off or on | For now, a setup cannot edit, move or delete a global rule. Do that in the LedgerSync app. |
+| An amount is not a plain amount | Write it with digits and up to 2 decimals, such as 1200.50, with no $ sign, commas or minus sign. The rule's money in or money out says which way. |
 
 </Accordion>
 
@@ -417,7 +511,7 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 
 </Accordion>
 
-<Accordion title="More messages: preview expired, setup not confirmed, LedgerSync busy, setup waiting, undo, setup failed, limits">
+<Accordion title="More messages: preview expired, setup not confirmed, LedgerSync busy, setup waiting, rules changed since the preview, undo, setup failed, limits">
 
 | The AI says | Do this |
 | --- | --- |
@@ -425,10 +519,13 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 | LedgerSync did not confirm the setup, so it may or may not have started | Don't ask it to apply again. Wait a minute, then ask it to check the setup's status. |
 | LedgerSync is busy with other setups | Nothing was saved. Wait a minute, then ask the AI to apply the same preview again. A preview works for 30 minutes. |
 | The setup is waiting | Your firm runs one setup at a time. It starts when the one before it finishes. |
-| Too many items for one preview | One preview takes up to 100 rules, 50 new global categories, 50 new client categories, 100 category links and 100 new vendors. Ask the AI to do the rest in another preview. |
-| A rule's words are refused | A rule needs 1 to 5 conditions on the bank text, each up to 200 characters. At least one must look for words (contains or is exactly). The AI says what is wrong. Ask it to fix the rule. |
+| Too many items for one preview | One preview takes up to 100 rules, 50 new global categories, 50 new client categories, 100 category links, 100 new vendors and 50 changes to existing rules, one per rule. Ask the AI to do the rest in another preview. |
+| A rule's words are refused | A rule needs 1 to 5 conditions, on the bank text (each up to 200 characters) or the amount. At least one must look for words in the bank text (contains or is exactly). The AI says what is wrong. Ask it to fix the rule. |
+| The rules changed since the preview | Someone changed or deleted one of the rules after the preview, so nothing was saved. Ask the AI to preview again. |
+| A change failed because its rule was changed or deleted | Someone changed or deleted the rule after the preview. If LedgerSync found this before it saved anything, the setup failed and nothing was saved. If it found it while saving, only that change failed, and the rest of the setup was saved. Ask the AI to read the rule again and preview the change again. |
+| Undo the later setup first | A later setup changed the same rules or transactions, and it is still in place. Ask the AI to undo that one first, then this one. |
 | A name is too long | Names can be up to 64 characters for a global rule, a client category or a global vendor, 80 for a client vendor, and 100 for a client rule or a global category. A GL code can be up to 64. Give the AI a shorter one. |
-| Undo is not possible | An undo works once a setup is no longer running, whether it is done, partly done or failed, and again after an undo that could not finish. It cannot start while another setup of your firm is running or being undone: ask the AI again when that one finishes. A setup that is undone cannot be undone again. Undoing global rules, global categories or global vendors needs **Manage Global Rules**. |
+| Undo is not possible | An undo works once a setup is no longer running, whether it is done, partly done or failed, and again after an undo that could not finish. It cannot start while another setup of your firm is running or being undone: ask the AI again when that one finishes. A setup that is undone cannot be undone again. Undoing global rules, global categories, global vendors or changes to global rules needs **Manage Global Rules**. |
 | The setup failed | What it saved before it stopped stays, marked LS-AI. To remove it, ask the AI to undo the setup. For help with why it failed, email <AiEmail /> and say which client. |
 | The undo check expired | An undo check works for 15 minutes. Ask the AI to check the undo again. |
 | Too many previews, setups or undos this hour or today | Each AI app you connect can preview 60 times an hour, save 30 setups a day and undo 10 a day. Try again next hour or tomorrow, as the AI says. |
@@ -455,18 +552,19 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 Anything else? See [Troubleshooting](/ai/troubleshooting).
 
 <AccordionGroup>
-  <Accordion title="For developers: the 9 tools and what they change">
+  <Accordion title="For developers: the 10 tools and what they change">
     | Tool | What it does | Changes data |
     | --- | --- | --- |
     | `ledgersync_get_rules_setup` | Can the client's rules be set up (Manual and QuickBooks Online clients); counts of its categories, vendors, rules and waiting transactions; for a QuickBooks client, its QuickBooks connection and the transactions waiting for a link; can you make global rules; the limits; the client's last setups | No |
     | `ledgersync_list_setup_categories` | The client's categories or the firm's global categories, with GL codes (Manual), links, a suggested link for each global category the client does not link, and the LS-AI mark | No |
     | `ledgersync_list_setup_vendors` | The client's vendors (and, for a QuickBooks client, its customers) or the firm's global vendors, with the LS-AI mark | No |
     | `ledgersync_list_rules` | The client's rules or the firm's global rules, with conditions, category, payee, rule type (`rule_type`: inclusion or exclusion) and the LS-AI mark | No |
+    | `ledgersync_get_rule` | One rule in full: every condition, every category line of a client rule, its payee, whether it is on, and the rules just before and after it | No |
     | `ledgersync_list_uncategorized_transactions` | The client's waiting transactions that no rule fills, grouped by bank text, largest groups first, and, at a QuickBooks client, the groups a global rule would file once a category is linked | No |
-    | `ledgersync_preview_rules_setup` | Checks up to 100 rules (inclusion or exclusion rules, `rule_type`) with their new categories, links and vendors, and counts what each rule would fill here and at the firm's other clients (for an exclusion rule, what it would mark for exclusion); at a QuickBooks client, also what waits for a link and which other clients need one | No |
-    | `ledgersync_apply_rules_setup` | Saves a previewed setup and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks | Yes |
-    | `ledgersync_get_rules_setup_status` | How a setup is going; what it created (in QuickBooks too) and filled; what failed and why | No |
-    | `ledgersync_undo_rules_setup` | Shows what undoing a setup would remove and keep (what it created in QuickBooks stays); after a yes, undoes it | Yes |
+    | `ledgersync_preview_rules_setup` | Checks up to 100 rules (inclusion or exclusion rules, `rule_type`) with their new categories, links and vendors, and up to 50 changes to existing rules, and counts what each rule would fill (for an exclusion rule, what it would mark for exclusion) and what each change would put back, keep or fill, here and at the firm's other clients; at a QuickBooks client, also what waits for a link and which other clients need one | No |
+    | `ledgersync_apply_rules_setup` | Saves a previewed setup, makes its changes to existing rules and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks | Yes |
+    | `ledgersync_get_rules_setup_status` | How a setup is going; what it created (in QuickBooks too), changed and filled; what failed and why | No |
+    | `ledgersync_undo_rules_setup` | Shows what undoing a setup would remove, put back and keep (what it created in QuickBooks stays); after a yes, undoes it | Yes |
 
     - The apply takes only the preview's `confirmation_id`. It works for 30 minutes, only for the person and the AI
       app that made the preview, and saves only the items the preview accepted. Calling the apply again with the
@@ -474,7 +572,7 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     - The undo works the same way. The first call changes nothing: it returns what would be removed and kept, and
       an `undo_id`. Only a second call with that `undo_id`, within 15 minutes, undoes the setup. Both calls go to
       the same tool, marked as changing data, so Claude and ChatGPT ask before each one, the check included.
-    - The preview, the apply and the undo need `write:accounting`; the other six tools need `read:accounting`. A
+    - The preview, the apply and the undo need `write:accounting`; the other seven tools need `read:accounting`. A
       read-only connection can read but cannot preview, apply or undo.
     - Rules setup can start without being asked. For a Manual or QuickBooks Online client, the first page of
       `ledgersync_list_transactions` also answers `transactions_without_rule`: how many of the client's transactions
@@ -482,6 +580,10 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
       tells the AI to offer rules and, after the user's yes, to call `ledgersync_get_rules_setup`.
       `ledgersync_list_transactions_to_categorize` offers the same after a push, when a transaction it lists has no
       rule. Neither offers on a read-only connection.
+    - A change to an existing rule goes in the preview's `changes`, naming the rule by the `rule_id` that
+      `ledgersync_list_rules` and `ledgersync_get_rule` show (`rul_c_...` or `rul_g_...`). A setup edits, turns off,
+      turns on, moves and deletes client rules, exclusion rules included, and only turns global rules off or on for
+      now. A change keeps the rule's type (`rule_type`).
     - The instructions above are also an MCP prompt, `rules_setup` ("Set up rules for a client"), with optional
       `client` and `focus` arguments. Claude Code lists it as a command.
     - For a client on another accounting app, such as Zoho Books, `ledgersync_get_rules_setup` answers
@@ -496,10 +598,14 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
   </Accordion>
 
   <Accordion title="For developers: limits">
-    - One preview takes up to 100 rules, 50 new global categories, 50 new client categories, 100 category links
-      and 100 new vendors (client and firm vendors together).
-    - A rule has 1 to 5 conditions on the bank text (contains, doesn't contain or is exactly), each 1 to 200
-      characters, and at least one of them contains or is exactly. There are no amount conditions.
+    - One preview takes up to 100 rules, 50 new global categories, 50 new client categories, 100 category links,
+      100 new vendors (client and firm vendors together) and 50 changes to existing rules, one per rule.
+    - A rule has 1 to 5 conditions, and at least one of them contains or is exactly. A condition looks at the bank
+      text (contains, doesn't contain or is exactly), 1 to 200 characters, or at the amount (equals, doesn't equal,
+      is greater than or is less than): a plain amount of up to 9 digits and 2 decimals, with no sign, currency
+      symbol or thousands separator, such as 1200.50. Amounts are compared without their sign.
+    - A change cannot edit, move or delete a global rule, change the category of a rule that splits a transaction
+      over several lines, or take a payee off a rule. A change keeps the rule's type: an exclusion rule stays one.
     - Names: a client rule up to 100 characters, a global rule 64, a global category 100, a client category 64, a
       client vendor 80, a global vendor 64 and a GL code 64. Names are trimmed, and a name counts as taken whatever
       its capitals.
@@ -513,7 +619,8 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     - A preview's confirmation works for 30 minutes, an apply's answer is kept for 24 hours, and an undo check
       works for 15 minutes.
     - Each person sets up rules only for the clients they see in the LedgerSync app: an employee, the clients
-      assigned to them. Global rules, global categories and global vendors also need **Manage Global Rules**.
+      assigned to them. Global rules, global categories and global vendors, and changes to global rules, also need
+      **Manage Global Rules**.
   </Accordion>
 </AccordionGroup>
 
