@@ -32,6 +32,8 @@ unless he asks.
 
 - Work only on the branch the session started on. Never switch to `main`: the session saves your branch by itself,
   so anything left on `main` would go live without his yes.
+- One change at a time. Publishing sends everything on your branch, so before you start a new change, settle the one
+  that is waiting: publish it if he said yes, or undo it.
 1. Make the change. Then tell him in plain words what will change, and ask: "Publish it?"
 2. When he says yes (publish, go live, ship it), commit with a one-line plain message and no co-author lines, then
    run `git push origin HEAD:main`. No pull requests.
