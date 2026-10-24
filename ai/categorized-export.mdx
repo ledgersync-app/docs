@@ -7,7 +7,7 @@ mode: "frame"
 
 import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
 
-<AiPage title="Export categorized transactions on a schedule" subtitle="Ask your AI once. At the time you choose, it gives you a link to a file of the transactions you accepted that were not exported yet. In ChatGPT, you may need to ask for it in a chat.">
+<AiPage title="Export categorized transactions on a schedule" video="/videos/export-schedule.mp4" poster="/videos/export-schedule-poster.jpg" subtitle="Ask your AI once. At the time you choose, it gives you a link to a file of the transactions you accepted that were not exported yet. In ChatGPT, you may need to ask for it in a chat.">
 
 <AiNote tone="green">
 
@@ -27,14 +27,15 @@ chat, type **@** and pick **LedgerSync**.
 
 <AiStep id="ask" n={2} total={5} title="Ask for it on a schedule">
 
-Type *"Every weekday at 3 PM, get me my new categorized transactions from LedgerSync, as the ACS file"* and press **Enter**. Use your own time. For a CSV file, say *the Default file*.
+Type *"Every weekday at exactly 3:00 PM, get me my new categorized transactions from LedgerSync, as the ACS file"* and
+press **Enter**. Use your own time. For a CSV file, say *the Default file*.
 
 </AiStep>
 
 <AiStep id="schedule" n={3} total={5} title="Click Schedule" img="/images/ai-export/export-3-schedule.png" caption="Schedule circled">
 
-Claude shows the task. Check that it says **Auto**, so runs don't wait for you, then click **Schedule**. In
-ChatGPT, confirm the task if it asks.
+Claude may ask a question or two first. When it shows the task, check that it has your time and says **Auto**, so
+runs don't wait for you. Then click **Schedule**. In ChatGPT, confirm the task if it asks.
 
 </AiStep>
 
@@ -239,9 +240,9 @@ at the end. Only one client? Add its name. For example: *Default file, only Acme
 1. Click **Copy** above.
 2. In Claude, click **Scheduled**, then **New task**, then **Create with Claude**. In ChatGPT, start a new chat, type
    **@** and pick **LedgerSync**.
-3. Type when it should run, such as *Every weekday at 3 PM,* then press **Ctrl+V** (**Command+V** on a Mac) and
+3. Type when it should run, such as *Every weekday at exactly 3:00 PM,* then press **Ctrl+V** (**Command+V** on a Mac) and
    **Enter**.
-4. In Claude, check that the task says **Auto**, then click **Schedule**.
+4. In Claude, check that the task has your time and says **Auto**, then click **Schedule**.
 
 </Accordion>
 
