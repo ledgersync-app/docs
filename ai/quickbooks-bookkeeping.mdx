@@ -6,81 +6,66 @@ mode: "frame"
 
 import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
 
-<AiPage title="Bookkeeping into QuickBooks" subtitle="Your AI picks a category and a payee for each of a client's bank transactions in LedgerSync, and asks you about the ones it is not sure of. After you say yes, LedgerSync posts them into the client's QuickBooks.">
+<AiPage title="Bookkeeping into QuickBooks" subtitle="Ask your AI. It categorizes a client's bank transactions, and after your yes, LedgerSync posts them into the client's QuickBooks.">
 
 <AiNote tone="green">
 
-**For clients with no QuickBooks bank feed.** With a bank feed, QuickBooks downloads the bank's transactions
-itself. If an account has one, leave that account out: QuickBooks would get each transaction twice.
+**For QuickBooks Online accounts with no bank feed.** Not set up yet? Go to [Start here](/ai/start-here). Added it a while ago? Do
+[After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
 
 </AiNote>
 
-## Before you start
-
-- **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
-  a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the new
-  QuickBooks tools.
-- **The client is connected to QuickBooks in LedgerSync**, the same connection you use to sync transactions from
-  the LedgerSync app. The AI checks this first.
-- **The client uses QuickBooks Online.**
-
 ## Start
 
-<AiStep id="copy" n={1} total={4} title="Copy the instructions">
+<AiStep id="new-chat" n={1} total={4} title="Start a new chat">
 
-Click **Copy** next to the instructions below.
-
-<div className="lsai-prompt">
-  <AiCopy label="Instructions for your AI" text={`Bookkeeping into QuickBooks with LedgerSync
-
-Use this for a client whose bank transactions do not come into QuickBooks through a QuickBooks bank feed. LedgerSync already has the transactions. You categorize them, and LedgerSync posts them into the client's QuickBooks.
-
-1. Find the client with ledgersync_find_clients, then call ledgersync_get_quickbooks_setup. QuickBooks must be connected. If an account has no QuickBooks bank account yet, ask the user which one it posts to.
-2. Ask the user to confirm that these QuickBooks bank accounts do not have a QuickBooks bank feed. If one does, skip that account: posting next to a live bank feed creates duplicates.
-3. For each account, call ledgersync_list_transactions_to_categorize. Load the client's categories with ledgersync_list_quickbooks_categories and look up payees with ledgersync_search_quickbooks_payees. Only use categories and payees that exist. Create a new payee only when nothing matches, and say so.
-4. Show the user a table with a category and a payee for every transaction, and how sure you are. Keep the category and payee LedgerSync suggests unless the user changes them; if you think one is wrong, say so. Ask only about the ones you are not sure of. Follow any rules the user gives you for this client.
-5. A transaction with pending_global_rule matched one of the firm's global rules, but this client has no QuickBooks category mapped to the rule's global category. Ask the user which category to use instead of guessing, and suggest mapping it in LedgerSync's Categories Mapping, so the rule files these by itself next time.
-6. Leave out transfers between the client's own accounts, payments of an open bill or invoice, and anything LedgerSync flags as a possible duplicate. List them for the user instead.
-7. Call ledgersync_preview_quickbooks_push. Show the user the summary, the refused rows and the warnings. Nothing has changed yet.
-8. Only after the user says yes, call ledgersync_push_to_quickbooks. Then check ledgersync_get_quickbooks_push_status and tell the user what was posted, what failed and why.`} />
-</div>
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
 
 </AiStep>
 
-<AiStep id="new-chat" n={2} total={4} title="Start a new chat">
+<AiStep id="ask" n={2} total={4} title="Ask the AI">
 
-In Claude, ChatGPT or Grok, start a new chat.
-
-</AiStep>
-
-<AiStep id="paste" n={3} total={4} title="Paste the instructions">
-
-Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
+Type *"Categorize Acme's September transactions and post them to QuickBooks"*, with your client's name and the
+month, and press **Enter**.
 
 </AiStep>
 
-<AiStep id="client" n={4} total={4} title="Name the client and the month">
+<AiStep id="answer" n={3} total={4} title="Answer its questions">
 
-At the end, type the client's name and the month. For example: *Acme, September 2026*. Then press **Enter**.
+The AI shows a category and a payee for each transaction, and asks about the ones it is not sure of. Say what to
+change.
 
 </AiStep>
 
-<AiNote tone="gray">
+<AiStep id="preview" n={4} total={4} title="Say yes to the preview">
 
-**Using Claude Code?** The instructions are also a LedgerSync command there. Type **/**, pick
-**quickbooks_bookkeeping** (it says **(MCP)** next to it) and press **Enter**. Then tell it the client and the
-month.
+The AI shows what it will post. Say yes, and allow it if Claude or ChatGPT asks. Nothing changes before that.
+
+</AiStep>
+
+<AiNote tone="yellow">
+
+**Using Grok?** It may post without asking. Tell it to wait for your yes.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**Tell it your rules for this chat.** For example: *"Anything from Shell is Fuel."*
 
 </AiNote>
 
 <AiNote tone="yellow">
 
-**Using Grok?** Grok may change things without asking you first. Tell it to wait for your yes before it posts
-anything.
+**Your client's bank data goes through your AI account.** Check its data settings first.
 
 </AiNote>
 
-## What happens next
+## More details
+
+<AccordionGroup>
+
+<Accordion title="What happens after you ask">
 
 1. The AI checks the client's QuickBooks connection. If it does not know which QuickBooks bank account one of the
    client's bank accounts posts to, it asks you.
@@ -136,7 +121,9 @@ To save rules in LedgerSync, use [Set up rules for a client](/ai/rules-setup). I
 
 </AiNote>
 
-## What it does not do yet
+</Accordion>
+
+<Accordion title="What it does not do yet">
 
 - Transfers between the client's own accounts.
 - Payments of an open bill or invoice in QuickBooks.
@@ -149,7 +136,27 @@ The AI leaves out transfers, bill or invoice payments and possible duplicates, a
 leaves out a transaction that already has a split, a class or a billable customer in LedgerSync, so nothing replaces
 it. Accept those in the LedgerSync app.
 
-## Your client's data
+</Accordion>
+
+<Accordion title="Before you start">
+
+<AiNote tone="green">
+
+**For clients with no QuickBooks bank feed.** With a bank feed, QuickBooks downloads the bank's transactions
+itself. If an account has one, leave that account out: QuickBooks would get each transaction twice.
+
+</AiNote>
+
+- **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
+  a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the new
+  QuickBooks tools.
+- **The client is connected to QuickBooks in LedgerSync**, the same connection you use to sync transactions from
+  the LedgerSync app. The AI checks this first.
+- **The client uses QuickBooks Online.**
+
+</Accordion>
+
+<Accordion title="Your client's data">
 
 <AiNote tone="yellow">
 
@@ -159,7 +166,50 @@ start.
 
 </AiNote>
 
+</Accordion>
+
+<Accordion title="Optional: the full instructions to paste">
+
+You don't need these: LedgerSync already gives your AI the same steps. If your AI does not follow them, give it
+these instructions.
+
+<div className="lsai-prompt">
+  <AiCopy label="Instructions for your AI" text={`Bookkeeping into QuickBooks with LedgerSync
+
+Use this for a client whose bank transactions do not come into QuickBooks through a QuickBooks bank feed. LedgerSync already has the transactions. You categorize them, and LedgerSync posts them into the client's QuickBooks.
+
+1. Find the client with ledgersync_find_clients, then call ledgersync_get_quickbooks_setup. QuickBooks must be connected. If an account has no QuickBooks bank account yet, ask the user which one it posts to.
+2. Ask the user to confirm that these QuickBooks bank accounts do not have a QuickBooks bank feed. If one does, skip that account: posting next to a live bank feed creates duplicates.
+3. For each account, call ledgersync_list_transactions_to_categorize. Load the client's categories with ledgersync_list_quickbooks_categories and look up payees with ledgersync_search_quickbooks_payees. Only use categories and payees that exist. Create a new payee only when nothing matches, and say so.
+4. Show the user a table with a category and a payee for every transaction, and how sure you are. Keep the category and payee LedgerSync suggests unless the user changes them; if you think one is wrong, say so. Ask only about the ones you are not sure of. Follow any rules the user gives you for this client.
+5. A transaction with pending_global_rule matched one of the firm's global rules, but this client has no QuickBooks category mapped to the rule's global category. Ask the user which category to use instead of guessing, and suggest mapping it in LedgerSync's Categories Mapping, so the rule files these by itself next time.
+6. Leave out transfers between the client's own accounts, payments of an open bill or invoice, and anything LedgerSync flags as a possible duplicate. List them for the user instead.
+7. Call ledgersync_preview_quickbooks_push. Show the user the summary, the refused rows and the warnings. Nothing has changed yet.
+8. Only after the user says yes, call ledgersync_push_to_quickbooks. Then check ledgersync_get_quickbooks_push_status and tell the user what was posted, what failed and why.`} />
+</div>
+
+1. Click **Copy** above.
+2. In Claude, ChatGPT or Grok, start a new chat.
+3. Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
+4. At the end, type the client's name and the month. For example: *Acme, September 2026*. Then press **Enter**.
+
+<AiNote tone="gray">
+
+**Using Claude Code?** The instructions are also a LedgerSync command there. Type **/**, pick
+**quickbooks_bookkeeping** (it says **(MCP)** next to it) and press **Enter**. Then tell it the client and the
+month.
+
+</AiNote>
+
+</Accordion>
+
+</AccordionGroup>
+
 ## If something goes wrong
+
+<AccordionGroup>
+
+<Accordion title="Most common messages">
 
 | The AI says | Do this |
 | --- | --- |
@@ -172,6 +222,8 @@ start.
 | A transaction already has a split or a class | LedgerSync leaves it alone, so the post does not replace it. Accept it in the LedgerSync app. |
 | A vendor name is too long | LedgerSync keeps vendor names of up to 80 characters. Give the AI a shorter new name. Or shorten the vendor's name in QuickBooks, click **Sync QuickBooks Data** in the LedgerSync app (as above), then ask the AI again. |
 | Some transactions failed | They stay in LedgerSync under **Categorized**. Fix the reason the AI gives, often in QuickBooks. Then, in the LedgerSync app, click **Rules Engine**, then **QuickBooks**, then **Transactions**. Pick **Categorized**, select them and click **Sync with QuickBooks**. |
+
+</Accordion>
 
 <Accordion title="More messages: QuickBooks account already used, preview expired, post not confirmed, LedgerSync busy, limits">
 
@@ -191,6 +243,8 @@ start.
 | **Your LedgerSync login cannot do QuickBooks bookkeeping for this client.** | Email <AiEmail /> and say which client. |
 
 </Accordion>
+
+</AccordionGroup>
 
 Anything else? See [Troubleshooting](/ai/troubleshooting).
 
