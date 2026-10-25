@@ -366,10 +366,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `lines` (each with its `category`: `id`, `name`, `gl_code` and `full_name` when it differs from the name; its
       `class`, `customer`, `amount` and `allocation_type`: `percentage` or `amount`), and the rules just before and
       after it in its list (`neighbours`: `before` and `after`, each with `id` and `name`). Its `next_step` says how
-      to change the rule and what a rules setup cannot change on it yet: a global rule can only be turned off or
-      on, and a rule split over several lines keeps its category. A change keeps the rule's `rule_type`. A
-      `rule_id` that is not one of the client's rules, or not one of the firm's global rules on the client's
-      platform, answers `not_found`. It changes nothing.
+      to change the rule and what a rules setup cannot change on it: a rule split over several lines keeps its
+      category. For a global rule, it says that every change works for it and applies at every client of the firm,
+      so the AI tells the user what the preview says happens at the other clients. A change keeps the rule's
+      `rule_type`. A `rule_id` that is not one of the client's rules, or not one of the firm's global rules on the
+      client's platform, answers `not_found`. It changes nothing.
     - `ledgersync_list_uncategorized_transactions` lists the client's waiting transactions that no rule holds and
       nobody categorized (not pending and not excluded), grouped by bank text, largest groups first, 50 groups at a
       time by default (up to 100), between optional `from` and `to` dates, and only money in or money out when
@@ -413,10 +414,12 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       many other clients need a link (`clients_needing_link_count`, named or not). Each is left out when it is 0.
       Those clients are named once for the whole preview, not per rule, in `clients_needing_link`, one entry per
       global category: its `firm_category` (the `id`, or the `ref` and `name` of a new one), the `rules` (refs)
-      that need the link and the `clients` (`client_id`, `name`), only clients the person can see, up to 20 per
-      global category (fewer when the answer is trimmed), the names left out of that list counted in `more_named`.
-      LedgerSync names at most 20 clients per rule, so a client that no rule names (past those 20, or one the
-      person cannot see) is counted only in the rules' `clients_needing_link_count`, not in `more_named`. A link in
+      that need the link, the `changes` (refs of the changes whose global rule needs it once changed: the global
+      category an edit gives it, or else its own; `rules` or `changes` is left out when empty) and the `clients`
+      (`client_id`, `name`), only clients the person can see, up to 20 per global category (fewer when the answer is
+      trimmed), the names left out of that list counted in `more_named`. LedgerSync names at most 20 clients per rule
+      or change, so a client that no rule or change names (past those 20, or one the person cannot see) is counted
+      only in the rules' and changes' `clients_needing_link_count`, not in `more_named`. A link in
       `items` has `fills_here`: how many waiting transactions the firm's existing global rules would fill here once
       it is saved.
       `summary.create_in_quickbooks` counts the new categories and vendors the client's QuickBooks would get.
@@ -452,9 +455,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       it changes, any of `name`, `direction`, `match`, `conditions`, `category` and `payee`: a part left out stays as
       it is, `conditions` replace all of the rule's, and `category` and `payee` take the same ids and refs as a new
       rule of the same scope. A `move` gives a `position`: a `place`, `before` or `after` another rule of the same
-      list (its `rule_id`), or `first` or `last`. For now a global rule can only be turned off or on. A change has
-      no `rule_type`: it keeps the rule's type, so an exclusion rule changes like any rule and stays an exclusion
-      rule, and the transactions it keeps or fills are marked for exclusion.
+      list (its `rule_id`), or `first` or `last`. Every action works for a global rule too, and a change to a global
+      rule applies at every client of the firm on the client's platform. A change has no `rule_type`: it keeps the
+      rule's type, so an exclusion rule changes like any rule and stays an exclusion rule, and the transactions it
+      keeps or fills are marked for exclusion.
     - Conditions, in new rules and in edits, look at the bank text (`contains`, `doesnt_contain`, `is_exactly`) or
       at the amount (`equals`, `doesnt_equal`, `is_greater_than`, `is_less_than`). An amount `value` is a plain
       amount: up to 9 digits and 2 decimals, with no sign, currency symbol or thousands separator, such as
@@ -463,14 +467,16 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `direction` says money in or out. A rule still needs a `contains` or `is_exactly` condition, and amount
       conditions that could never match, or that repeat each other, are refused.
     - A change is refused when: its rule is not one of the client's rules, or not one of the firm's global rules on
-      the client's platform; the proposal changes the rule twice (`conflicting_changes`); it edits, moves or deletes
-      a global rule (`not_available_yet`); an edit gives a new category to a rule that splits a transaction over
-      several lines (`split_rule`); it would leave the rule as it is, such as turning on a rule that is on
-      (`no_change`); a move's place is not valid
-      (`move_anchor_invalid`) or lies among rules that share a priority (`priority_ties`); or it is global and the
-      login lacks **Manage Global Rules**. An edit is checked like a new rule (name, conditions, category, payee): a
-      problem it brings in refuses it, and one the rule already had is only a warning. A payee can be set or
-      replaced, never removed.
+      the client's platform; the proposal changes the rule twice (`conflicting_changes`); an edit gives a new
+      category to a rule that splits a transaction over several lines (`split_rule`); it would leave the rule as it
+      is, such as turning on a rule that is on (`no_change`); a move's place is not valid (`move_anchor_invalid`) or
+      lies among rules that share a priority (`priority_ties`); some of the global rules between where a global rule
+      is and where its move puts it, or just next to them, share a priority (`priority_ties`); a global rule to delete
+      shares its priority with another (`priority_ties`); or it is global and the login lacks **Manage Global Rules**.
+      The order of global rules that share a priority is not certain, so the message of a global `priority_ties`
+      says to make that change in the LedgerSync app, and the `next_step` offers another place for a move. An edit is
+      checked like a new rule (name, conditions, category, payee): a problem it brings in refuses it, and one the rule
+      already had is only a warning. A payee can be set or replaced, never removed.
     - With `changes`, the preview also answers `changes`, one entry per change, refused ones too: its `ref`,
       `rule_id`, `scope`, `action`, the rule's `name`, its `status` (`ok`, or `refused` with the `code`; the reason
       is in `refused`), the rule `before` and `after` the change (as `ledgersync_list_rules` shows a rule, with its
@@ -479,9 +485,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       many each takes, and `released_waiting` counts the ones left waiting), `restamped_here` (kept by an edited
       rule, stamped again with it), `fills_here` and `kept_for_person_edit` (the rule's transactions a person
       changed, left as they are). For a global rule it adds `released_other_clients`, `restamped_other_clients`,
-      `fills_other_clients`, `other_clients` and `badges_cleared` (the "map this category" badges a turned-off rule
-      takes off), each left out when it is 0. A change also has its `warnings` and `examples` (each with an
-      `effect`: `released`, `restamped` or `filled`). `summary.change` counts the kept changes by action, with
+      `fills_other_clients`, `other_clients` and `badges_cleared` (the "map this category" badges a turned-off,
+      deleted or edited rule takes off, at every client), each left out when it is 0. At a QuickBooks client, a
+      global rule that a change edits or turns on also says how many of the transactions it matches would wait for a
+      link instead, with the badge, here (`waiting_on_link_here`) and at the firm's other QuickBooks clients
+      (`waiting_on_link_other_clients`), and how many other clients need that link (`clients_needing_link_count`), as
+      a new global rule does. Each is left out when it is 0, and those clients are named in `clients_needing_link`
+      (see above). A change also has its `warnings` and `examples` (each with an `effect`: `released`, `restamped` or
+      `filled`). `summary.change` counts the kept changes by action, with
       `changes_ok` and `changes_refused`, and the totals add `released_here`, `restamped_here`,
       `filled_by_changed_rules` and `kept_for_person_edit`. If LedgerSync cannot take changes just then, a preview
       with `changes` is refused with `internal_error` and stores nothing: preview the new items without `changes`.
@@ -512,11 +523,22 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       changed or was deleted since, nothing is saved: the apply is refused with `invalid_request` ("These rules
       changed since the preview: ... Preview again."). The setup then writes the changes, checking each rule again
       first: a change whose rule changed or was deleted meanwhile fails with `rule_changed` or `rule_gone`, and when
-      that is found before anything was written, the whole setup fails and writes nothing. Then it puts back the
-      transactions a turned-off, deleted or edited rule owns (an edited rule keeps the ones it still matches,
-      stamped again), and the client's other rules decide them again at once, as for new transactions; for a
-      changed global rule, at the firm's other clients on the same platform too. A changed rule gets an entry in its
-      Rule History in the LedgerSync app, not the LS-AI mark (a deleted rule has no page to open its history from).
+      that is found before anything was written, the whole setup fails and writes nothing. A global move or deletion
+      is checked for rules that share a priority again when it is written, and fails with `priority_ties` when some
+      do by then. Then it puts back the transactions a turned-off, deleted or edited rule owns (an edited rule keeps
+      the ones it still matches, stamped again; a QuickBooks global rule only at the clients that link its global
+      category), and each client's other rules decide them again at once, as for new transactions; for a changed
+      global rule, at the firm's other clients on the same platform too. A QuickBooks global rule turned off, deleted
+      or edited also loses its "map this category" badges at every client, and those transactions are decided again
+      at once by the rules on file there, an edited rule included: it badges the ones it matches at a client that
+      links no category to its global category. A changed rule gets an entry in its Rule History in the LedgerSync
+      app, not the LS-AI mark (a deleted rule has no page to open its history from). An edited QuickBooks global rule
+      also gets a finished run with 0 categorized transactions on the app's **Apply Status** tab, which stops any
+      apply run the app was still making with the rule as it was. A QuickBooks global rule the app is still applying
+      (a run of it still processing on that tab) is deleted only once that run ends: the setup stays running and
+      tries again about every 3 minutes, 5 runs in all, and on the last one that deletion fails with `write_failed`
+      while the rest of the setup is saved, so the setup ends done with some failed items. A Manual global rule never
+      waits.
     - For a QuickBooks client, the setup first creates the client's new categories and vendors in its QuickBooks,
       then saves the links and rules. At the firm's other QuickBooks clients that do not link a new global rule's
       category, the transactions it matches get the "map this category" badge. When QuickBooks does not answer or
@@ -557,7 +579,12 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `turned_off`, `turned_on`, `moved` and `deleted`, then the transactions the changes `released` (put back for
       the other rules to decide again) and `restamped`, the ones the changed rules filled (`filled_here` and
       `filled_other_clients`), `badges_cleared` and `kept_for_person_edit`. Each of these counts this client's and
-      the firm's other clients' transactions together, except `filled_here` and `filled_other_clients`.
+      the firm's other clients' transactions together, except `filled_here` and `filled_other_clients`. When a
+      changed QuickBooks global rule left transactions waiting for a link with the badge, it adds
+      `waiting_on_link_here` and `waiting_on_link_other_clients` (those transactions, here and at the firm's other
+      clients) and `other_clients_needing_link` (those other clients), each left out when it is 0, and the
+      `next_step` tells the AI to tell the user, who can link the rule's global category with a rules setup for that
+      client.
       `other_clients` counts the other clients where the changes put back, stamped again or filled at least one
       transaction, so it does not say where the fills are. The changed rules' fills are counted only in
       `result.changes`, never in the result's own `filled_here`, `filled_by_existing_rules`, `filled_other_clients`,
@@ -566,7 +593,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       latest first: `ref`, `type` `client_rule_change` or `global_rule_change`, `name` and `action`) and
       `rows_to_restore`. The undo puts each changed rule back as it was (a deleted rule comes back with its old id),
       and each transaction the setup wrote back as it was before the setup, only while it still holds what the setup
-      left; the transactions of the rules the setup created go back the same way. When the rules around a moved or
+      left; the transactions of the rules the setup created go back the same way. For a global rule, that is at every
+      client of the firm. A deleted global rule's earlier runs on the app's **Apply Status** tab are not put back, and
+      undoing an edited QuickBooks global rule adds one more finished run there. When the rules around a moved or
       deleted rule changed since, it goes back as close to its old place as it can, and its `restore` entry then has a
       `placement`: `between_neighbours` (between the same two rules, at another priority number) or, for a deleted
       rule, `before_successor` (just before the rule that came after it), `after_predecessor` (just after the rule
@@ -724,9 +753,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       2 decimals with no sign, currency symbol or thousands separator, compared without its sign. Names: a client
       rule up to 100 characters, a global rule 64, a global category 100, a client category 64, a client vendor 80, a
       global vendor 64 and a GL code 64.
-    - Rules setup changes: one change per rule. For now a global rule can only be turned off or on; the category of
-      a rule split over several lines cannot be changed; and a payee can be set or replaced but not removed. A
-      change keeps the rule's type: an exclusion rule changes like any rule and stays an exclusion rule.
+    - Rules setup changes: one change per rule. The category of a rule split over several lines cannot be changed; a
+      payee can be set or replaced but not removed; and a global rule cannot move across or next to global rules
+      that share a priority, or be deleted while it shares its own (`priority_ties`). A change keeps the rule's type:
+      an exclusion rule changes like any rule and stays an exclusion rule.
     - Rules setup applies: LedgerSync takes a few at a time, shared by every firm. An apply past that is refused as
       busy, is not counted, and can be sent again a minute later with the same `confirmation_id`. A firm runs one
       setup at a time; the next one waits until the one before it finishes. An undo does not wait: while another

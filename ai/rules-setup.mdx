@@ -161,7 +161,7 @@ global rules, it proposes client rules only. You decide: say yes, or ask for the
 
 - A client's own rules always come first. A global rule fills a transaction only when none of that client's rules
   match it.
-- To make global rules, your login needs **Manage Global Rules**, as in **Before you start**.
+- To make or change global rules, your login needs **Manage Global Rules**, as in **Before you start**.
 - Either kind can be an exclusion rule, as in the LedgerSync app. A global exclusion rule at a QuickBooks client
   works only through the client's category linked to its global category, like any global rule.
 
@@ -219,10 +219,10 @@ For a QuickBooks Online client, rules setup works the same way, with these diffe
 - **A new category needs a QuickBooks account type**, such as Expense or Income. It is created at the top level, not
   under another category. A setup never creates customers.
 - **The preview names your other QuickBooks clients that need a link.** A new global rule files transactions at
-  your other QuickBooks clients only where they link its global category. At the others, those transactions wait
-  with the badge. The preview counts them, and names those clients if you can see them in LedgerSync (an employee
-  sees the clients assigned to them). To link the category there, set up rules for those clients with the AI too,
-  or link it in the LedgerSync app.
+  your other QuickBooks clients only where they link its global category, and so does a global rule you edit or
+  turn on. At the others, those transactions wait with the badge. The preview counts them, and names those clients
+  if you can see them in LedgerSync (an employee sees the clients assigned to them). To link the category there, set
+  up rules for those clients with the AI too, or link it in the LedgerSync app.
 - **If the client's QuickBooks connection stopped working,** the AI can still read what the client has (except its
   customers), make links and make rules. But the client's new categories, its new vendors and customers as payees
   need QuickBooks: the preview refuses them and asks you to reconnect QuickBooks first. To reconnect, click
@@ -239,8 +239,8 @@ For a QuickBooks Online client, rules setup works the same way, with these diffe
 <Accordion title="Changing your rules" id="changing-your-rules">
 
 Your AI can also change the rules you already have, for Manual and QuickBooks Online clients. Ask it in your own
-words. For example: *Turn off Acme's Shell rule*, *Change Acme's Amazon rule to Office Supplies* or *Move Acme's Uber
-rule to the top*.
+words. For example: *Turn off Acme's Shell rule*, *Change Acme's Amazon rule to Office Supplies*, *Move Acme's Uber
+rule to the top* or *Delete our global Zoom rule*.
 
 1. The AI finds the rule and reads all of it: its conditions, category, vendor, whether it is on, and its place in
    the list.
@@ -268,11 +268,20 @@ rule to the top*.
   transaction that someone then excluded, by hand or with its bank account, a change to that rule changes it like a
   waiting one. It stays on **Excluded**, but the change takes the rule's category and vendor off it, or gives it the
   edited rule's, and your other rules do not file it again.
-- **Global rules: only off or on, for now.** Turning off a global rule puts back its waiting transactions at every
-  client of your firm with the same accounting app. At your QuickBooks clients, it also takes off its "map this
-  category" badges. Turning one on fills waiting transactions here and at your other clients, as a new global rule
-  does. To edit, move or delete a global rule, use the LedgerSync app. Turning global rules off or on needs
-  **Manage Global Rules**.
+- **Global rules change at every client.** A change to a global rule works at every client of your firm with the
+  same accounting app. Turning one off, deleting it, or editing it so it no longer matches puts back its waiting
+  transactions there, and each client's other rules file them again. Turning one on fills waiting transactions here
+  and at your other clients, as a new global rule does. The preview shows what happens at your other clients.
+  Changing global rules needs **Manage Global Rules**.
+- **Global rules at your QuickBooks clients.** Turning a global rule off, deleting it or editing it also takes off
+  its "map this category" badges. Those transactions are filed again at once, by each client's other rules or by the
+  edited rule. A global rule you edit or turn on files transactions only at the clients that link its global
+  category. At the others, the transactions it matches wait with the badge. The preview counts them, and names those
+  clients, as for a new global rule. To delete a global rule the LedgerSync app is still applying to transactions,
+  the setup waits up to about 15 minutes for that to finish.
+- **Global rules that share a priority.** When some of your global rules have the same **Priority** number in the
+  LedgerSync app, the order between them is not certain. So the AI cannot move a global rule across them or next to
+  them, or delete one of them. Ask the AI for another place, or move or delete the rule in the LedgerSync app.
 - **Exclusion rules change the same way.** You can change an exclusion rule like any other rule. It stays an
   exclusion rule: the waiting transactions it keeps or fills are marked for exclusion, and move to **Excluded**
   when you accept them. The preview and the result count them with the change, apart from what new exclusion rules
@@ -286,7 +295,9 @@ rule to the top*.
   it. If it finds this before it saves anything, nothing is saved. If it finds it while it saves, only that change
   fails, and the rest is saved. Either way, ask the AI to read the rule again and preview the change again.
 - **A changed rule is not marked LS-AI.** Its history shows the change instead: in the LedgerSync app, open the rule
-  and click the **Rule History** button at the top right. A deleted rule has no page to open its history from.
+  and click the **Rule History** button at the top right. A deleted rule has no page to open its history from. A
+  QuickBooks global rule the AI edits also gets a line on the **Apply Status** tab of **Global Rules**: **Finished**,
+  with 0 categorized transactions, because the setup files its transactions itself. Undoing the edit adds one more.
 - **Changed your mind?** Undo the setup, as for new rules. It puts the rules back as they were, and their waiting
   transactions too. See [Undo](#undo).
 
@@ -360,6 +371,9 @@ setup:
   place in the list. A rule the setup deleted comes back, in its old place or as close to it as it can.
 - **The transactions.** Each waiting transaction the setup changed goes back to how it was before the setup. That
   includes the ones it put back for your other rules, and the ones the rules filled during the setup.
+- **Global rules, at every client.** A global rule the setup changed goes back the same way, a deleted one included,
+  and so do its transactions at every client of your firm. A deleted global rule's earlier lines on the
+  **Apply Status** tab of **Global Rules** do not come back.
 - **What changed since stays.** A rule someone changed after the setup stays as it is now, and so does a rule whose
   old category was deleted. A moved rule goes back to its old place, or between its old neighbours. If those were
   moved apart since, it stays where it is. A transaction someone changed after the setup stays as it is too, even
@@ -388,8 +402,6 @@ finishes. Undoing global rules, global categories, global vendors or changes to 
 <Accordion title="What it does not do yet">
 
 - Clients that use another accounting app, such as Zoho Books.
-- Editing, moving or deleting a global rule. A setup can turn a global rule off or on. For the rest, use the
-  LedgerSync app.
 - Changing the category of a rule that splits each transaction over several categories.
 - Taking a rule's vendor off. A change can give a rule a vendor or replace it.
 - A rule on the amount alone. A rule also needs words to look for in the bank text.
@@ -411,7 +423,7 @@ finishes. Undoing global rules, global categories, global vendors or changes to 
   these clients under **Rules Engine**, then **Manual** or **QuickBooks**.
 - **The client does not need its own categories yet.** The AI can propose new ones, or use your firm's global
   categories.
-- **Global rules need permission.** To make a global rule, or turn one off or on, your LedgerSync login needs
+- **Global rules need permission.** To make or change a global rule, your LedgerSync login needs
   **Manage Global Rules**. The firm owner and administrators always have it. Employees have it unless the owner or
   an administrator turned it off. They do that in the LedgerSync app: they click their name at the top, then **Permissions**.
 
@@ -447,8 +459,8 @@ them, give it these instructions.
 6. Give every rule a payee the same way: one of the client's vendors (for a QuickBooks client, also one of its customers) for a client rule, one of the firm's vendors for a global rule, or a new vendor you say is new. The rule puts it on each transaction it fills as the payee, and the firm can accept a transaction only when it has a payee. An exclusion rule needs no payee: accepting its transactions moves them to Excluded.
 7. Pick the kind of each rule yourself: a global rule (every client of the firm) for vendors that mean the same for every client, such as bank fees, software or fuel, otherwise a client rule (this client only). Then propose each rule to the user by its name, saying what it does and for whom, and ask yes or no, for example: "Can I create a global rule 'Square' that leaves Square deposits out of the books for every client?" The user answers yes, no or what to change, so they never have to ask for a client or global rule.
 8. Follow the firm's naming pattern for rule names; you can see it in the existing rules.
-9. To change a rule that exists, read it first with ledgersync_get_rule, then put the change in the preview's changes, one per rule: edit (its name, money in or out, conditions, category or payee), turn_off, turn_on, move (before or after another rule of its list, or first or last) or delete. A change keeps the rule's type: an exclusion rule stays an exclusion rule. A global rule can only be turned off or on for now. Conditions, in new rules and edits, can also test the amount (equals, doesnt_equal, is_greater_than, is_less_than) with a plain amount such as 1200.50.
-10. Preview with ledgersync_preview_rules_setup (up to 100 rules and 50 changes at a time). Show the user what will be created (for a QuickBooks client, new categories and vendors are created in its QuickBooks after the yes), how many transactions each rule fills for this client and for other clients (for an exclusion rule, how many it marks for exclusion), which other clients still need a link, for each change the rule before and after and the transactions it puts back for the client's other rules to file, and every warning.
+9. To change a rule that exists, read it first with ledgersync_get_rule, then put the change in the preview's changes, one per rule: edit (its name, money in or out, conditions, category or payee), turn_off, turn_on, move (before or after another rule of its list, or first or last) or delete. A change keeps the rule's type: an exclusion rule stays an exclusion rule. A change to a global rule applies at every client of the firm: say so when you propose it. Conditions, in new rules and edits, can also test the amount (equals, doesnt_equal, is_greater_than, is_less_than) with a plain amount such as 1200.50.
+10. Preview with ledgersync_preview_rules_setup (up to 100 rules and 50 changes at a time). Show the user what will be created (for a QuickBooks client, new categories and vendors are created in its QuickBooks after the yes), how many transactions each rule fills for this client and for other clients (for an exclusion rule, how many it marks for exclusion), which other clients still need a link, for each change the rule before and after and the transactions it puts back for the other rules to file, here and, for a global rule, at the firm's other clients, and every warning.
 11. Only after the user says yes, call ledgersync_apply_rules_setup. Then follow ledgersync_get_rules_setup_status until it finishes and report the result. For a QuickBooks client, offer to post the filled transactions into its QuickBooks with the QuickBooks bookkeeping tools, as the status's next_step says.
 12. Everything you create is marked LS-AI in LedgerSync for review, and a rule you change shows the change in its history. If the user wants a setup taken back, use ledgersync_undo_rules_setup: it removes what the setup created and puts the rules it changed back as they were; categories and vendors created in QuickBooks stay there, and an undo also puts back on For review the transactions the user moved to Excluded because of the setup's exclusion rules.`} />
 </div>
@@ -486,11 +498,12 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 | QuickBooks could not be read just now | Links and rules still work. The client's new categories, its new vendors and customers as payees need QuickBooks: wait a few minutes, then ask the AI to preview again. If it keeps happening, reconnect QuickBooks, as in [QuickBooks clients](#quickbooks-clients). |
 | The client uses another accounting app, such as Zoho Books | Not yet. Set up its rules in the LedgerSync app. |
 | It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
-| You cannot make global rules | Your LedgerSync login needs **Manage Global Rules**. Make it a client rule, or ask your firm owner. |
+| You cannot make or change global rules | Your LedgerSync login needs **Manage Global Rules**. Make it a client rule, or ask your firm owner. |
 | Some items were refused in the preview | The AI says why for each one. Answer its questions, or leave them out, and ask it to preview again. Nothing has changed yet. |
 | Some items failed | The AI says which ones and why. The rest was saved. Fix the reason, then ask the AI to preview the missing ones again. |
 | QuickBooks did not answer while the setup ran, or its connection stopped working | The setup keeps running, and LedgerSync tries again every few minutes, 5 tries in all. If the connection stopped working, reconnect it. After the last try, what still needs QuickBooks fails, and the rest of the setup is saved: ask the AI to preview the failed items again. |
-| A global rule can only be turned off or on | For now, a setup cannot edit, move or delete a global rule. Do that in the LedgerSync app. |
+| A global rule can only be turned off or on | Your AI still has an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| Some global rules share a priority | They have the same **Priority** number in the LedgerSync app, so the AI cannot move a global rule across or next to them, or delete one of them. Ask the AI for another place, or move or delete the rule in the LedgerSync app. |
 | An amount is not a plain amount | Write it with digits and up to 2 decimals, such as 1200.50, with no $ sign, commas or minus sign. The rule's money in or money out says which way. |
 
 </Accordion>
@@ -507,7 +520,7 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 | A rule is very broad | It fills more than half of this client's waiting transactions, or more than 200 at your other clients. Make sure it is not too general. |
 | The category has no GL code | Manual clients only. The transactions it fills get a category with no GL code. Pick a category that has one, or go ahead if that is fine. |
 | The client has no category linked to the global category | At a Manual client, the transactions get the global category and its GL code: to use the GL code of one of the client's categories instead, ask the AI to link it in the same setup. At a QuickBooks client, the rule cannot file them, so they wait with the "map this category" badge: ask the AI to link a category in the same setup. |
-| Your other QuickBooks clients need a link | A new global rule files their transactions only once they link its global category. Until then, those transactions wait with the badge. Set up rules for those clients with the AI too, or link the category in the LedgerSync app. |
+| Your other QuickBooks clients need a link | A new global rule, or one you edit or turn on, files their transactions only once they link its global category. Until then, those transactions wait with the badge. Set up rules for those clients with the AI too, or link the category in the LedgerSync app. |
 
 </Accordion>
 
@@ -523,6 +536,7 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 | A rule's words are refused | A rule needs 1 to 5 conditions, on the bank text (each up to 200 characters) or the amount. At least one must look for words in the bank text (contains or is exactly). The AI says what is wrong. Ask it to fix the rule. |
 | The rules changed since the preview | Someone changed or deleted one of the rules after the preview, so nothing was saved. Ask the AI to preview again. |
 | A change failed because its rule was changed or deleted | Someone changed or deleted the rule after the preview. If LedgerSync found this before it saved anything, the setup failed and nothing was saved. If it found it while saving, only that change failed, and the rest of the setup was saved. Ask the AI to read the rule again and preview the change again. |
+| LedgerSync was still applying a global rule to transactions, so it was not deleted | The LedgerSync app was still running that global rule on transactions, even after the setup waited about 15 minutes for it. The rest of the setup was saved. In the LedgerSync app, wait until the rule's line on the **Apply Status** tab of **Global Rules** shows **Finished**, then ask the AI to delete it again. |
 | Undo the later setup first | A later setup changed the same rules or transactions, and it is still in place. Ask the AI to undo that one first, then this one. |
 | A name is too long | Names can be up to 64 characters for a global rule, a client category or a global vendor, 80 for a client vendor, and 100 for a client rule or a global category. A GL code can be up to 64. Give the AI a shorter one. |
 | Undo is not possible | An undo works once a setup is no longer running, whether it is done, partly done or failed, and again after an undo that could not finish. It cannot start while another setup of your firm is running or being undone: ask the AI again when that one finishes. A setup that is undone cannot be undone again. Undoing global rules, global categories, global vendors or changes to global rules needs **Manage Global Rules**. |
@@ -582,8 +596,9 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
       rule. Neither offers on a read-only connection.
     - A change to an existing rule goes in the preview's `changes`, naming the rule by the `rule_id` that
       `ledgersync_list_rules` and `ledgersync_get_rule` show (`rul_c_...` or `rul_g_...`). A setup edits, turns off,
-      turns on, moves and deletes client rules, exclusion rules included, and only turns global rules off or on for
-      now. A change keeps the rule's type (`rule_type`).
+      turns on, moves and deletes client rules and global rules, exclusion rules included. A change to a global rule
+      applies at every client of the firm on the client's platform, and its preview entry counts what it does there.
+      A change keeps the rule's type (`rule_type`).
     - The instructions above are also an MCP prompt, `rules_setup` ("Set up rules for a client"), with optional
       `client` and `focus` arguments. Claude Code lists it as a command.
     - For a client on another accounting app, such as Zoho Books, `ledgersync_get_rules_setup` answers
@@ -604,8 +619,10 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
       text (contains, doesn't contain or is exactly), 1 to 200 characters, or at the amount (equals, doesn't equal,
       is greater than or is less than): a plain amount of up to 9 digits and 2 decimals, with no sign, currency
       symbol or thousands separator, such as 1200.50. Amounts are compared without their sign.
-    - A change cannot edit, move or delete a global rule, change the category of a rule that splits a transaction
-      over several lines, or take a payee off a rule. A change keeps the rule's type: an exclusion rule stays one.
+    - A change cannot change the category of a rule that splits a transaction over several lines, or take a payee
+      off a rule. A global rule cannot move across or next to global rules that share a priority, and a global rule
+      that shares its priority cannot be deleted (`priority_ties`). A change keeps the rule's type: an exclusion rule
+      stays one.
     - Names: a client rule up to 100 characters, a global rule 64, a global category 100, a client category 64, a
       client vendor 80, a global vendor 64 and a GL code 64. Names are trimmed, and a name counts as taken whatever
       its capitals.

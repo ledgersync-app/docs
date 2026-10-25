@@ -3,6 +3,36 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-25" tags={["AI connector"]}>
+  ## Change your global rules too
+
+  Your AI can now edit, move and delete your firm's global rules, not only turn them off or on. It shows you a
+  preview first and saves nothing until you say yes. See
+  [Changing your rules](/ai/rules-setup#changing-your-rules).
+
+  - **Every client at once.** A change to a global rule works at every client of your firm with the same accounting
+    app. The preview shows what happens at your other clients.
+  - **Transactions follow the change.** The transactions a global rule no longer files go back to each client's other
+    rules right away. Transactions someone changed by hand stay as they are.
+  - **QuickBooks clients.** Turning off, deleting or editing a global rule takes off its "map this category" badges.
+    A global rule you edit or turn on files transactions only at the clients that link its global category. At the
+    others, its transactions wait with the badge, and the preview names those clients.
+  - **Rules that share a priority.** When some of your global rules have the same **Priority** number, the AI cannot
+    move a global rule across or next to them, or delete one of them. Ask it for another place, or move or delete the
+    rule in the LedgerSync app.
+  - **One-step undo.** Undoing the setup puts a global rule back as it was, a deleted one included, and its
+    transactions at every client. A deleted rule's earlier lines on the **Apply Status** tab do not come back.
+  - Changing global rules needs **Manage Global Rules**.
+  - New result fields, for a QuickBooks global rule a change edits or turns on: `waiting_on_link_here`,
+    `waiting_on_link_other_clients` and `clients_needing_link_count` in the preview's `changes`, with its clients in
+    `clients_needing_link`, and `waiting_on_link_here`, `waiting_on_link_other_clients` and
+    `other_clients_needing_link` in the status's `result.changes`. No new tool. See
+    [For developers](/ai/developers).
+  - If your AI still says a global rule can only be turned off or on, it has the old tool descriptions: reconnect in
+    Claude, click **Refresh** in ChatGPT, or reauthenticate in Grok, then start a new chat. See
+    [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+</Update>
+
 <Update label="2026-10-24" tags={["AI connector"]}>
   ## Change a client's rules from Claude, ChatGPT and Grok
 
