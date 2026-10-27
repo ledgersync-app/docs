@@ -335,13 +335,15 @@ A liability account (credit card, line of credit, loan or mortgage) can carry a 
     "credit_limit": 65000.00,
     "available_credit": 50596.54,
     "statement_balance": -14381.66,
+    "statement_date": "2026-08-28",
+    "remaining_statement_balance": -9381.66,
     "minimum_payment": 143.00,
     "payment_due_date": "2026-09-24"
   }
 }
 ```
 
-**The object is absent unless we know something.** It is never present on a checking, savings or investment account, even when the bank reports a figure there, and it is null on a liability account whose bank publishes no terms. Check for the object before reading fields inside it. Individual fields are independently nullable for the same reason: an absent field means the bank did not report it, never that the value is zero.
+**The object is absent unless we know something.** It is never present on a checking, savings or investment account, even when the bank reports a figure there, and it is null on a liability account whose bank publishes no terms. Check for the object before reading fields inside it. Individual fields are independently nullable for the same reason: an absent field means the bank did not report it, never that the value is zero. The two fields LedgerSync computes, `statement_date` and `remaining_statement_balance`, are the exception: they are present or null together (see [What is still owed on the last statement](#what-is-still-owed-on-the-last-statement)).
 
 <Warning>
 **Identify cards by `type: credit_card`, not by whether `liabilities` is present.** Loans, mortgages and lines of credit carry the object too, usually with just a `minimum_payment` and a `payment_due_date`. Before 2026-09-23 the object could also appear on checking, savings and investment accounts; it no longer does.
@@ -371,6 +373,29 @@ One consequence is worth knowing: a card that was **in credit** at statement clo
 <Note>
 `payment_due_date` is the bank's own figure and only as current as the last refresh. A bank that has not yet published a new cycle is still reporting the previous one, so **a date in the past means the cycle rolled over and we have not seen the new one**, not that a payment is overdue. Read `last_refreshed_at` before acting on it.
 </Note>
+
+#### What is still owed on the last statement
+
+`statement_balance` is the balance printed on the last statement, so it stays the same for the whole cycle, even after the card is paid off. Two more fields say how much of it is still unpaid:
+
+- **`statement_date`** is the day that statement closed, the same date as the statement's `statement_date` in `GET /v3/accounts/{account_id}/statements`.
+- **`remaining_statement_balance`** is `statement_balance` minus every payment, refund and other credit posted after `statement_date`. It is negative like `statement_balance`, reaches `0` once the statement is paid off, is `0` when the statement closed in credit, and is never more than the card owes in total (`current_balance`). Pending payments count once they post.
+
+No bank or aggregator reports this figure, so LedgerSync computes it, on credit cards from Finicity and MX. The two fields are always present or null together. They are null:
+
+- **For a few days after each close.** The bank reports the new `statement_balance` a day or two after the close, but the statement itself reaches us a few days later. Until it does, we cannot tell which payments belong to the new statement, so we report nothing rather than a wrong number.
+- **On cards with no statement on file,** and on lines of credit, loans and mortgages.
+
+Measured on 2026-10-27, the two fields are present on 70% of MX cards and 53% of Finicity cards that report a statement balance.
+
+How they move through one cycle:
+
+| Moment | `statement_balance` | `statement_date` | `remaining_statement_balance` |
+| --- | --- | --- | --- |
+| The statement closes on Aug 28 at 14,381.66, and the bank reports it a day later | `-14381.66` | `null` | `null` |
+| The statement reaches us | `-14381.66` | `"2026-08-28"` | `-14381.66` |
+| A 5,000.00 payment posts | `-14381.66` | `"2026-08-28"` | `-9381.66` |
+| The rest is paid | `-14381.66` | `"2026-08-28"` | `0` |
 
 ### The enum is intentionally coarse
 

@@ -3,6 +3,24 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-27" tags={["Accounts"]}>
+  ## What is still owed on a card's last statement
+
+  `statement_balance` is the balance printed on the last statement, so it does not go down when the card is paid.
+  Two new fields on a credit card's `liabilities` say how much of it is still unpaid:
+
+  - **`statement_date`**: the day that statement closed, the same date as its `statement_date` in
+    `GET /v3/accounts/{account_id}/statements`.
+  - **`remaining_statement_balance`**: `statement_balance` minus every payment, refund and other credit posted after
+    `statement_date`. Negative like `statement_balance`, `0` once the statement is paid off or when it closed in
+    credit, and never more than the card owes in total. Pending payments count once they post.
+
+  No bank or aggregator reports this figure, so LedgerSync computes it, for credit cards from Finicity and MX. The two
+  fields are null together for a few days after each close, until the new statement reaches us, and on cards with no
+  statement on file. They are always null in sandbox. See
+  [What is still owed on the last statement](/guides/connection-lifecycle#what-is-still-owed-on-the-last-statement).
+</Update>
+
 <Update label="2026-10-25" tags={["AI connector"]}>
   ## Change your global rules too
 

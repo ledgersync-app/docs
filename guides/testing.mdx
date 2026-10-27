@@ -204,6 +204,7 @@ The sandbox banks publish very little credit data, so an empty `liabilities` on 
 - **FinBank credit cards carry no card terms.** Use the FinBank **line of credit** to see a populated object: it carries `available_credit`, `statement_balance`, `minimum_payment` and `payment_due_date` (no `credit_limit`). The FinBank auto loan and mortgage carry a `minimum_payment` only.
 - **The MX Bank credit card** carries `available_credit` (3000) and a fixed `payment_due_date` of 2021-05-07; it reports no `credit_limit` or `minimum_payment`. The MX Bank loan and mortgage carry a fixed 2021-05-12 due date. A due date in the past is the bank's last published cycle, not an overdue payment.
 - **Checking, savings and investment accounts never carry `liabilities`**, even though MX Bank reports a due date on them.
+- **`statement_date` and `remaining_statement_balance` are always null in sandbox.** LedgerSync computes them only for a credit card that reports a statement balance, and no sandbox card does: the FinBank line of credit reports one, but it is not a card.
 
 `mask` is the last 4 digits of the account number on every source: FinBank reports `7777` for the credit card, `6666` for the line of credit, `1111` for checking and `2222` for savings; MX Bank accounts report the last 4 of their masked account numbers.
 
