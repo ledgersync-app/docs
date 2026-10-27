@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (42 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (43 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -63,7 +63,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">42</span>
+## Tools <span className="lsai-badge">43</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -103,7 +103,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_get_rule` | One of a client's rules or the firm's global rules in full: every condition, every category line of a client rule, its payee, whether it is on, and the rules just before and after it | No |
 | `ledgersync_list_uncategorized_transactions` | A client's waiting transactions that no rule fills, grouped by bank text, largest groups first, and, at a QuickBooks client, the groups a global rule would file once a category is linked | No |
 | `ledgersync_preview_rules_setup` | Checks up to 100 rules with their new categories, links and vendors, and up to 50 changes to existing rules (edit, turn off, turn on, move, delete), and counts what each rule would fill and what each change would put back, keep or fill, for the client and at the firm's other clients; at a QuickBooks client, also what waits for a link and which other clients need one | No |
-| `ledgersync_apply_rules_setup` | Saves a previewed rules setup, makes its changes to existing rules and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks | Yes |
+| `ledgersync_preview_category_links` | For one global category, proposes the category to link at every client that has none linked to it yet (only the clients you can see), with the totals, a summary by category and, at QuickBooks clients, how many waiting transactions the firm's global rules would file once it is linked; a page at a time | No |
+| `ledgersync_apply_rules_setup` | Saves a previewed rules setup, makes its changes to existing rules and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks; it also saves the links `ledgersync_preview_category_links` previewed, client by client | Yes |
 | `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created (in QuickBooks too), changed and filled; what failed and why | No |
 | `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove, put back and keep (what it created in QuickBooks stays); after a yes, undoes it | Yes |
 | `ledgersync_get_categorized_export_link` | How many of the Manual clients' categorized transactions are not exported yet, and a 24-hour link to them as the LedgerSync app's Default or ACS export file | No (pressing **Download** on the link's page marks them Synced) |
@@ -608,6 +609,40 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       answer. While a later setup that changed the same rules or transactions is still in place, the undo is
       refused with `invalid_request`, naming that setup: undo it first. Undoing changes to global rules needs
       **Manage Global Rules**.
+    - `ledgersync_preview_category_links` links one global category at every client that lacks it, in one
+      preview. It takes the global category's `firm_category_id` (`cat_f_...`) and covers every client of the firm
+      on its platform, Manual or QuickBooks, that has no category linked to it. It writes nothing. For each client it
+      proposes a category the way `link_suggestion` does: the first candidate at level `a` or `b`, none at level
+      `c`. Each client in `clients` has its `client_id`, `name` and `status`: `link` (with the `client_category`
+      and its `basis`: `a` or `b` for the level, or `picked` by the user), `ask` (with the options to pick from), `refused` (with
+      the reason) or `skipped`. The ones that need a decision, `refused` and `ask`, come first. At a QuickBooks
+      client, a `link` row's `fills_here` says how many waiting transactions the firm's global rules would file once
+      it is saved. `totals` counts every client, and `by_account` sums up the links by the client category's name,
+      most clients first.
+    - It names only the clients the person can see: for an employee, the clients assigned to them. The others are
+      only counted (`not_visible` in `totals`). One preview names up to 1,000 clients, the ones the user changed
+      first. The rest are counted in `totals`, with a warning, and a new preview covers them once the setup is done.
+      When the global category's rules have too many conditions to read every client's booked transactions in time,
+      the clients not read keep levels `b` and `c` only: `history_not_read` counts them, with a warning.
+    - The answer comes a page at a time, each up to 20,000 characters. Every page has the `totals` and `by_account`,
+      and `next_cursor` points to the next one. The next pages come from the stored preview, so they do not count as
+      previews. To change clients, the AI calls the tool again with `overrides` (up to 500, each a `client_id` and
+      the `client_category` to link there) and `skip_client_ids` (up to 500). Every client is checked again, with a
+      new `confirmation_id`.
+    - `ledgersync_apply_rules_setup` takes that `confirmation_id` and starts one setup for all the links, in the
+      background, with a `setup_id` that starts with `rsl_`. LedgerSync first checks each link again: a client the
+      person no longer sees, one that linked the category since, or an account that can no longer be linked there
+      fails with its reason. Then it links the category client by client, each link marked LS-AI. At a QuickBooks
+      client, the firm's global rules on that category then file the waiting transactions they now win, and take off
+      their "map this category" badge. Transactions another rule holds, or that a person categorized, stay as they
+      are. A client that fails does not stop the others. While the setup runs, the firm's other setups wait.
+    - `ledgersync_get_rules_setup_status` and `ledgersync_undo_rules_setup` take an `rsl_` `setup_id` without a
+      `client_id`. The status counts the clients done (`clients_done` of `clients_total`), and its `firm_links` block
+      counts the links made (`linked`) and the transactions filed through them (`filled_through_links`), and lists
+      the clients whose link failed, with the reason (`failed_clients`). The undo takes back every link of the setup
+      still in place, so it needs a person who sees every client it linked at. At a QuickBooks client, the transactions filed through the link go back to waiting, with
+      the badge where no other rule takes them. A link a person changed since stays. Links need no
+      **Manage Global Rules**.
     - A rules setup apply or undo that got no clear answer from LedgerSync comes back as `upstream_unknown`,
       naming the setup: check `ledgersync_get_rules_setup_status` before trying again.
     - The instructions on [Set up rules for a client](/ai/rules-setup) are also an MCP prompt, `rules_setup`
@@ -762,6 +797,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       setup at a time; the next one waits until the one before it finishes. An undo does not wait: while another
       setup of the firm is running or being undone, it is refused with `invalid_request`, and can be sent again when
       that one finishes.
+    - Linking one global category at every client: one preview covers up to 1,000 clients and takes up to 500
+      `overrides` and 500 `skip_client_ids`. It counts as one preview toward the 60 an hour, however many pages it
+      has. Its apply and undo count like any rules setup's.
     - Categorized export: one file holds up to 10,000 transactions. Per connected AI app: 30 export links an hour;
       a call that could not reach LedgerSync is not counted. A link works for 24 hours and takes 5 presses of
       **Download** a minute. A firm's downloads run one at a time; a press that waits more than a minute gets a

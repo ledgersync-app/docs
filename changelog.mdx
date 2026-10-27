@@ -3,6 +3,32 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-27" tags={["AI connector"]}>
+  ## Link one global category at every client
+
+  Your AI can now link one of your firm's global categories at every client that has no category linked to it yet,
+  in one preview. It proposes the client's category for each one, and saves nothing until you say yes. See
+  [Link your global categories](/ai/rules-setup#link-your-global-categories).
+
+  - **One preview for all your clients.** The AI shows the totals and a summary of the categories it would link,
+    for example *Fuel at 120 clients, Auto:Fuel at 40*, then the clients that need your answer.
+  - **Change only what is wrong.** Say yes, or name the clients to change or leave out. The AI checks again with
+    your changes.
+  - **QuickBooks clients.** Once a client's category is linked, your global rules file the transactions that were
+    waiting for it, and the "map this category" badge goes away. The preview says how many.
+  - **Manual clients too.** There, a link makes LedgerSync use the GL code of the client's own category.
+  - **Your clients only.** An employee links the category only at the clients assigned to them.
+  - **One undo for all.** One undo takes back every link the setup made, unless someone changed it since. At
+    QuickBooks clients, the transactions filed through those links go back to waiting.
+  - New tool: `ledgersync_preview_category_links`. `ledgersync_apply_rules_setup` saves its preview, and
+    `ledgersync_get_rules_setup_status` and `ledgersync_undo_rules_setup` take its `setup_id` (`rsl_...`) without a
+    `client_id`. See [For developers](/ai/developers).
+  - Your AI keeps working as before. To link a category at every client, it needs the new tool list: reconnect in
+    Claude, click **Refresh** in ChatGPT, or reauthenticate in Grok, then start a new chat. On ChatGPT Business,
+    Enterprise or Edu, your workspace admin refreshes LedgerSync's tools, and on Enterprise and Edu also turns on
+    the new tool under **Action control**. See [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+</Update>
+
 <Update label="2026-10-27" tags={["Accounts"]}>
   ## What is still owed on a card's last statement
 
