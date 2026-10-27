@@ -3766,7 +3766,10 @@ components:
         Credit terms of a liability account (credit card, line of credit,
         loan or mortgage), reported per account. Every field is independently
         nullable: institutions differ in what they publish, and a value absent
-        here means the bank did not report it, never that it is zero.
+        here means the bank did not report it, never that it is zero. The
+        exceptions are `statement_date` and `remaining_statement_balance`,
+        which LedgerSync computes rather than the bank reports, and which are
+        present or null together.
 
         Availability differs by source and by bank. Finicity and MX report
         these terms where the institution publishes them, and many
@@ -3798,8 +3801,35 @@ components:
             reporting the same debt as a negative account balance, so passing
             the reported sign through would make the field unusable. One
             consequence is that a card that was in credit at statement close,
-            because the holder overpaid, is reported as owed.
+            because the holder overpaid, is reported as owed. It is the balance
+            printed on that statement, so it does not change when a payment
+            posts; `remaining_statement_balance` does.
           example: -14381.66
+        statement_date:
+          type: [string, 'null']
+          format: date
+          description: >-
+            The day the statement behind `statement_balance` closed, matching
+            that statement's `statement_date` in
+            [`GET /accounts/{account_id}/statements`](#operation/listStatements).
+            Credit cards only. Set only when a statement we hold prints exactly
+            `statement_balance`, so it is null for a few days after each close,
+            while the bank already reports the new statement balance but the
+            statement itself has not reached us yet, and on cards with no
+            statements on file.
+          example: "2026-08-28"
+        remaining_statement_balance:
+          type: [number, 'null']
+          description: >-
+            What is still unpaid on that statement, NEGATIVE like
+            `statement_balance`, and 0 once it is paid off or when the statement
+            closed in credit. It is
+            `statement_balance` minus every payment, refund and other credit
+            posted after `statement_date`, and never more than the card owes in
+            total (`current_balance`). Pending payments count once they post.
+            No bank or aggregator reports this figure, so LedgerSync computes
+            it. Null exactly when `statement_date` is null.
+          example: -9381.66
         minimum_payment:
           type: [number, 'null']
           description: >-
@@ -3922,8 +3952,9 @@ components:
         liabilities:
           description: |
             Credit terms for this account: what the client can borrow,
-            what they owed at the last statement close, and what the bank
-            wants next. Present only on liability accounts: credit cards,
+            what they owed at the last statement close, how much of that is
+            still unpaid, and what the bank wants next. Present only on
+            liability accounts: credit cards,
             lines of credit, loans and mortgages. Null on every other account
             (checking, savings, investment), even when the source reports
             terms for it, and also on liability accounts at institutions that
