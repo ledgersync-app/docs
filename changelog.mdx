@@ -4,6 +4,40 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-10-28" tags={["AI connector"]}>
+  ## Category links from how your client's QuickBooks booked its transactions
+
+  When your AI has nothing else to go on for a QuickBooks client's category link, LedgerSync now looks at how the
+  client's QuickBooks booked its expenses and deposits over the last 12 months. See
+  [Link your global categories](/ai/rules-setup#link-your-global-categories).
+
+  - **Proposals instead of questions.** If your global rules for the category match at least 3 of those
+    transactions, and at least 8 in 10 were booked to one of the client's categories, the AI proposes that one.
+  - **Best guesses stay first.** When QuickBooks points elsewhere than a best guess from the names or your other
+    clients' links, the AI shows it as another option.
+  - **One client at a time.** LedgerSync reads a client's QuickBooks only when the AI needs it, and keeps that read
+    for an hour. Transactions LedgerSync sent to QuickBooks itself do not count.
+  - `ledgersync_list_setup_categories` has `booked_in_quickbooks` on candidates and `quickbooks_history` on the
+    page. See [For developers](/ai/developers).
+  - Your AI keeps working as before, with no reconnect.
+</Update>
+
+<Update label="2026-10-28" tags={["AI connector"]}>
+  ## Fewer questions about category links
+
+  When your AI links a QuickBooks client's categories to your global categories, it now asks you only about the
+  links that the client's waiting transactions need. See
+  [Link your global categories](/ai/rules-setup#link-your-global-categories).
+
+  - **The links that matter first.** The global categories the client's waiting transactions are waiting for come
+    first, with how many transactions wait for each.
+  - **Fewer questions.** When the AI has nothing to go on for a link that no waiting transaction needs yet, it no
+    longer asks. It tells you how many can wait: link them later, or ask for them now.
+  - `ledgersync_list_setup_categories` (kind firm) has a new field, `waiting_on_link`. See
+    [For developers](/ai/developers).
+  - Your AI keeps working as before, with no reconnect.
+</Update>
+
+<Update label="2026-10-28" tags={["AI connector"]}>
   ## New QuickBooks categories under another category, with a detail type
 
   Your AI can now create a QuickBooks client's new category under one of the client's categories, and give it a

@@ -356,9 +356,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `full_name` when that differs from its name (a sub-account's includes its parents), and no GL code. A new
       client category's `parent` takes the `id` of one of them. A link on a deactivated category still shows in
       `mapped_here`, flagged with `active: false`.
-    - Global categories come in this order: the ones the client does not link that the firm's enabled global rules
-      use (`used_by_enabled_global_rules` counts those rules), then the other ones it does not link, then the
-      linked ones. Each one the client does not link carries a suggested link, `link_suggestion`: a `level` (`a`:
+    - Global categories come in this order: the ones the client does not link that its waiting transactions wait
+      on, then the ones the firm's enabled global rules use (`used_by_enabled_global_rules` counts those rules), then
+      the other ones it does not link, then the linked ones. At a QuickBooks client, each one the client does not
+      link has `waiting_on_link`: how many of its waiting transactions a global rule matches but cannot file until
+      that link exists (0 included). Each one the client does not link carries a suggested link, `link_suggestion`: a `level` (`a`:
       the client's booked transactions decide it; `b`: a best guess from the same name, or from the name the
       firm's other clients link it to, with how many clients; `c`: nothing to go on), up to 5 `candidates` and the
       client's categories that cannot take the link, `unavailable`. A candidate has its `id`, `name`, `full_name`,
@@ -369,6 +371,20 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       its other clients make it the suggestion: the first candidate at level `a` or `b`. This works for Manual
       clients too. A page too long for one answer leaves out the examples first, then all but the first candidate,
       counting the rest in `more_candidates` and `more_unavailable`.
+    - At a QuickBooks client, a global category nothing else decides a link for (level `c`) can take one from how
+      the client's QuickBooks booked its expenses and deposits of the last 12 months (lines on bank and credit card
+      accounts and the entries LedgerSync pushed itself left out): when the category's global rules match at least 3
+      of them, and at least 8 in 10 were booked to one free category of the client, that one becomes the first
+      candidate at level `a`, with `booked_in_quickbooks` (how many) and examples from those. When another suggestion
+      of the page proposes that category, or another level `c` category has more lines on it, it stays level `c` with
+      that category as its first option. As for the client's booked transactions, a category whose type contradicts
+      every way the rules go (an expense category for money that only comes in) is never offered, and one another
+      global category holds is listed under `unavailable`.
+      A level `b` guess stays first: its candidate carries `booked_in_quickbooks` when QuickBooks agrees, and the
+      category QuickBooks points to comes next when it does not. The page's `quickbooks_history` says how that read
+      went: `read`, `reading` (not finished in time: call again shortly), `unavailable` (try later), `broken`
+      (reconnect QuickBooks) or `busy` (LedgerSync was reading other clients' QuickBooks: call again shortly). LedgerSync reads one client at a time, only when a page needs it, and keeps the read
+      for an hour.
     - `ledgersync_list_setup_vendors` lists the client's vendors (`kind: "client"`, ids `ven_c_...`) or the firm's
       global vendors (`kind: "firm"`, ids `ven_f_...`, with their `aliases`), narrowed by `query`, a page at a
       time. For a QuickBooks client, `kind: "client"` also lists its QuickBooks customers (ids `cus_c_...`), read

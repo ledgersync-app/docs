@@ -181,13 +181,20 @@ categories to each global category. What the link does depends on the client:
   no GL code, LedgerSync uses the global one. Not linked, LedgerSync uses the global category and its GL code.
 
 **The AI proposes all the missing links at once.** It goes through every global category the client has no link
-for, starting with the ones your global rules use. For each one, it looks for the client's category that fits:
+for, starting with the ones the client's waiting transactions need, then the ones your global rules use. For each
+one, it looks for the client's category that fits:
 
 - **The client's history shows it.** The client's past transactions that the category's global rules match were
   booked to one of the client's categories (at least 3 of them, and at least 8 in 10). The AI proposes that one.
 - **A best guess.** One of the client's categories has the same name as the global category, or the same name as
   the category your other clients link it to. The AI proposes its best guess and shows you the other options.
-- **Nothing to go on.** The AI asks you.
+- **How the client's QuickBooks booked them.** At a QuickBooks client, LedgerSync also looks at the client's expenses
+  and deposits of the last 12 months in QuickBooks. When nothing above fits, and the category's global rules match at
+  least 3 of them with at least 8 in 10 booked to one of the client's categories, the AI proposes that one. When it
+  disagrees with a best guess, the AI shows it as another option. Transactions LedgerSync sent to QuickBooks itself,
+  and money moved to or from a bank or credit card account, do not count.
+- **Nothing to go on.** The AI asks you. At a QuickBooks client, it asks only about the links that transactions are
+  waiting for. It tells you how many others can wait: link them later, or ask for them now.
 
 It puts every link it can into one preview and asks you about the rest. Check them: say yes, or tell the AI which
 ones are wrong. For example: *Link Fuel to Auto Expense, not to Fuel Surcharge.* At a QuickBooks client, the
@@ -481,7 +488,9 @@ rules. It keeps the chat under your AI account's settings. Check that account's 
 your other clients, it sees counts, such as how many transactions a global rule would fill. For a QuickBooks client,
 it also sees the names of your other QuickBooks clients that still need a link, only the ones you can see in
 LedgerSync. To link a global category at every client, it sees the names of those clients and of their categories,
-only the ones you can see in LedgerSync.
+only the ones you can see in LedgerSync. To suggest a QuickBooks client's links, LedgerSync reads the client's
+expenses and deposits of the last 12 months in QuickBooks. The AI sees how many were booked to each category and up
+to 3 examples (date, amount and description). LedgerSync keeps that read in memory for an hour, not in its database.
 
 </AiNote>
 
@@ -496,7 +505,7 @@ them, give it these instructions.
   <AiCopy label="Instructions for your AI" text={`Set up or change categorization rules for a LedgerSync client.
 1. Find the client with ledgersync_find_clients, then call ledgersync_get_rules_setup. It works for QuickBooks Online and Manual clients; follow its next_step.
 2. Read what exists: ledgersync_list_rules (client and global), ledgersync_list_setup_categories (client and firm) and ledgersync_list_setup_vendors (client and firm).
-3. Link the firm's categories. ledgersync_list_setup_categories (kind firm) lists first the ones this client does not link yet, each with a link_suggestion. Level a: the client's own transactions decide it, so propose its first candidate. Level b: propose the first candidate as your best guess and show the user the other candidates. Level c: ask the user which of the client's categories to link. Put all these links in one preview (mappings); if there are more than one preview takes, start with the ones the firm's global rules use and ask before the rest. For a QuickBooks client a link is what lets the firm's global rules file its transactions at all; for a Manual client it sets the GL code they use. To link one firm category at every client of the firm that lacks it, not only this one, use ledgersync_preview_category_links: one preview for all of those clients, a page at a time. Show the totals and the clients that need a decision, call it again with overrides and skip_client_ids for the clients the user changes, and apply its confirmation_id after the user's yes.
+3. Link the firm's categories. ledgersync_list_setup_categories (kind firm) lists first the ones this client does not link yet, the ones its waiting transactions wait on (waiting_on_link) ahead of the rest, each with a link_suggestion. Level a: the client's own transactions decide it (in LedgerSync, or how its QuickBooks booked them), so propose its first candidate. Level b: propose the first candidate as your best guess and show the user the other candidates. Level c: ask the user which of the client's categories to link; for a QuickBooks client only when waiting_on_link is above 0, and say in one line how many others can wait. Put all these links in one preview (mappings); if there are more than one preview takes, start with the ones transactions wait on, then the ones the firm's global rules use, and ask before the rest. For a QuickBooks client a link is what lets the firm's global rules file its transactions at all; for a Manual client it sets the GL code they use. To link one firm category at every client of the firm that lacks it, not only this one, use ledgersync_preview_category_links: one preview for all of those clients, a page at a time. Show the totals and the clients that need a decision, call it again with overrides and skip_client_ids for the clients the user changes, and apply its confirmation_id after the user's yes.
 4. Call ledgersync_list_uncategorized_transactions and work through the groups, largest first. A group with waiting_on_link needs the link from step 3, not a new rule.
 5. For each group choose the category from the client's own categories or, for a global rule, from the firm's categories. Use names that exist, or propose new ones and say they are new. Never guess: ask the user when you are not sure. When a group looks like money that should be left out of the books (for example transfers between the client's own accounts), propose an exclusion rule (rule_type exclusion) for it: it still files to a category, and LedgerSync marks the transactions it matches for exclusion instead of categorizing them.
 6. Give every rule a payee the same way: one of the client's vendors (for a QuickBooks client, also one of its customers) for a client rule, one of the firm's vendors for a global rule, or a new vendor you say is new. The rule puts it on each transaction it fills as the payee, and the firm can accept a transaction only when it has a payee. An exclusion rule needs no payee: accepting its transactions moves them to Excluded.
