@@ -19,6 +19,7 @@ import { AiPage, AiBox, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
 | **This LedgerSync login cannot use LedgerSync in AI apps.** Or: **This LedgerSync login cannot use LedgerSync in Claude or ChatGPT.** | [Connect again](#connect-again) and sign in with your own LedgerSync login. Still there? Email <AiEmail />. |
 | It asks you to disconnect and reconnect LedgerSync, or it doesn't know something new, like check images links | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](#after-an-update). |
 | It doesn't seem to know LedgerSync | Start a new chat and ask again. In Claude or Grok, click **+** in the message box, then **Connectors**, and turn **LedgerSync** on. Not there in Grok? [Add it again](/ai/setup-grok). In ChatGPT, type **@** and pick **LedgerSync**. Not in that list? Open ChatGPT's [Plugins](https://chatgpt.com/plugins) page, click **Personal**, then **LedgerSync**, then **Install plugin**. |
+| Claude or ChatGPT says it could not connect to LedgerSync, or keeps asking you to sign in | [Connect again](#connect-again). Sign in with the username or email you use in the LedgerSync app. Still the same? Email <AiEmail />. |
 | Grok says **Connection failed** while you add LedgerSync | Click **Go Back** and add it again: see [Set up in Grok](/ai/setup-grok). When the small LedgerSync window opens, sign in right away. Grok waits only a couple of minutes. Still failing? Email <AiEmail />. |
 
 <AiBox id="connect-again" title="To connect again">
@@ -44,8 +45,11 @@ copy once:
 
 **Claude:** [connect again](#connect-again).
 
-**ChatGPT:** open [Plugins](https://chatgpt.com/plugins), click **Personal**, then **LedgerSync**, then
-**Refresh**.
+**ChatGPT:** open [Settings, then Plugins](https://chatgpt.com/settings/plugins-settings) and click **LedgerSync**.
+Under **Manage app**, click **Refresh tools**. On older ChatGPT screens: open [Plugins](https://chatgpt.com/plugins),
+click **Personal**, then **LedgerSync**, then **Refresh**. On ChatGPT Business, Enterprise or Edu, your workspace admin
+refreshes LedgerSync's tools in the workspace's app settings. On Enterprise or Edu, new actions stay off until the admin
+turns them on.
 
 **Grok:** [connect again](#connect-again).
 

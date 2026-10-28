@@ -7,7 +7,7 @@ mode: "frame"
 import { AiPage, AiStep, AiCopy, AiButton, AiNote, AiTest, AiStuck } from "/snippets/ai-ui.jsx";
 import AiAsk from "/snippets/ai-ask.mdx";
 
-<AiPage title="Set up in ChatGPT" subtitle="5 steps · about 3 minutes · ChatGPT Plus or higher, on chatgpt.com in a web browser (not the phone app)" video="/videos/setup-chatgpt.mp4" poster="/videos/setup-chatgpt-poster.jpg" stage={2}>
+<AiPage title="Set up in ChatGPT" subtitle="5 steps · about 3 minutes · ChatGPT Go, Plus, Pro, Business, Enterprise or Edu, on chatgpt.com in a web browser (not the phone app)" video="/videos/setup-chatgpt.mp4" poster="/videos/setup-chatgpt-poster.jpg" stage={2}>
 
 <Accordion title="On ChatGPT Business, Enterprise or Edu? Open this first">
 
@@ -16,9 +16,11 @@ signs in with their own LedgerSync login. Your admin has no LedgerSync login?
 [Book a call with our team](https://ledgersync.com/book-a-demo) and we'll set it up with you. Nobody creates a new
 LedgerSync account.
 
-Otherwise, send this page to your admin: the address is in step 3. They add it from **Workspace settings** and then
-click **Publish**. Until then it is a draft that only they can use. Everyone in your workspace then sees LedgerSync.
-Then each person connects it with their own LedgerSync login.
+Otherwise, send this page to your admin: the address is in step 3. They add it with steps 2 to 5 below, then
+publish it: in the **Admin Console** they pick your workspace, open **Plugins**, then **Manage Legacy Apps**, then
+**Drafts**, and click **Publish**. Until then it is a draft that only they can use. Everyone in your workspace then
+sees LedgerSync. On Enterprise or Edu, your admin can also choose which groups see it. Then each person connects it
+with their own LedgerSync login.
 
 Once it is published, each person opens
 [chatgpt.com/settings/plugins-settings](https://chatgpt.com/settings/plugins-settings) (**Settings**, then
@@ -30,25 +32,27 @@ Once it is published, each person opens
 
 Open [chatgpt.com/settings/security](https://chatgpt.com/settings/security) (it opens in a new tab). That is
 **Settings**, then **Security and login**. Turn on **Developer mode**. ChatGPT may show a risk warning. Turn it on
-anyway: LedgerSync needs it. Then come back to this tab for step 2.
+anyway. Then come back to this tab for step 2.
 
-Don't see **Developer mode** there? Skip this step and go on to step 2.
+Don't see **Developer mode** there? Skip this step and go on to step 2. Newer ChatGPT screens add LedgerSync without
+it.
 
 </AiStep>
 
-<AiStep id="plugins" stage={2} n={2} total={5} title="Click Add, then Create MCP App" img="/images/ai-connector/full/chatgpt-2-create-mcp-app.png" caption="Create MCP App circled">
+<AiStep id="plugins" stage={2} n={2} total={5} title="Click Add, then Add custom MCP server" img="/images/ai-connector/full/chatgpt-2-create-mcp-app.png" caption="Create MCP App circled">
 
 <AiButton href="https://chatgpt.com/plugins" newTab>Open ChatGPT Plugins</AiButton>
 
 ChatGPT opens in a new tab. Keep it open, and come back to this tab for step 3. In ChatGPT, click **Add** at
-the top right, then **Create MCP App**.
+the top right, then **Add custom MCP server** (older ChatGPT screens say **Create MCP App**).
 
 LedgerSync is already under **Settings**, then **Plugins**? Don't create it again:
 [connect again](/ai/troubleshooting#connect-again) instead. Only under **Plugins**, then **Personal**? Click it, then
 **Install plugin**.
 
-Don't see **Create MCP App**? Turn on **Developer mode** (step 1). On ChatGPT Business, Enterprise or Edu,
-ask your workspace admin. Still not there? [Book a call with our team](https://ledgersync.com/book-a-demo) and
+Don't see **Add custom MCP server** or **Create MCP App**? Turn on **Developer mode** (step 1). On the free
+ChatGPT plan, you need Go, Plus or Pro first. On ChatGPT Business, Enterprise or Edu, ask your workspace admin.
+Still not there? [Book a call with our team](https://ledgersync.com/book-a-demo) and
 we'll set it up with you.
 
 </AiStep>
@@ -60,14 +64,14 @@ we'll set it up with you.
    **Ctrl+V** (Windows) or **Command+V** (Mac).
 3. Leave everything else as it is.
 4. Tick **I understand and want to continue**.
-5. Click **Create**.
+5. Click **Create as a plugin** (older screens say **Create**).
 
 <AiCopy label="Your LedgerSync address" text="https://api.ledgersyncappv2.com/mcp" />
 
 <AiNote tone="yellow">
 
-ChatGPT shows this warning for every app you add yourself, because LedgerSync is not in ChatGPT's list
-yet. It's safe to tick.
+ChatGPT shows this warning for every app you add yourself, because OpenAI has not reviewed apps that
+people add. It's safe to tick.
 
 </AiNote>
 

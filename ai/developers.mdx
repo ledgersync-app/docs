@@ -42,9 +42,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
   - Sub-account (firm) logins and their employees cannot connect yet; they get **Connecting an AI assistant is
     not available for sub-account logins yet.** Client logins, support sessions and logins with access days and
     hours cannot connect.
-  - ChatGPT needs a paid plan (Plus or higher) and the web version on chatgpt.com. If **Create MCP App** is
-    missing, turn on **Developer mode** (**Settings**, then **Security and login**). On ChatGPT Business,
-    Enterprise or Edu, only the workspace admin can add it for everyone.
+  - ChatGPT needs a paid plan (Go, Plus or Pro, or Business, Enterprise or Edu) and the web version on
+    chatgpt.com. Add it from **Plugins**: **Add**, then **Add custom MCP server** (older screens: **Create MCP
+    App**). If neither is there, turn on **Developer mode** (**Settings**, then **Security and login**). On
+    ChatGPT Business, Enterprise or Edu, only the workspace admin can add it for everyone.
   - On Claude Team and Enterprise, an Owner first adds it under **Organization settings > Connectors** (**Add**,
     then **Custom**, then **Web**). Members then open **Connectors**, find LedgerSync and click **Connect**. The
     Claude Free plan allows one custom connector. Once added, it also works in Claude Desktop, the Claude
@@ -118,6 +119,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - When `access.status` is `active`, `ledgersync_get_account_status` also names the firm and the login the
       connection uses, in `account`: `firm_name`, `signed_in_as` (the login's email) and `role` (`owner`, `admin` or `employee`).
       A name LedgerSync could not read is left out.
+    - An active status also has a `next_step`: greet the user by `account.firm_name`, say sandbox or live and full
+      or read-only, and end with one offer. Until the connection has run another tool that worked, it also has
+      `suggested_questions`, a short menu of what this connection can ask: reads only for a read-only connection,
+      and, for a firm still under review, adding a client and converting a statement PDF (finding a client when
+      read-only).
     - `ledgersync_find_clients` also returns the firm's own accounts: the banks connected on the firm owner's
       own LedgerSync login rather than for a client, as the LedgerSync app's client list shows them. They come
       back as one entry, first in the list, whose name ends in "(the firm's own accounts)", marked
