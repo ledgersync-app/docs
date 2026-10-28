@@ -243,10 +243,20 @@ For a QuickBooks Online client, rules setup works the same way, with these diffe
   employee. A global rule uses your firm's global categories and global vendors, as for any client.
 - **New categories and vendors are created in the client's QuickBooks, after your yes.** LedgerSync creates them
   before it saves the rules. When QuickBooks already has one with that name, LedgerSync uses it instead: for a
-  category, only when it is of the same type and not under another category. LedgerSync never turns a deactivated
-  QuickBooks category or vendor back on, so a name that belongs to one is refused, and the AI tells you which.
-- **A new category needs a QuickBooks account type**, such as Expense or Income. It is created at the top level, not
-  under another category. A setup never creates customers.
+  category, only when it is of the same type and in the same place, under the same category or at the top level.
+  LedgerSync never turns a deactivated QuickBooks category or vendor back on, so a name that belongs to one is
+  refused, and the AI tells you which.
+- **A new category needs a QuickBooks account type**, such as Expense or Income, unless it goes under another
+  category. A setup never creates customers.
+- **A new category goes at the top level, or under one of the client's categories.** For example: *Make a new
+  category Fuel under Auto.* QuickBooks calls it a sub-account. It gets the type of the category it goes under. The
+  preview, the result and the undo show it with that category's name in front: *Auto:Fuel*. The preview checks that
+  category in the client's QuickBooks first: it must be active. QuickBooks allows 5 levels at most, and never puts a
+  category under a few special ones, such as Undeposited Funds, Opening Balance Equity or Retained Earnings.
+- **A new category can also have a QuickBooks detail type**, such as Travel or Office/General Administrative
+  Expenses. It must be one LedgerSync knows for the category's account type: if not, the AI names some that are.
+  Under another category, a new one with no detail type gets that category's. The preview shows the detail type
+  a new category gets, before you say yes; at the top level without one, QuickBooks picks it.
 - **The preview names your other QuickBooks clients that need a link.** A new global rule files transactions at
   your other QuickBooks clients only where they link its global category, and so does a global rule you edit or
   turn on. At the others, those transactions wait with the badge. The preview counts them, and names those clients
@@ -435,7 +445,8 @@ finishes. Undoing global rules, global categories, global vendors or changes to 
 - Changing the category of a rule that splits each transaction over several categories.
 - Taking a rule's vendor off. A change can give a rule a vendor or replace it.
 - A rule on the amount alone. A rule also needs words to look for in the bank text.
-- New QuickBooks categories under another category, or with a detail type. New ones are made at the top level.
+- A new QuickBooks category under another new one. Set up the first one, then ask for the one under it.
+- Moving a QuickBooks category you have under another one, or changing its type or detail type.
 - Employees as payees, and new customers.
 - Turning a deactivated QuickBooks category or vendor back on.
 
@@ -534,6 +545,7 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 | Some items failed | The AI says which ones and why. The rest was saved. Fix the reason, then ask the AI to preview the missing ones again. |
 | QuickBooks did not answer while the setup ran, or its connection stopped working | The setup keeps running, and LedgerSync tries again every few minutes, 5 tries in all. If the connection stopped working, reconnect it. After the last try, what still needs QuickBooks fails, and the rest of the setup is saved: ask the AI to preview the failed items again. |
 | A global rule can only be turned off or on | Your AI still has an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| A new QuickBooks category can only go at the top level, or cannot have a detail type | Your AI still has an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
 | Some global rules share a priority | They have the same **Priority** number in the LedgerSync app, so the AI cannot move a global rule across or next to them, or delete one of them. Ask the AI for another place, or move or delete the rule in the LedgerSync app. |
 | An amount is not a plain amount | Write it with digits and up to 2 decimals, such as 1200.50, with no $ sign, commas or minus sign. The rule's money in or money out says which way. |
 
@@ -543,7 +555,7 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 
 | The AI says | Do this |
 | --- | --- |
-| A name is already taken | LedgerSync already has a category, vendor or rule with that name. For a QuickBooks client, that includes the categories and vendors in its QuickBooks. The AI can use the one you have, or pick another name. |
+| A name is already taken | LedgerSync already has a category, vendor or rule with that name. For a QuickBooks client, that includes the categories and vendors in its QuickBooks. The AI can use the one you have, or pick another name. For a new QuickBooks category under another one, only a category with that name under the same one counts. |
 | A rule fills no transactions | Its words match no waiting transaction, here or at your other clients, or every transaction they match already goes to another rule (see the next row). Check the words with the AI, or leave the rule out. |
 | Another rule already gets a rule's transactions | One of your existing rules, a rule earlier in the preview or, for a global rule, a new client rule fills them first (a client's own rules always come before global rules). Leave the new rule out, or ask the AI for more specific words. |
 | Two new rules match the same transactions | Each transaction goes to only one rule: a client rule before a global rule, otherwise the one listed first. Check with the AI that the right rule gets them, or make the words more specific. |
@@ -577,15 +589,18 @@ says **(MCP)** next to it) and press **Enter**. Then tell it the client.
 
 </Accordion>
 
-<Accordion title="QuickBooks clients: deactivated categories and vendors, account types, customers, characters">
+<Accordion title="QuickBooks clients: deactivated categories and vendors, account types, categories under another one, detail types, customers, characters">
 
 | The AI says | Do this |
 | --- | --- |
 | A name belongs to a deactivated category or vendor in QuickBooks | LedgerSync never turns it back on. Use another name. Or turn it back on in QuickBooks, then, in the LedgerSync app, select the client, click **Rules Engine**, then **QuickBooks**, then **Sync QuickBooks Data** at the bottom of the menu on the left. Then ask the AI to preview again. |
 | A category or a vendor is deactivated | A rule or a link cannot use a deactivated QuickBooks category, and a client rule cannot pay a deactivated vendor. Pick another one, or turn it back on in QuickBooks and sync, as in the row above. |
-| A name belongs to a QuickBooks category of another type, or one under another category | Use that category, or give the new one another name. |
-| A new category needs an account type | Tell the AI the QuickBooks account type, such as Expense or Income. |
-| A new category's name has `:` | In QuickBooks, `:` puts a category under another one. A setup makes top-level categories only: use a name without it. |
+| A name belongs to a QuickBooks category of another type, or one under another category | Use that category, or give the new one another name. To make the new one under a category, tell the AI which one. |
+| A new category needs an account type | Tell the AI the QuickBooks account type, such as Expense or Income. Or tell it which category the new one goes under: it gets that one's type. |
+| A new category's name has `:` | In QuickBooks, `:` puts a category under another one. Give the new category a name without it, and tell the AI which category it goes under. |
+| A new category cannot go under the category you picked | That category is not in the client's QuickBooks, is deactivated, has another type than the one you gave, is already on the fifth level, or is one of the special ones QuickBooks never puts a category under, such as Undeposited Funds. The AI says which. Pick another category, or make the new one at the top level. |
+| A detail type is refused | It does not belong to the category's account type, or LedgerSync does not know it: the AI names some that work. Pick one of them, or leave it out. Under another category, a few special detail types, such as Opening Balance Equity, are not allowed. |
+| A Manual client's new category cannot go under another category, or have a detail type | Those are for QuickBooks clients only. Ask the AI to leave them out. |
 | A new vendor has the name of one of the client's customers | Make the customer the rule's payee, or give the vendor another name. |
 | A rule's words have `%`, `_` or `\` | At a QuickBooks client, a rule cannot look for these characters. Leave them out. |
 | A payee is the wrong kind | A global rule pays one of your firm's global vendors, never a customer. No rule pays an employee. |

@@ -4,6 +4,33 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-10-28" tags={["AI connector"]}>
+  ## New QuickBooks categories under another category, with a detail type
+
+  Your AI can now create a QuickBooks client's new category under one of the client's categories, and give it a
+  QuickBooks detail type. It shows you a preview first and saves nothing until you say yes. See
+  [QuickBooks clients](/ai/rules-setup#quickbooks-clients).
+
+  - **Under a category you have.** For example: *Make a new category Fuel under Auto.* QuickBooks calls it a
+    sub-account. The preview, the result and the undo show it with that category's name in front: *Auto:Fuel*.
+  - **Checked in QuickBooks first.** The preview checks the category it goes under in the client's QuickBooks: it
+    must be active, and QuickBooks allows 5 levels at most. The new category takes its type, so it needs no type of
+    its own.
+  - **Detail types.** A new category can have a QuickBooks detail type, such as Travel or Office/General
+    Administrative Expenses, spelled as QuickBooks shows it. Under another category, a new one without a detail type
+    gets that category's. The preview shows the detail type a new category gets (at the top level without one,
+    QuickBooks picks it).
+  - **The same name in another place.** A category with the same name at the top level does not stop a new one
+    under another category, and two new categories can share a name under different ones.
+  - **QuickBooks clients only.** A Manual client's new categories cannot go under another one or have a detail type.
+  - Not yet: a new category under another new one. Set up the first one, then ask for the one under it.
+  - New input on `ledgersync_preview_rules_setup`: `parent` and `detail_type` on a new client category. New refusal
+    codes: `parent_invalid` and `detail_type_invalid`. See [For developers](/ai/developers).
+  - Your AI keeps working as before. To create a category under another one, or with a detail type, it needs the new
+    tool list: reconnect in Claude, click **Refresh tools** in ChatGPT, or reauthenticate in Grok, then start a new
+    chat. See [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+</Update>
+
+<Update label="2026-10-28" tags={["AI connector"]}>
   ## A greeting with your firm's name, and which AI plans work
 
   - **A greeting.** When your AI checks your LedgerSync account, it greets you with your firm's name and says

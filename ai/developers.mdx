@@ -316,10 +316,25 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       QuickBooks vendors or customers, never an employee. A global rule files to a firm category through the
       client's category linked to it: without a link, its transactions wait with the "map this category" badge. The
       client's new categories and vendors are created in its QuickBooks when the setup runs, after the yes. A
-      category or vendor QuickBooks already has with that name is used instead (a category only when it is top level
-      and of the same type), and a deactivated one is never turned back on. A new client category needs an
-      `account_type` (a QuickBooks account type, such as `Expense`) and is created at the top level. LedgerSync keeps
-      no GL codes for QuickBooks: a `gl_code` sent with a new category is ignored.
+      category or vendor QuickBooks already has with that name is used instead (a category only when it has the same
+      full name, so the same parent, and the same type), and a deactivated one is never turned back on. A new client
+      category needs an `account_type` (a QuickBooks account type, such as `Expense`) and is created at the top level,
+      or as a sub-account of the existing category in its `parent`, whose type it takes when it has no
+      `account_type`. It may also have a `detail_type`: QuickBooks' detail type (AccountSubType), one LedgerSync
+      knows for its account type or, under a parent, the parent's own. A sub-account without one takes its parent's.
+      LedgerSync keeps no GL codes for QuickBooks: a `gl_code` sent with a new category is ignored.
+    - A new category's `parent` is read live from the client's QuickBooks at the preview, and again when the apply
+      checks the items. It must be there and active, have the account type given (if one is), sit above the fifth
+      level (QuickBooks nests accounts 5 levels deep at most), and not have one of the six detail types QuickBooks
+      keeps sub-accounts off: `OpeningBalanceEquity`, `UndepositedFunds`, `RetainedEarnings`, `CashReceiptIncome`,
+      `CashExpenditureExpense` and `ExchangeGainOrLoss`. A `detail_type` matches any spelling QuickBooks shows, with
+      case and every character other than letters and digits ignored (`Office/General Administrative Expenses` is
+      `OfficeGeneralAdministrativeExpenses`); under a parent it cannot be one of those six. The new account's full
+      name, `Parent:Name` (the parent's full name, a colon and its `name`), decides whether its name is taken: an
+      account with that full name is used instead, a top-level account with the same name does not block it, and two
+      new categories of one preview may share a name under different parents. A sub-account is named by its full name
+      in the preview's `items`, the status's `created_in_quickbooks` and the undo, and its item shows the
+      `detail_type` it gets.
     - `ledgersync_get_rules_setup` takes the `client_id` and returns the client's `platform`, whether rules setup is
       `supported` for it, `counts` (the client's and the firm's categories and how many have a GL code, their
       vendors and rules, and the client's waiting transactions: all of them, the ones no rule holds, and the ones
@@ -336,8 +351,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       how many clients link it, `clients_mapped`), narrowed by `query` (a name or GL code), 50 at a time by default
       (up to 100).
     - A QuickBooks client's categories are its active QuickBooks categories, each with its `account_type`, its
-      `full_name` when that differs from its name (a sub-account's includes its parents), and no GL code. A link on
-      a deactivated category still shows in `mapped_here`, flagged with `active: false`.
+      `full_name` when that differs from its name (a sub-account's includes its parents), and no GL code. A new
+      client category's `parent` takes the `id` of one of them. A link on a deactivated category still shows in
+      `mapped_here`, flagged with `active: false`.
     - Global categories come in this order: the ones the client does not link that the firm's enabled global rules
       use (`used_by_enabled_global_rules` counts those rules), then the other ones it does not link, then the
       linked ones. Each one the client does not link carries a suggested link, `link_suggestion`: a `level` (`a`:
@@ -398,7 +414,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       vendor for a global rule. A rule may also have a `rule_type`: `inclusion` (the default) or `exclusion`. An
       exclusion rule marks the transactions it matches for exclusion instead of filing them: they wait on For review
       and move to Excluded when the user accepts them. It still needs a `category`, and its `payee` is optional. Any
-      other `rule_type` is refused with `invalid_request` on `rules[i].rule_type`. A mapping links a firm (global)
+      other `rule_type` is refused with `invalid_request` on `rules[i].rule_type`. A new client category has a
+      `ref`, a `name` (its own name, without its parent's), an `account_type` (required at a QuickBooks client unless
+      it has a `parent`, optional at a Manual one), a `gl_code` (Manual clients only) and an optional `firm_category`
+      to link it to. At a QuickBooks client it may also have a `parent`, the existing client category it goes under,
+      as `{"id": "cat_c_..."}`, and a `detail_type` (up to 100 characters). A `parent` takes an `id` only: a category
+      new in the same preview cannot be a parent, and anything else there, such as a `ref`, is refused before the
+      preview runs. If LedgerSync cannot take a `parent` or `detail_type` just then, the preview is
+      refused with `invalid_request` on that field and stores nothing. A mapping links a firm (global)
       category to a client category: up to 100 in one preview, so all of a client's missing links can go in one. A
       vendor has a `scope` too.
     - The preview writes nothing. It returns the client's `platform` (`manual` or `quickbooks`). For each rule it
@@ -407,7 +430,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       same platform, Manual or QuickBooks
       (`fills_other_clients`, at `other_clients` clients), and its `warnings` (`code`, `message`). It also returns
       the categories, links and vendors it keeps, in `items` (`ref`, `type`, `name` and `action`: `create`, `link`
-      or `reuse`, with `existing_id` for one it reuses), every refused item with its `name`, code and reason (and,
+      or `reuse`, with `existing_id` for one it reuses, and on a QuickBooks client category the `detail_type` it
+      gets, its parent's when none was given), every refused item with its `name`, code and reason (and,
       for a name that is taken, `existing_id`: the id of the category, vendor or rule that has it), the totals and,
       when at least one item is OK, a `confirmation_id`.
     - For an exclusion rule, `fills_here` and `fills_other_clients` count the transactions it would mark for
@@ -447,10 +471,16 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       a global category is named like a GL code the firm already uses; a GL code is too long; a rule uses the wrong
       kind of category or vendor; a link clashes with an existing one; a condition is invalid, or none of them looks
       for words; LedgerSync's rule checks block the rule (the message says why); or it depends on a refused item.
-      Refused rules are left out of the counts.
+      Refused rules are left out of the counts. At a Manual client, a new category with a `parent` or a
+      `detail_type` is refused (`parent_invalid` or `detail_type_invalid`): they are QuickBooks only.
     - At a QuickBooks client, an item is also refused when: a new name belongs to a deactivated category or vendor,
-      to a category of another type or under another category, or to one of the client's customers; a new
-      category has no QuickBooks account type, or `:` in its name; a rule or a link uses a deactivated category; a
+      to a category of another type or under another category, or to one of the client's customers (a new
+      category's name counts with its parent's, as its full name); a new category has no QuickBooks account type and
+      no `parent` to take one from, or `:` in its name (its parent goes in `parent`); its `parent` is not one of the
+      client's QuickBooks accounts, is deactivated, has another type than its `account_type`, is on the fifth level,
+      or has one of the six detail types above (`parent_invalid`); its `detail_type` is not one LedgerSync knows for
+      its account type (or, under a parent, the parent's own), the message naming a few that are, or is one of
+      those six under a parent (`detail_type_invalid`); a rule or a link uses a deactivated category; a
       client rule pays a deactivated vendor; a bank text holds `%`, `_` or `\`; a payee is an employee, or a
       customer on a global rule; or it needs QuickBooks (a new client category, a new client vendor or a customer
       payee) while QuickBooks cannot be reached (`quickbooks_broken`): the connection is broken, or QuickBooks could
@@ -547,7 +577,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       while the rest of the setup is saved, so the setup ends done with some failed items. A Manual global rule never
       waits.
     - For a QuickBooks client, the setup first creates the client's new categories and vendors in its QuickBooks,
-      then saves the links and rules. At the firm's other QuickBooks clients that do not link a new global rule's
+      then saves the links and rules. A sub-account is created under its parent, with its own detail type or else its
+      parent's. At the firm's other QuickBooks clients that do not link a new global rule's
       category, the transactions it matches get the "map this category" badge. When QuickBooks does not answer or
       the connection is broken, the setup stays running and tries again every few minutes, 5 runs in all. Then
       what still needs QuickBooks fails, with `quickbooks_broken` when the connection is broken or refused, or
