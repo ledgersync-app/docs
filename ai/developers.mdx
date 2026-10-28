@@ -330,8 +330,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       level (QuickBooks nests accounts 5 levels deep at most), and not have one of the six detail types QuickBooks
       keeps sub-accounts off: `OpeningBalanceEquity`, `UndepositedFunds`, `RetainedEarnings`, `CashReceiptIncome`,
       `CashExpenditureExpense` and `ExchangeGainOrLoss`. A `detail_type` matches any spelling QuickBooks shows, with
-      case and every character other than letters and digits ignored (`Office/General Administrative Expenses` is
-      `OfficeGeneralAdministrativeExpenses`); under a parent it cannot be one of those six. The new account's full
+      case and every character other than letters and digits ignored and `&` read as nothing or as "and"
+      (`Office/General Administrative Expenses` is `OfficeGeneralAdministrativeExpenses`, `Rent & lease home office` is
+      `RentAndLeaseHomeOffice`), and QuickBooks' screen labels worded otherwise match too (`Communication` is
+      `Communications`); under a parent it cannot be one of those six. The new account's full
       name, `Parent:Name` (the parent's full name, a colon and its `name`), decides whether its name is taken: an
       account with that full name is used instead, a top-level account with the same name does not block it, and two
       new categories of one preview may share a name under different parents. A sub-account is named by its full name
