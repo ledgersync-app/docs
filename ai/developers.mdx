@@ -322,6 +322,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       or as a sub-account of the existing category in its `parent`, whose type it takes when it has no
       `account_type`. It may also have a `detail_type`: QuickBooks' detail type (AccountSubType), one LedgerSync
       knows for its account type or, under a parent, the parent's own. A sub-account without one takes its parent's.
+      A top-level one without one would get QuickBooks' default for its type (`Travel` for an Expense account), so
+      a preview that keeps one says in its `next_step` to propose a `detail_type` and preview again.
       LedgerSync keeps no GL codes for QuickBooks: a `gl_code` sent with a new category is ignored.
     - A new category's `parent` is read live from the client's QuickBooks at the preview, and again when the apply
       checks the items. It must be there and active, have the account type given (if one is), sit above the fifth

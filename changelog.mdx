@@ -17,8 +17,8 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
     its own.
   - **Detail types.** A new category can have a QuickBooks detail type, such as Travel or Office/General
     Administrative Expenses, spelled as QuickBooks shows it. Under another category, a new one without a detail type
-    gets that category's. The preview shows the detail type a new category gets (at the top level without one,
-    QuickBooks picks it).
+    gets that category's. At the top level the AI gives every new category one, since QuickBooks would otherwise
+    pick its own (Travel, for an expense category). The preview shows the detail type each new category gets.
   - **The same name in another place.** A category with the same name at the top level does not stop a new one
     under another category, and two new categories can share a name under different ones.
   - **QuickBooks clients only.** A Manual client's new categories cannot go under another one or have a detail type.

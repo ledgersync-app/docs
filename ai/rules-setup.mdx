@@ -255,8 +255,9 @@ For a QuickBooks Online client, rules setup works the same way, with these diffe
   category under a few special ones, such as Undeposited Funds, Opening Balance Equity or Retained Earnings.
 - **A new category can also have a QuickBooks detail type**, such as Travel or Office/General Administrative
   Expenses. It must be one LedgerSync knows for the category's account type: if not, the AI names some that are.
-  Under another category, a new one with no detail type gets that category's. The preview shows the detail type
-  a new category gets, before you say yes; at the top level without one, QuickBooks picks it.
+  Under another category, a new one with no detail type gets that category's. At the top level, the AI gives
+  every new category a detail type, since QuickBooks would otherwise pick its own (Travel, for an expense
+  category). The preview shows the detail type each new category gets, before you say yes.
 - **The preview names your other QuickBooks clients that need a link.** A new global rule files transactions at
   your other QuickBooks clients only where they link its global category, and so does a global rule you edit or
   turn on. At the others, those transactions wait with the badge. The preview counts them, and names those clients
