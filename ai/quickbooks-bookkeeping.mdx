@@ -135,7 +135,8 @@ To save rules in LedgerSync, use [Set up rules for a client](/ai/rules-setup). I
 
 The AI leaves out transfers, bill or invoice payments and possible duplicates, and lists them for you. LedgerSync also
 leaves out a transaction that already has a split, a class or a billable customer in LedgerSync, so nothing replaces
-it. Accept those in the LedgerSync app.
+it. Accept those in the LedgerSync app, or ask the AI to accept them without posting them: see
+[Accept For review transactions](/ai/accept-transactions).
 
 </Accordion>
 
@@ -220,7 +221,7 @@ month.
 | A category or a vendor does not exist, but you just added it in QuickBooks | LedgerSync keeps its own copy of the client's QuickBooks lists. In the LedgerSync app, select the client, click **Rules Engine**, then **QuickBooks**, then **Sync QuickBooks Data** at the bottom of the menu on the left. Then ask the AI again. |
 | Some transactions were refused in the preview | The AI says why for each one. Answer its questions, or leave them out, and ask it to preview again. Nothing has changed yet. |
 | A transaction may already be in QuickBooks (a possible duplicate) | LedgerSync does not post it. Check it in QuickBooks before you add anything by hand. |
-| A transaction already has a split or a class | LedgerSync leaves it alone, so the post does not replace it. Accept it in the LedgerSync app. |
+| A transaction already has a split or a class | LedgerSync leaves it alone, so the post does not replace it. Accept it in the LedgerSync app, or ask the AI to accept it without posting it. |
 | A vendor name is too long | LedgerSync keeps vendor names of up to 80 characters. Give the AI a shorter new name. Or shorten the vendor's name in QuickBooks, click **Sync QuickBooks Data** in the LedgerSync app (as above), then ask the AI again. |
 | Some transactions failed | They stay in LedgerSync under **Categorized**. Fix the reason the AI gives, often in QuickBooks. Then, in the LedgerSync app, click **Rules Engine**, then **QuickBooks**, then **Transactions**. Pick **Categorized**, select them and click **Sync with QuickBooks**. |
 
