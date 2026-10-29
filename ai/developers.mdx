@@ -128,7 +128,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       or read-only, and end with one offer. Until the connection has run another tool that worked, it also has
       `suggested_questions`, a short menu of what this connection can ask: reads only for a read-only connection,
       and, for a firm still under review, adding a client and converting a statement PDF (finding a client when
-      read-only).
+      read-only). Both menus of a reviewed firm ask which vendors need a 1099, since the 1099 list is a read.
     - `ledgersync_find_clients` also returns the firm's own accounts: the banks connected on the firm owner's
       own LedgerSync login rather than for a client, as the LedgerSync app's client list shows them. They come
       back as one entry, first in the list, whose name ends in "(the firm's own accounts)", marked
@@ -778,6 +778,13 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       tools; for any other firm, the preview and the apply answer `access_not_active`, and the 1099 list still
       works. The status and the undo work for any change a firm made. LedgerSync keeps who approved each change
       and from which AI app.
+    - Every ready answer of `ledgersync_get_1099_summary`, an empty list too, ends its `next_step` with what the
+      list does not cover (royalties, gross proceeds paid to attorneys, and which 1099 form and box each payment
+      goes in) and says the firm files its 1099s through its own 1099 service, before the offers.
+    - The instructions on [Find who needs a 1099](/ai/1099-vendors) are also an MCP prompt, `form_1099_season`
+      ("Find who needs a 1099"), with optional `client` and `tax_year` arguments. Claude Code lists it as a
+      command. The connector's instructions also tell the AI to preview 1099 marks first and apply them only after
+      the user's yes.
   </Accordion>
 
   <Accordion title="Security: bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview, rules saved only after a preview, 24-hour export links that export only on Download, vendors marked for 1099 only after a preview, tax IDs never shown">

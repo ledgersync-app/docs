@@ -4,6 +4,19 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-10-29" tags={["AI connector"]}>
+  ## Your AI runs a client's 1099 check the same way every time
+
+  Ask your AI *"Which vendors need a 1099 for Acme?"*. It lists the vendors who need a 1099, goes through the ones not
+  marked for 1099 in QuickBooks and the ones with no tax ID on file, offers to mark them after your yes (marking opens
+  to a few test firms first), and ends with what the list does not cover. The menu your AI shows on a new connection
+  can now offer this question too. See [Find who needs a 1099](/ai/1099-vendors).
+
+  - The steps are also an MCP prompt, `form_1099_season`. See [For developers](/ai/developers).
+  - The list's new ending and the menu reach your AI with no reconnect. The prompt shows after your AI app connects
+    again.
+</Update>
+
+<Update label="2026-10-29" tags={["AI connector"]}>
   ## Your AI lists a client's 1099 vendors, and can mark them in QuickBooks
 
   Ask your AI who needs a 1099 for a QuickBooks Online client: it lists the vendors paid at or over the 1099-NEC
