@@ -64,7 +64,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">43</span>
+## Tools <span className="lsai-badge">48</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -109,11 +109,16 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created (in QuickBooks too), changed and filled, never counting an account hidden in LedgerSync; what failed and why | No |
 | `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove, put back and keep, never counting an account hidden in LedgerSync (what it created in QuickBooks stays); after a yes, undoes it | Yes |
 | `ledgersync_get_categorized_export_link` | How many of the Manual clients' categorized transactions are not exported yet, and a 24-hour link to them as the LedgerSync app's Default or ACS export file | No (pressing **Download** on the link's page marks them Synced) |
+| `ledgersync_get_1099_summary` | The vendors a QuickBooks client paid at or over the 1099 threshold in a tax year, with each one's QuickBooks 1099 flag, whether a tax ID and an email are on file (never the tax ID itself) and a suggested next step; card and payment app payments left out by default | No |
+| `ledgersync_preview_ledger_changes` | Checks marking up to 100 of a QuickBooks client's vendors for 1099, or unmarking them: each vendor's 1099 flag before and after, and the vendors it would leave as they are, with the reason (open to a few test firms first) | No |
+| `ledgersync_apply_ledger_changes` | Marks the previewed vendors for 1099 in the client's QuickBooks, in the background, changing nothing else on them | Yes |
+| `ledgersync_get_ledger_changes_status` | How marking vendors went: which were changed, which were left as they were and why, and how an undo went | No |
+| `ledgersync_undo_ledger_changes` | Shows which vendors' 1099 flags would go back and which would stay; after a yes, puts them back | Yes |
 | `ledgersync_get_desktop_app_status` | Is the desktop app linked and connected (live only) | No |
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
 <AccordionGroup>
-  <Accordion title="Tool details: refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions, QuickBooks bookkeeping, rules setup, categorized export">
+  <Accordion title="Tool details: refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099">
     - `ledgersync_get_account_status` also says whether the connection is full or read-only. Refreshes left
       is your firm's shared daily budget, not the per-app cap.
     - When `access.status` is `active`, `ledgersync_get_account_status` also names the firm and the login the
@@ -731,9 +736,51 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       name and mark nothing new. Nothing spends the link.
     - If marking fails, the file is still returned, the transactions stay Not Synced, and the next press on that
       link tries again. An export from the app marks the same transactions, so the next link leaves them out.
+    - `ledgersync_get_1099_summary` lists the vendors a QuickBooks Online client paid at or over the 1099-NEC
+      threshold in a tax year: 600.00 for 2025 and 2,000.00 for 2026 by default; for another year, pass
+      `threshold`. `tax_year` defaults to the year that just ended until February 15, then the current year. It
+      counts expenses and checks to a vendor and bill payments, by payment date. Payments by card or through a
+      payment app (PayPal, Venmo, Square, Stripe, Cash App) are left out by default, since they go on a 1099-K;
+      `exclude_card_payments: false` keeps them in.
+    - Each vendor comes with `total_paid`, `card_and_app_paid` and `reportable` (money as text with two decimals),
+      `qbo_1099_flag`, `has_tin` and `has_email` (true or false only: a tax ID never reaches the AI),
+      `w9_status` ("not tracked yet"), a `suggested_action` (`mark_for_1099`, `get_tax_id`, `review` or `ok`) and
+      its `evidence`. The answer also has the counts, `total_reportable`, `excluded_card_and_app_total` and
+      `data_as_of`, when the payments were read; the vendors come a page at a time (`limit`, 25 by default and at
+      most 100, and `cursor`).
+    - LedgerSync reads a year's payments from QuickBooks once and keeps them for the rest of the day; each vendor's
+      flags are read again on every call. A large client's first call can answer `status: running`: call it again
+      with the same arguments in about 30 seconds. `refresh: true` reads the payments again, unless today's read
+      is under 5 minutes old.
+    - Marking vendors for 1099 takes three steps and a yes. `ledgersync_preview_ledger_changes` takes `client_id`
+      and `changes`: 1 to 100 of `type` `update_vendor`, a `vendor_id` from `ledgersync_get_1099_summary` and
+      `is_1099` (`true` to mark, `false` to unmark). It reads each vendor from QuickBooks and answers `changes`
+      (each vendor's `qbo_1099_flag_before` and `qbo_1099_flag_after`), `refused` (with a `reason`: `not_found`,
+      `inactive`, `already_marked`, `already_unmarked` or `duplicate`), `to_mark`, `to_unmark`, `data_as_of` and
+      a `confirmation_id` that works for 30 minutes. It changes nothing, so it is annotated read-only; it needs
+      `write:accounting`. QuickBooks refuses any change to an inactive vendor, so make it active there first.
+    - `ledgersync_apply_ledger_changes` takes only the `confirmation_id`, after the user's yes, and answers a
+      `change_set_id` (`lcs_...`). LedgerSync marks the vendors one at a time in the background and sends QuickBooks
+      only each vendor's 1099 flag: nothing else on the vendor changes, and a tax ID is never read or written. A
+      vendor someone changed in QuickBooks since the preview is left as it is (`changed_since_preview`). Calling it
+      again with the same `confirmation_id` never marks twice. An apply that got no clear answer comes back as
+      `upstream_unknown`: check `ledgersync_get_ledger_changes_status` before trying again.
+    - `ledgersync_get_ledger_changes_status` takes `client_id` and `change_set_id`. It answers `status` (`queued`,
+      `running`, `done`, `partial`, `failed`, `undoing`, `undone` or `undo_failed`), the counts, the AI app the
+      changes were approved from (`app`) and, a page at a time, each vendor's flag before and after with its
+      `result` and `reason`, and after an undo its `undo` and `undo_reason`.
+    - `ledgersync_undo_ledger_changes` takes two calls. The first, without `undo_id`, changes nothing: it lists the
+      vendors whose flag goes back (`revert`) and the ones left as they are (`keep`, with the reason: changed in
+      QuickBooks since, inactive, no longer in QuickBooks, or already back), with an `undo_id` that works for 15
+      minutes. The second, with that `undo_id`, starts the undo. Only vendors nobody changed in QuickBooks since
+      go back. An undo that could not put a vendor back (`undo_failed`) can be run again.
+    - Marking vendors for 1099 is open to a few test firms first, and opens to everyone soon. Every firm sees the
+      tools; for any other firm, the preview and the apply answer `access_not_active`, and the 1099 list still
+      works. The status and the undo work for any change a firm made. LedgerSync keeps who approved each change
+      and from which AI app.
   </Accordion>
 
-  <Accordion title="Security: bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview, rules saved only after a preview, 24-hour export links that export only on Download">
+  <Accordion title="Security: bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview, rules saved only after a preview, 24-hour export links that export only on Download, vendors marked for 1099 only after a preview, tax IDs never shown">
     - Bank sign-ins never happen in the chat. The account holder picks the bank on a LedgerSync page and signs
       in there, or on the bank-data partner's secure page it opens for some banks. Connect links expire after
       72 hours.
@@ -794,9 +841,16 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - Anyone with an export link can download its file while the link works, so the tool tells the AI to hand it
       over without opening it. Each link takes 5 presses a minute, and each person exports only the clients they
       see in the LedgerSync app: an employee, the clients assigned to them.
+    - Vendors are marked for 1099 in a client's QuickBooks only after a preview and a yes.
+      `ledgersync_apply_ledger_changes` takes only the preview's `confirmation_id`, which works for 30 minutes and
+      only for the person and the AI app that made it. It and `ledgersync_undo_ledger_changes` are marked as
+      changing data, so Claude and ChatGPT ask before they run. In Grok, ask it to wait for your yes.
+    - LedgerSync changes only a vendor's 1099 flag, and only while the vendor is as the preview saw it; the undo
+      puts back only vendors nobody changed since. A tax ID is never read into the chat, shown or changed: the
+      1099 list says only whether one is on file.
   </Accordion>
 
-  <Accordion title="Refreshes and limits: 50 AI refreshes a day on live, 20 on sandbox, 300 client messages a day per firm on live, 60 QuickBooks pushes a day per AI app, 30 rules setups a day per AI app, 30 export links an hour per AI app, per-minute and per-hour caps">
+  <Accordion title="Refreshes and limits: 50 AI refreshes a day on live, 20 on sandbox, 300 client messages a day per firm on live, 60 QuickBooks pushes a day per AI app, 30 rules setups a day per AI app, 30 export links an hour per AI app, 30 sets of 1099 marks a day per AI app, per-minute and per-hour caps">
     - LedgerSync refreshes every working connection about once a day. A refresh you ask for takes a few
       minutes; see [Keeping data fresh](/guides/data-freshness).
     - A connection refreshed in the last 30 minutes is skipped unless you ask for a new pull anyway.
@@ -862,6 +916,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       a call that could not reach LedgerSync is not counted. A link works for 24 hours and takes 5 presses of
       **Download** a minute. A firm's downloads run one at a time; a press that waits more than a minute gets a
       page that says to try again.
+    - Marking vendors for 1099: one preview takes up to 100 vendors. Per connected AI app: 60 previews an hour,
+      30 applies a day and 10 undos a day; an apply or an undo counts only when it reaches LedgerSync. A preview's
+      confirmation works for 30 minutes, an apply's answer is kept for 24 hours, and an undo check works for 15
+      minutes. A client's changes run one set at a time: while another set of the client is being made or undone,
+      an undo is refused as busy (`rate_limit_exceeded`) and can be sent again a minute later.
   </Accordion>
 
   <Accordion title="Tool updates: Claude and ChatGPT keep a copy of the tool list, and Grok may too">
@@ -886,7 +945,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     templates first: it may already be saved). A QuickBooks push that got no clear answer from LedgerSync comes
     back as `upstream_unknown`, with its `push_id`: check `ledgersync_get_quickbooks_push_status` before pushing
     again. A rules setup apply or undo that got no clear answer comes back as `upstream_unknown` too, naming the
-    setup: check `ledgersync_get_rules_setup_status` before trying again.
+    setup: check `ledgersync_get_rules_setup_status` before trying again. So does a 1099 marking apply or undo:
+    check `ledgersync_get_ledger_changes_status` before trying again.
 
     | Code | What it means | What to do |
     | --- | --- | --- |

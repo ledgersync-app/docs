@@ -4,6 +4,22 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-10-29" tags={["AI connector"]}>
+  ## Your AI lists a client's 1099 vendors, and can mark them in QuickBooks
+
+  Ask your AI who needs a 1099 for a QuickBooks Online client: it lists the vendors paid at or over the 1099-NEC
+  threshold in the tax year (2,000.00 for 2026), with whether each one is marked for 1099 in QuickBooks and whether a
+  tax ID is on file. Card and payment app payments are left out, since they go on a 1099-K. A tax ID is never shown.
+
+  Your AI can also mark those vendors for 1099 in QuickBooks: it shows each vendor's 1099 flag before and after,
+  marks them only after your yes, and can put them back. Marking opens to a few test firms first.
+
+  - See `ledgersync_get_1099_summary`, `ledgersync_preview_ledger_changes`, `ledgersync_apply_ledger_changes`,
+    `ledgersync_get_ledger_changes_status` and `ledgersync_undo_ledger_changes` in [For developers](/ai/developers).
+  - To use the new tools, your AI app loads the new tool list first (see Tool updates on
+    [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-10-29" tags={["AI connector"]}>
   ## Rule changes and undo keep hidden accounts out too
 
   When your AI previews a change to an existing rule or an undo, and when it reports how a rules setup went, its
