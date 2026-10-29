@@ -3,6 +3,19 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-29" tags={["AI connector"]}>
+  ## Rule changes and undo keep hidden accounts out too
+
+  When your AI previews a change to an existing rule or an undo, and when it reports how a rules setup went, its
+  counts and example transactions now leave out the accounts hidden in LedgerSync, like the rest of its rule
+  suggestions. Transactions on a hidden account that a changed rule had filed are filed again by your other rules,
+  the same way as on the accounts you see.
+
+  - See `ledgersync_preview_rules_setup`, `ledgersync_get_rules_setup_status` and `ledgersync_undo_rules_setup` in
+    [For developers](/ai/developers).
+  - Your AI keeps working as before, with no reconnect.
+</Update>
+
 <Update label="2026-10-28" tags={["AI connector"]}>
   ## Excluded transactions stay out of your AI's transaction lists
 
