@@ -77,7 +77,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_get_connection` | Checks one bank connection | No |
 | `ledgersync_list_connections_needing_attention` | Broken connections across all clients, and the firm's own | No |
 | `ledgersync_list_accounts` | A client's accounts with balances | No |
-| `ledgersync_list_transactions` | An account's transactions (last 30 days by default); for a Manual or QuickBooks Online client, how many of its transactions have no rule yet | No |
+| `ledgersync_list_transactions` | An account's transactions (last 30 days by default), leaving out the ones on LedgerSync's Excluded list unless the user asks for them (`include_excluded`, which marks each one `excluded`); for a Manual or QuickBooks Online client, how many of its transactions have no rule yet, leaving out accounts hidden in LedgerSync | No |
 | `ledgersync_list_statements` | An account's statements | No |
 | `ledgersync_get_statement_download_link` | One-time link to a statement PDF | No |
 | `ledgersync_create_statement_upload_link` | Secure page where you upload a bank statement PDF to turn it into transactions | Yes |
@@ -97,13 +97,13 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_preview_quickbooks_push` | Checks up to 100 transactions with the categories and payees the AI picked, and shows what would be posted to QuickBooks | No |
 | `ledgersync_push_to_quickbooks` | Posts a previewed set of transactions into the client's QuickBooks | Yes |
 | `ledgersync_get_quickbooks_push_status` | What a QuickBooks push posted, skipped or failed, and why | No |
-| `ledgersync_get_rules_setup` | Can a client's rules be set up (Manual and QuickBooks Online clients); counts of its categories, vendors, rules and waiting transactions; for a QuickBooks client, its QuickBooks connection and the transactions waiting for a link; can you make global rules; the limits; the client's last setups | No |
+| `ledgersync_get_rules_setup` | Can a client's rules be set up (Manual and QuickBooks Online clients); counts of its categories, vendors, rules and waiting transactions (accounts hidden in LedgerSync left out); for a QuickBooks client, its QuickBooks connection and the transactions waiting for a link; can you make global rules; the limits; the client's last setups | No |
 | `ledgersync_list_setup_categories` | A client's categories or the firm's global categories, with GL codes (Manual), links, a suggested link for each global category the client does not link, and the LS-AI mark | No |
 | `ledgersync_list_setup_vendors` | A client's vendors (and, for a QuickBooks client, its customers) or the firm's global vendors, with the LS-AI mark | No |
 | `ledgersync_list_rules` | A client's rules or the firm's global rules, with conditions, category, payee and the LS-AI mark | No |
 | `ledgersync_get_rule` | One of a client's rules or the firm's global rules in full: every condition, every category line of a client rule, its payee, whether it is on, and the rules just before and after it | No |
-| `ledgersync_list_uncategorized_transactions` | A client's waiting transactions that no rule fills, grouped by bank text, largest groups first, and, at a QuickBooks client, the groups a global rule would file once a category is linked | No |
-| `ledgersync_preview_rules_setup` | Checks up to 100 rules with their new categories, links and vendors, and up to 50 changes to existing rules (edit, turn off, turn on, move, delete), and counts what each rule would fill and what each change would put back, keep or fill, for the client and at the firm's other clients; at a QuickBooks client, also what waits for a link and which other clients need one | No |
+| `ledgersync_list_uncategorized_transactions` | A client's waiting transactions that no rule fills, grouped by bank text, largest groups first, and, at a QuickBooks client, the groups a global rule would file once a category is linked. Accounts hidden in LedgerSync are left out | No |
+| `ledgersync_preview_rules_setup` | Checks up to 100 rules with their new categories, links and vendors, and up to 50 changes to existing rules (edit, turn off, turn on, move, delete), and counts what each rule would fill (never on an account hidden in LedgerSync) and what each change would put back, keep or fill, for the client and at the firm's other clients; at a QuickBooks client, also what waits for a link and which other clients need one | No |
 | `ledgersync_preview_category_links` | For one global category, proposes the category to link at every client that has none linked to it yet (only the clients you can see), with the totals, a summary by category and, at QuickBooks clients, how many waiting transactions the firm's global rules would file once it is linked; a page at a time | No |
 | `ledgersync_apply_rules_setup` | Saves a previewed rules setup, makes its changes to existing rules and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks; it also saves the links `ledgersync_preview_category_links` previewed, client by client | Yes |
 | `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created (in QuickBooks too), changed and filled; what failed and why | No |
@@ -415,7 +415,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `rule_type`. A `rule_id` that is not one of the client's rules, or not one of the firm's global rules on the
       client's platform, answers `not_found`. It changes nothing.
     - `ledgersync_list_uncategorized_transactions` lists the client's waiting transactions that no rule holds and
-      nobody categorized (not pending and not excluded), grouped by bank text, largest groups first, 50 groups at a
+      nobody categorized (not pending, not excluded, and not on an account hidden in LedgerSync, which the
+      LedgerSync app does not show either), grouped by bank text, largest groups first, 50 groups at a
       time by default (up to 100), between optional `from` and `to` dates, and only money in or money out when
       `direction` is given. Each group has the bank text (`description`), `count`, `money_in`, `money_out`,
       `total`, `first_date`, `last_date`, `sources`, up to 3 `examples` and, when an existing rule would already

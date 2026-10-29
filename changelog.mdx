@@ -4,6 +4,30 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-10-28" tags={["AI connector"]}>
+  ## Excluded transactions stay out of your AI's transaction lists
+
+  When your AI lists an account's transactions, it now leaves out the ones on LedgerSync's Excluded list, unless you
+  ask for excluded transactions. Then it lists them too, and says which ones are excluded.
+
+  - `ledgersync_list_transactions` takes `include_excluded`, and marks each excluded transaction `excluded`. See
+    [For developers](/ai/developers).
+  - Excluded transactions stay out with no reconnect. To ask for them, your AI app loads the new tool list first
+    (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-10-28" tags={["AI connector"]}>
+  ## Hidden accounts stay out of your AI's rule suggestions
+
+  Your AI's list of a client's transactions that no rule has filed yet now leaves out the accounts hidden in
+  LedgerSync, the way the LedgerSync app does. The count of those transactions, and what a new rule would file, leave
+  them out too, so your AI no longer brings up transactions from accounts you cannot see for that client.
+
+  - `ledgersync_list_uncategorized_transactions` leaves out transactions on hidden accounts. See
+    [For developers](/ai/developers).
+  - Your AI keeps working as before, with no reconnect.
+</Update>
+
+<Update label="2026-10-28" tags={["AI connector"]}>
   ## Category links from how your client's QuickBooks booked its transactions
 
   When your AI has nothing else to go on for a QuickBooks client's category link, LedgerSync now looks at how the
