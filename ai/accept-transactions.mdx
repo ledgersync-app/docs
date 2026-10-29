@@ -1,0 +1,332 @@
+---
+title: "Accept For review transactions"
+description: "Your AI moves a client's For review transactions in the Rules Engine to Categorized, as Accept does in the LedgerSync app, for Manual and QuickBooks Online clients. It shows you what would move and what would stay first, and moves them only after you say yes. It can also check your rules against the transactions they filed."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="Accept For review transactions" subtitle="Ask your AI. It shows you which For review transactions would move to Categorized and which would stay, and why. After your yes, LedgerSync moves them, and the AI tells you what moved and what did not.">
+
+<AiNote tone="green">
+
+**For Manual and QuickBooks Online clients.** Not set up yet? Go to [Start here](/ai/start-here). Added it a while ago? Do
+[After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+
+</AiNote>
+
+## Start
+
+<AiStep id="new-chat" n={1} total={4} title="Start a new chat">
+
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
+
+</AiStep>
+
+<AiStep id="ask" n={2} total={4} title="Ask the AI">
+
+Type *"Move Acme's For review transactions with rules to Categorized"*, with your client's name, and press **Enter**.
+
+</AiStep>
+
+<AiStep id="check" n={3} total={4} title="Check the preview">
+
+For each client, the AI shows what would move to **Categorized**, what LedgerSync would refuse, and what would stay in
+**For review**, and why. Nothing has moved yet.
+
+</AiStep>
+
+<AiStep id="yes" n={4} total={4} title="Say yes">
+
+Say yes, and allow it each time Claude or ChatGPT asks. LedgerSync moves the transactions, and the AI tells you what
+moved and what did not.
+
+</AiStep>
+
+<AiNote tone="green">
+
+**Say exactly what to move.** For example: *"For Acme, Beta and Cedar, go to the Rules Engine, For review, and move the
+transactions with rules to Categorized, except exclusion rules and the ones coded to 8001 or 8002. Give me a report of
+what you did and didn't move."*
+
+</AiNote>
+
+<AiNote tone="yellow">
+
+**Using Grok?** Tell it to wait for your yes before it moves anything.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**Nothing goes to QuickBooks.** Accepting moves the transactions in LedgerSync only. For a QuickBooks client, sync
+them in the LedgerSync app. A Manual client's go in its next export.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**Check your rules too.** Ask, for example: *"Review Acme's rules for any mismatches between a rule and the
+transactions it filed."* See [Check your rules](#check-your-rules).
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**Changed your mind?** In the same chat, ask: *"Undo the accept you just did."* See [Undo](#undo).
+
+</AiNote>
+
+<AiNote tone="yellow">
+
+**Your client's bank data goes through your AI account.** Check its data settings first.
+
+</AiNote>
+
+## More details
+
+<AccordionGroup>
+
+<Accordion title="What happens after you ask">
+
+1. The AI finds your clients: up to 10 in one preview.
+2. LedgerSync checks each client's transactions on **For review** in the Rules Engine.
+3. The AI shows you a preview, client by client: what would move to **Categorized** (or to **Excluded**, see below),
+   what LedgerSync would refuse and why, and what would stay in **For review** and why. Nothing has moved yet.
+4. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right.
+5. LedgerSync checks each transaction again and moves it, as **Accept** does in the app. A transaction that changed
+   since the preview stays as it is. With many clients, this can take more than one step: the AI goes on with the
+   same preview until every client is done, and LedgerSync never moves a transaction twice.
+6. The AI tells you, client by client, what moved, what LedgerSync refused and why, what changed since the preview,
+   and what stayed in **For review**.
+7. For a QuickBooks client, sync the moved transactions in the LedgerSync app: click **Rules Engine**, then
+   **QuickBooks**, then **Transactions**. Pick **Categorized**, select them and click **Sync with QuickBooks**. A
+   Manual client's go in its next export: see [Export categorized transactions](/ai/categorized-export).
+
+<AiNote tone="gray">
+
+**Which transactions move?** By default, the ones a rule filed, except the ones an exclusion rule filed. You can also
+ask for:
+
+- **Exclusion rules too.** Accepting moves those transactions to **Excluded**, not **Categorized**. The preview says
+  which ones.
+- **Transactions no rule filed,** such as the ones you categorized by hand.
+- **Some categories to stay.** Name them by GL code or name, such as *8001* or *Ask Accountant*: up to 20. A
+  transaction stays in **For review** when its category, or any line of a split, has that GL code or name, or a name
+  that starts with it followed by a space or a dash, such as *8001 - Ask Accountant*.
+- **Some dates only.** For example: *only September.* LedgerSync goes by the posted date.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**Why some transactions stay in For review.**
+
+- **Left out:** no rule filed it, a kind of rule you did not ask for filed it (by default, an exclusion rule), or its
+  category is one you asked to keep.
+- **Refused,** as the app refuses it: it has no payee (a vendor, customer or employee), no category, or, for a
+  QuickBooks client, its bank account is not mapped to a QuickBooks bank or credit card account. Add what is missing
+  in the LedgerSync app, then ask the AI again.
+- **Changed since the preview:** someone accepted, excluded or changed it, or its rule or category no longer matches
+  what you asked. LedgerSync leaves it as it is.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**What changes in LedgerSync.** The transactions move from **For review** to **Categorized**, or to **Excluded** for an
+exclusion rule's, as when you click **Accept** in the app. Nothing is posted to QuickBooks. LedgerSync keeps who said
+yes, and in which AI app.
+
+</AiNote>
+
+</Accordion>
+
+<Accordion title="Check your rules" id="check-your-rules">
+
+Your AI can check a client's rules against the transactions they filed. Ask, for example: *"Review Acme's rules for
+any mismatches between a rule and the transactions it filed."*
+
+1. The AI lists the client's transactions on **For review**, or on **Categorized** if you ask, each with the rule that
+   filed it.
+2. It reads each rule: the words it looks for, the amount, its category and its payee.
+3. It compares them with each transaction the rule filed, and tells you about every mismatch.
+4. It proposes a fix only after you agree. A fix works as in [Changing your rules](/ai/rules-setup#changing-your-rules):
+   a preview first, then your yes.
+
+You can also ask what is waiting. For example: *"What's in Acme's For review, and which rule filed each one?"* For
+each transaction, the AI sees its date, amount, bank text, account, category and GL code, payee, and the rule that
+filed it, if one did. It lists them as the LedgerSync app shows them, and changes nothing.
+
+</Accordion>
+
+<Accordion title="Undo" id="undo">
+
+Changed your mind? In the same chat, ask the AI to undo it. For example: *"Undo the accept you just did."*
+
+1. The AI first checks what the undo would do. Claude and ChatGPT already ask you to allow it here: allow it,
+   because this check changes nothing. Then the AI shows you, client by client, what would go back to **For review**
+   and what would stay, and why. Nothing has changed yet.
+2. You say yes. Claude and ChatGPT also ask you to allow it.
+3. LedgerSync moves them back to **For review**, the ones on **Excluded** too. The AI tells you what went back and
+   what stayed.
+
+- **What stays.** A transaction synced to QuickBooks or exported since stays **Categorized**. One that someone changed
+  since stays as it is.
+- **The whole accept.** The undo covers every client of that accept.
+- **In the same chat.** The AI needs that accept's details. To move back transactions you accepted in the LedgerSync
+  app, use the app: on **Categorized**, select them and click **Undo**.
+
+</Accordion>
+
+<Accordion title="What it does not do yet">
+
+- Clients that use another accounting app, such as Zoho Books.
+- Bank accounts on LedgerSync's own bank connection, such as banks that need the LedgerSync desktop app.
+- Posting to QuickBooks. Sync a QuickBooks client's transactions in the LedgerSync app.
+- Excluding transactions that no exclusion rule filed. Use **Exclude** in the LedgerSync app.
+
+</Accordion>
+
+<Accordion title="Before you start">
+
+- **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
+  a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the new
+  tools. On ChatGPT Business, Enterprise or Edu, your workspace admin refreshes LedgerSync's tools first. On
+  Enterprise and Edu, they also turn on the new tools: **Workspace settings**, then **Apps**, then **...** next to
+  LedgerSync, then **Action control**.
+- **The clients are Manual or QuickBooks Online clients.** In the LedgerSync app, you work on these clients under
+  **Rules Engine**, then **Manual** or **QuickBooks**.
+- **Your connection can make changes.** A read-only connection can show the transactions, but not move them.
+- **Your clients.** Each person works only on the clients they see in the LedgerSync app: an employee, the clients
+  assigned to them.
+
+</Accordion>
+
+<Accordion title="Your client's data">
+
+<AiNote tone="yellow">
+
+**Your client's bank data goes through your AI account.** The AI app reads the client's For review and Categorized
+transactions: dates, amounts, bank text, accounts, categories, payees and the rules that filed them. It keeps the chat
+under your AI account's settings. Check that account's data settings before you start.
+
+</AiNote>
+
+</Accordion>
+
+<Accordion title="Optional: the full instructions to paste">
+
+You don't need these: LedgerSync already gives your AI the same steps. If your AI does not follow them, give it these
+instructions.
+
+<div className="lsai-prompt">
+  <AiCopy label="Instructions for your AI" text={`Accept a LedgerSync client's For review transactions, then report what moved and what did not.
+1. Find each client with ledgersync_find_clients. This works for QuickBooks Online and Manual clients, up to 10 clients in one preview.
+2. Call ledgersync_preview_accept_transactions with the clients. By default it takes the transactions an inclusion rule filed. Use rule_type exclusion for the ones exclusion rules filed (accepting moves them to Excluded) or any for both, only_rule_filed false to add the ones no rule filed, leave_out_categories for the GL codes or category names to keep in For review, and from and to for the posted dates. For example, "move the transactions with rules to Categorized, except exclusion rules and those coded to 8001 or 8002" is rule_type inclusion with leave_out_categories ["8001", "8002"].
+3. Show the user, client by client, what moves (to Categorized, or to Excluded for an exclusion rule's transactions), what LedgerSync would refuse and why, and what stays in For review and why. Nothing has moved yet.
+4. Only after the user says yes, call ledgersync_accept_transactions with the preview's confirmation_id. If a client is not done yet (upstream_unknown, not_reached or not_started), call it again with the same confirmation_id: it never accepts twice.
+5. Report to the user, client by client: what moved, what LedgerSync refused and why, what changed since the preview, and what stayed in For review. Accepting posts nothing to QuickBooks: a QuickBooks client's Categorized transactions are synced in the LedgerSync app, and a Manual client's go in its next export.
+6. If the user wants them back in For review, call ledgersync_undo_accept_transactions with the accept_id. The first call only shows what would go back and what would stay. Only after the user says yes, call it again with the undo_id.
+7. To check rules against the transactions they filed, list them with ledgersync_list_review_transactions, read each rule with ledgersync_get_rule, compare its conditions, category and payee with each transaction, and tell the user about every mismatch. Propose a fix with ledgersync_preview_rules_setup only after the user agrees.`} />
+</div>
+
+1. Click **Copy** above.
+2. In Claude, ChatGPT or Grok, start a new chat.
+3. Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
+4. At the end, type your clients' names and what to keep in For review. For example: *Acme, Beta and Cedar, except
+   8001 and 8002*. Then press **Enter**.
+
+</Accordion>
+
+</AccordionGroup>
+
+## If something goes wrong
+
+<AccordionGroup>
+
+<Accordion title="Most common messages">
+
+| The AI says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. On ChatGPT Business, Enterprise or Edu, ask your workspace admin to refresh LedgerSync's tools. On Enterprise and Edu, also ask them to turn on the new tools under **Action control**. |
+| **Accepting transactions from an AI app works for QuickBooks Online and Manual clients only.** | Accept this client's transactions in the LedgerSync app. |
+| A transaction has no payee, or no category | LedgerSync refuses it, as the app does. Add the payee (a vendor, customer or employee) or the category to the transaction in the LedgerSync app, then ask the AI again. |
+| A bank account is not mapped | QuickBooks clients only. Map the client's bank account to a QuickBooks bank or credit card account on **Bank Accounts Mapping** (**Rules Engine**, then **QuickBooks**, in the menu on the left), then ask the AI again. |
+| Some transactions changed since the preview | Someone accepted, excluded or changed them after the preview, or their rule or category no longer matches what you asked. LedgerSync left them as they are. Ask the AI to preview again. |
+| Too many transactions for one accept | One accept moves up to 500 transactions, across all its clients. The AI previews again with a shorter date range or fewer clients. |
+| More than 10 clients | One preview takes up to 10 clients. Ask for the others in another preview. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+
+</Accordion>
+
+<Accordion title="More messages: preview expired, accept not confirmed, LedgerSync busy, read-only, limits, undo">
+
+| The AI says | Do this |
+| --- | --- |
+| **This confirmation is unknown or expired. Preview the transactions to accept again.** | A preview works for 30 minutes. Ask the AI to preview again. |
+| LedgerSync **did not confirm** a client's accept, so its transactions may or may not have moved | Ask the AI to accept the same preview again. LedgerSync never moves a transaction twice, and the AI then tells you what moved. |
+| Some clients are not done yet | The AI asks again with the same preview to finish them. LedgerSync never moves a transaction twice. |
+| **These transactions are already being accepted.** | Wait a minute, then ask the AI to accept the same preview again. It tells you what moved, and never accepts twice. |
+| **Other transactions are being accepted; try again in a minute.** | Nothing was moved. Wait a minute, then ask the AI to accept the same preview again. A preview works for 30 minutes. |
+| **This connection is read-only or lacks permission for this action.** | This connection can show the transactions, but not move them. Accept them in the LedgerSync app, or email <AiEmail />. |
+| This connection has used a tool too many times this hour or this day | Each AI app you connect can preview 120 times an hour, accept 60 times a day and undo 30 times a day. Try again next hour or tomorrow, as the AI says, or do it in the LedgerSync app. |
+| **Accepting transactions from an AI app needs the current LedgerSync release, which is not running just now.** | Nothing was changed. Try again later, or use the Rules Engine in the LedgerSync app meanwhile. |
+| **This undo_id is unknown, expired or for another accept.** | An undo check works for 15 minutes. Ask the AI to check the undo again. |
+| LedgerSync **did not confirm** the undo | Ask the AI to check the undo again before you undo again. The check shows what has not gone back yet. |
+| **This undo is already running.** | Wait a minute, then ask the AI to check the undo again. |
+
+</Accordion>
+
+</AccordionGroup>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the 4 tools and what they change">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_list_review_transactions` | One client's transactions in the Rules Engine's For review or Categorized tab, as the LedgerSync app shows them, each with its category and GL code, payee and the rule that filed it | No |
+    | `ledgersync_preview_accept_transactions` | Checks which For review transactions of 1 to 10 clients would move to Categorized (an exclusion rule's to Excluded), which LedgerSync would refuse and why, and which would stay and why | No |
+    | `ledgersync_accept_transactions` | Accepts the previewed transactions, client by client, as the LedgerSync app's Accept does; posts nothing to QuickBooks | Yes |
+    | `ledgersync_undo_accept_transactions` | Shows which accepted transactions would go back to For review and which would stay (synced, exported or changed since); after a yes, moves them back | Yes |
+
+    - The list needs `read:accounting`; the preview, the accept and the undo need `write:accounting`. A read-only
+      connection can list but cannot preview, accept or undo. The preview changes nothing, so it is annotated
+      read-only.
+    - The accept takes only the preview's `confirmation_id`. It works for 30 minutes, only for the person and the AI
+      app that made the preview, and accepts only the transactions that preview counted, and only while they still
+      match. Calling it again with the same confirmation answers from what it kept, for 24 hours, and never accepts
+      twice.
+    - The undo takes the `accept_id` the accept returned, in two calls. The first, without `undo_id`, changes nothing:
+      it returns what would go back and what would stay and, when something would go back, an `undo_id`. Only a
+      second call with that `undo_id`,
+      within 15 minutes, moves them back. Both calls go to the same tool, marked as changing data, so Claude and
+      ChatGPT ask before each one, the check included.
+    - There is no MCP prompt for these tools: each tool's description and `next_step` carry the steps.
+    - No new error codes: `invalid_request`, `not_found`, `insufficient_scope`, `rate_limit_exceeded`,
+      `idempotency_conflict`, `upstream_unavailable`, `upstream_unknown` and `internal_error`.
+    - On the sandbox connector, an accept really moves the sandbox client's transactions, and an undo really moves
+      them back. There is no dry run.
+    - See [For developers](/ai/developers) for every field.
+  </Accordion>
+
+  <Accordion title="For developers: limits">
+    - One preview takes 1 to 10 clients and up to 20 categories to leave out, each up to 100 characters. One accept
+      moves up to 500 transactions across its clients: a preview that would move more keeps no confirmation.
+    - Each connected AI app can make 120 previews an hour, 60 accepts a day and 30 undos a day. An accept or an undo
+      counts only when it reaches LedgerSync, and the undo's first call is not counted.
+    - LedgerSync sends a few accepts at a time, shared by every firm. An accept past that is refused as busy, is not
+      counted, and can be sent again a minute later with the same `confirmation_id`.
+    - One accept call starts no new client after 30 seconds. The clients left answer `not_started`, and the next call
+      with the same `confirmation_id` sends them.
+    - A preview's confirmation works for 30 minutes, an accept's answer is kept for 24 hours, and an undo check works
+      for 15 minutes.
+    - Each person accepts only for the clients they see in the LedgerSync app: an employee, the clients assigned to
+      them.
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>

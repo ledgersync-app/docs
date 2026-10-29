@@ -4,6 +4,24 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-10-29" tags={["AI connector"]}>
+  ## Your AI accepts For review transactions, and checks your rules
+
+  Ask your AI to move a client's For review transactions in the Rules Engine to Categorized, as **Accept** does in
+  the LedgerSync app. For example: *"For Acme, Beta and Cedar, move the transactions with rules to Categorized, except
+  exclusion rules and the ones coded to 8001 or 8002. Give me a report of what you did and didn't move."* It shows you
+  what would move and what would stay first, moves them only after your yes, and then tells you what moved and what
+  did not, and why. It can undo it too. For Manual and QuickBooks Online clients, up to 10 clients at a time.
+  Nothing is posted to QuickBooks. See [Accept For review transactions](/ai/accept-transactions).
+
+  Your AI can also check your rules against the transactions they filed, and tell you about every mismatch.
+
+  - See `ledgersync_list_review_transactions`, `ledgersync_preview_accept_transactions`,
+    `ledgersync_accept_transactions` and `ledgersync_undo_accept_transactions` in [For developers](/ai/developers).
+  - To use the new tools, your AI app loads the new tool list first (see Tool updates on
+    [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-10-29" tags={["AI connector"]}>
   ## Your AI runs a client's 1099 check the same way every time
 
   Ask your AI *"Which vendors need a 1099 for Acme?"*. It lists the vendors who need a 1099, goes through the ones not
