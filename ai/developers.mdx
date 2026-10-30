@@ -109,7 +109,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created (in QuickBooks too), changed and filled, never counting an account hidden in LedgerSync; what failed and why | No |
 | `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove, put back and keep, never counting an account hidden in LedgerSync (what it created in QuickBooks stays); after a yes, undoes it | Yes |
 | `ledgersync_get_categorized_export_link` | How many of the Manual clients' categorized transactions are not exported yet, and a 24-hour link to them as the LedgerSync app's Default or ACS export file | No (pressing **Download** on the link's page marks them Synced) |
-| `ledgersync_get_1099_summary` | The vendors a QuickBooks client paid at or over the 1099 threshold in a tax year, with each one's QuickBooks 1099 flag, whether a tax ID and an email are on file (never the tax ID itself) and a suggested next step; card and payment app payments left out by default | No |
+| `ledgersync_get_1099_summary` | The vendors a QuickBooks client paid at or over the 1099 threshold in a tax year, with each one's QuickBooks 1099 flag, whether a tax ID and an email are on file (never the tax ID itself), a suggested next step and advice from the expense accounts its payments were booked to; card and payment app payments left out by default; can count only the accounts the accountant chooses | No |
 | `ledgersync_preview_ledger_changes` | Checks marking up to 100 of a QuickBooks client's vendors for 1099, or unmarking them: each vendor's 1099 flag before and after, and the vendors it would leave as they are, with the reason (open to a few test firms first) | No |
 | `ledgersync_apply_ledger_changes` | Marks the previewed vendors for 1099 in the client's QuickBooks, in the background, changing nothing else on them | Yes |
 | `ledgersync_get_ledger_changes_status` | How marking vendors went: which were changed, which were left as they were and why, and how an undo went | No |
@@ -810,13 +810,40 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - Each vendor comes with `total_paid`, `card_and_app_paid` and `reportable` (money as text with two decimals),
       `qbo_1099_flag`, `has_tin` and `has_email` (true or false only: a tax ID never reaches the AI),
       `w9_status` ("not tracked yet"), a `suggested_action` (`mark_for_1099`, `get_tax_id`, `review` or `ok`) and
-      its `evidence`. The answer also has the counts, `total_reportable`, `excluded_card_and_app_total` and
-      `data_as_of`, when the payments were read; the vendors come a page at a time (`limit`, 25 by default and at
-      most 100, and `cursor`).
+      its `evidence`, plus `advice` and `advice_reason` (below). The answer also has the counts,
+      `total_reportable`, `excluded_card_and_app_total` and `data_as_of`, when the payments were read; the vendors
+      come a page at a time (`limit`, 15 by default and at most 100, and `cursor`). Every answer stays under 15,000
+      characters: a page cut to fit says so with `truncated` and the `limit` to call again with.
     - LedgerSync reads a year's payments from QuickBooks once and keeps them for the rest of the day; each vendor's
       flags are read again on every call. A large client's first call can answer `status: running`: call it again
       with the same arguments in about 30 seconds. `refresh: true` reads the payments again, unless today's read
       is under 5 minutes old.
+    - Each vendor's `advice` comes from the expense accounts its payments were booked to (for a bill payment, the
+      accounts on the bills it paid). An account leans by its name first, then its QuickBooks detail type, then its
+      account type: services and legal fees toward a 1099-NEC, rent toward a 1099-MISC, goods, travel, utilities,
+      wages, taxes and the like away, and repairs, advertising and catch-all accounts in question. Goods, travel or
+      reimbursements on a payment or bill that also has a services or legal fees line (a line toward a 1099-NEC)
+      count as in question, since parts supplied with the work count. The advice is `points_to_1099` when the
+      1099-NEC part or the 1099-MISC part alone reaches the threshold, `ask` when one of them reaches it only with
+      the part in question or the two reach it only together, and `points_away` otherwise. `advice_reason` (at most
+      200 characters) names up to two accounts with their amounts, and `counts.advice` counts `points_to_1099`,
+      `points_away` and `ask`. A vendor is listed when its total reaches the threshold, or when one form's part
+      alone does.
+    - The first page carries `expense_accounts`: up to 10 accounts the vendors at or over the threshold were paid
+      through, the largest first, each with `account_id` (absent for a part that is not an account, such as a bill
+      payment not applied to a bill), `name`, `lean` (`1099`, `no_1099` or `ask`), `form` (`1099-NEC` or
+      `1099-MISC`, only when `lean` is `1099`), `why`, `reportable` and `vendors`; `expense_accounts_more` says how
+      many more there are. The form is suggested from the account's name: QuickBooks does not share its own 1099
+      setup's mapping of accounts to boxes through its API.
+    - `count_only_account_ids` (1 to 100 QuickBooks account ids, digits only, from `expense_accounts` or
+      `ledgersync_list_quickbooks_categories`) counts only payments booked to those accounts and the accounts under
+      them, the way QuickBooks' own 1099 setup counts its mapped accounts. The chosen accounts are then the 1099
+      part: one that leans rent counts toward a 1099-MISC, any other toward a 1099-NEC. The answer adds
+      `counted_account_ids` (the ids applied), `unknown_account_ids` (ids the client's QuickBooks does not have),
+      `left_out_by_choice` (what the vendors listed without the choice were paid through other accounts),
+      `dropped_by_choice` (how many of them drop off) and, on `expense_accounts`, `counted`. A choice naming none of
+      the client's accounts answers `invalid_request` on `count_only_account_ids`. Nothing is saved: the AI asks
+      again next time. A cursor works only with the choice it came from.
     - Marking vendors for 1099 takes three steps and a yes. `ledgersync_preview_ledger_changes` takes `client_id`,
       `client_name` and `changes`: 1 to 100 of `type` `update_vendor`, a `vendor_id` from `ledgersync_get_1099_summary`
       (sealed: as that list gave it for this client) and
@@ -847,8 +874,12 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       works. The status and the undo work for any change a firm made. LedgerSync keeps who approved each change
       and from which AI app.
     - Every ready answer of `ledgersync_get_1099_summary`, an empty list too, ends its `next_step` with what the
-      list does not cover (royalties, gross proceeds paid to attorneys, and which 1099 form and box each payment
-      goes in) and says the firm files its 1099s through its own 1099 service, before the offers.
+      list does not cover (royalties, gross proceeds paid to attorneys, medical and health care payments, and which
+      1099 form and box each payment goes in) and says the firm files its 1099s through its own 1099 service, before
+      the offers. With the advice, it first asks about the `ask` vendors and points out marked vendors that point
+      away, and its marking offer (or, where marking is not open, its pointer to QuickBooks' own 1099 tracking)
+      counts only the vendors not marked that point to a 1099. On the first page, when some vendors are in question
+      or point away, it then offers `count_only_account_ids`.
     - The instructions on [Find who needs a 1099](/ai/1099-vendors) are also an MCP prompt, `form_1099_season`
       ("Find who needs a 1099"), with optional `client` and `tax_year` arguments. Claude Code lists it as a
       command. The connector's instructions also tell the AI to preview 1099 marks first and apply them only after

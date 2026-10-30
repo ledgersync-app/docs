@@ -4,6 +4,21 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-10-30" tags={["AI connector"]}>
+  ## Your AI advises which vendors need a 1099, from the expense accounts they were paid through
+
+  Ask your AI *"Which vendors need a 1099 for Acme?"*. Next to each vendor, it now says whether the expense accounts
+  its payments were booked to, such as Contract Labor, Legal Fees, Rent or Supplies, point to a 1099, point away, or
+  need your answer, with the reason. It asks you about the unclear ones first. You can also tell it to count only
+  some accounts, the way QuickBooks' own 1099 setup does. You decide. See [Find who needs a 1099](/ai/1099-vendors).
+
+  - See `advice`, `advice_reason`, `expense_accounts` and `count_only_account_ids` in
+    [For developers](/ai/developers). The default page of the 1099 list is now 15 vendors.
+  - The advice reaches your AI with no reconnect. To count only some accounts, and to get the updated
+    `form_1099_season` steps, your AI app loads the new tool list first (see Tool updates on
+    [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-10-30" tags={["AI connector"]}>
   ## Your AI names each client, and LedgerSync stops it from using the wrong one
 
   Your AI now gives LedgerSync each client's name with the client's id. LedgerSync checks they are the same client

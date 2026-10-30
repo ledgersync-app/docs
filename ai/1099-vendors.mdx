@@ -1,6 +1,6 @@
 ---
 title: "Find who needs a 1099"
-description: "Your AI lists the vendors a QuickBooks Online client paid enough to need a 1099, and which ones are not marked for 1099 or have no tax ID on file. After you say yes, LedgerSync marks them for 1099 in QuickBooks (open to a few test firms first)."
+description: "Your AI lists the vendors a QuickBooks Online client paid enough to need a 1099, and which ones are not marked for 1099 or have no tax ID on file. It also advises, from the expense accounts each vendor was paid through, which ones look like they need one. After you say yes, LedgerSync marks them for 1099 in QuickBooks (open to a few test firms first)."
 mode: "frame"
 ---
 
@@ -17,31 +17,46 @@ import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-u
 
 ## Start
 
-<AiStep id="new-chat" n={1} total={4} title="Start a new chat">
+<AiStep id="new-chat" n={1} total={5} title="Start a new chat">
 
 In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
 
 </AiStep>
 
-<AiStep id="ask" n={2} total={4} title="Ask the AI" img="/images/ai-1099/1099-1-ask.png" caption="Your request">
+<AiStep id="ask" n={2} total={5} title="Ask the AI" img="/images/ai-1099/1099-1-ask.png" caption="Your request">
 
 Type *"Which vendors need a 1099 for Acme?"*, with your client's name, and press **Enter**.
 
 </AiStep>
 
-<AiStep id="check" n={3} total={4} title="Check the list" img="/images/ai-1099/1099-2-list.png" caption="The list">
+<AiStep id="check" n={3} total={5} title="Check the list" img="/images/ai-1099/1099-2-list.png" caption="The list">
 
 The AI lists the vendors paid enough to need a 1099, highest first. It says which ones are not marked for 1099 in
-QuickBooks and which have no tax ID on file.
+QuickBooks and which have no tax ID on file. It also says, from the expense accounts each vendor was paid through,
+whether it looks like it needs a 1099, and why.
 
 </AiStep>
 
-<AiStep id="preview" n={4} total={4} title="Say yes to the preview" imgs={[{ src: "/images/ai-1099/1099-3-preview.png", caption: "The preview" }, { src: "/images/ai-1099/1099-4-allow.png", caption: "Allow once circled" }]}>
+<AiStep id="questions" n={4} total={5} title="Answer its questions">
+
+When the accounts don't settle it, the AI asks you about the vendor, one at a time. For example: were the repairs
+someone's work, or parts bought on their own? You decide.
+
+</AiStep>
+
+<AiStep id="preview" n={5} total={5} title="Say yes to the preview" imgs={[{ src: "/images/ai-1099/1099-3-preview.png", caption: "The preview" }, { src: "/images/ai-1099/1099-4-allow.png", caption: "Allow once circled" }]}>
 
 Ask it to mark the vendors you checked. It shows each one before and after. Say yes, and allow it each time Claude or
 ChatGPT asks. Nothing changes before that.
 
 </AiStep>
+
+<AiNote tone="green">
+
+**Only some accounts count for 1099?** Tell the AI which ones, for example Contract Labor and Legal Fees. It counts
+only those, as QuickBooks' own 1099 setup does. Nothing is saved, so tell it again next time.
+
+</AiNote>
 
 <AiNote tone="yellow">
 
@@ -72,17 +87,23 @@ for every firm.
    lot of activity, the AI may say LedgerSync is still reading, and asks again about 30 seconds later.
 2. The AI shows you the vendors paid at or over the 1099 amount for the year: $2,000 for 2026 payments, $600 for
    2025. For each vendor: how much counts, whether it is marked for 1099 in QuickBooks, and whether a tax ID and an
-   email are on file.
-3. It goes through the vendors not marked for 1099, and the ones with no tax ID on file, with you. A vendor with no
+   email are on file. It also gives its advice, from the expense accounts the vendor's payments were booked to: it
+   points to a 1099, points away from one, or asks you, with the reason.
+3. It asks you about the vendors the accounts don't settle, one at a time, and about the vendors marked for 1099
+   whose accounts point away. You decide.
+4. Want only some accounts to count, as in QuickBooks' own 1099 setup? Tell the AI which ones. It lists the vendors
+   again, counting only those accounts and the accounts under them, and tells you how much it left out and how many
+   vendors dropped off the list. Nothing is saved: tell it again next time.
+5. It goes through the vendors not marked for 1099, and the ones with no tax ID on file, with you. A vendor with no
    tax ID on file needs a W-9 before you file.
-4. You pick the vendors to mark, or to unmark. The AI shows you a preview: each vendor's 1099 setting before and
+6. You pick the vendors to mark, or to unmark. The AI shows you a preview: each vendor's 1099 setting before and
    after, and the vendors LedgerSync would leave as they are, with the reason. Nothing has changed yet.
-5. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right. LedgerSync turns
+7. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right. LedgerSync turns
    on 1099 tracking for each vendor in QuickBooks and changes nothing else on the vendor. A minute or so later, the AI
    tells you which vendors were marked and which were left as they were, and why.
-6. Changed your mind? Ask the AI to undo it. It shows which vendors would go back, and puts them back after your yes.
+8. Changed your mind? Ask the AI to undo it. It shows which vendors would go back, and puts them back after your yes.
    A vendor someone changed in QuickBooks since is left as it is.
-7. At the end, the AI tells you what the list does not cover, and offers a dashboard of the list or the same check
+9. At the end, the AI tells you what the list does not cover, and offers a dashboard of the list or the same check
    for your other clients.
 
 <AiNote tone="gray">
@@ -95,8 +116,20 @@ Venmo, Square, Stripe or Cash App, are left out: the card company or the app rep
 
 <AiNote tone="gray">
 
+**How the advice works.** LedgerSync looks at the expense accounts each payment was booked to, and for a bill
+payment, the accounts on the bills it paid. It reads each account's name first, then the type QuickBooks gives it.
+Services and legal fees point to a 1099-NEC, and rent to a 1099-MISC. Goods, travel, utilities, phone, freight,
+insurance, taxes, wages and bank fees point away. Repairs, advertising and catch-all accounts such as Uncategorized
+Expense get a question, and so do supplies on a contractor's bill with the work. Each form needs $2,000 on its own
+for 2026 payments, so $1,500 of labor and $1,000 of rent to one vendor also get a question. It is advice: you decide.
+
+</AiNote>
+
+<AiNote tone="gray">
+
 **Corporations.** Most corporations need no 1099, but lawyers and medical providers do. QuickBooks cannot tell which
-vendors are corporations, so the list keeps them. Check each vendor's W-9.
+vendors are corporations, so the list keeps them. Check each vendor's W-9. The advice counts legal fees even when
+the law firm is a corporation.
 
 </AiNote>
 
@@ -113,7 +146,9 @@ never shows or changes a tax ID. LedgerSync keeps who said yes, and in which AI 
 
 - Royalties.
 - Gross proceeds paid to attorneys.
-- Which 1099 form and box each payment goes in.
+- Medical and health care payments.
+- Which 1099 form and box each payment goes in. The AI only suggests a form from each account's name, and your
+  client's 1099 setup in QuickBooks may map an account differently.
 - Payments entered as journal entries.
 - Asking vendors for a W-9.
 - Filing. File the 1099s through your usual 1099 service. For 2026 payments, 1099-NEC forms are due February 1, 2027.
@@ -153,13 +188,15 @@ these instructions.
   <AiCopy label="Instructions for your AI" text={`Find who needs a 1099 for a LedgerSync client.
 1. Find the client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. The 1099 list works for QuickBooks Online clients.
 2. Call ledgersync_get_1099_summary. It lists the vendors the client paid at or over the 1099-NEC threshold in the tax year (2,000.00 for 2026 payments, 600.00 for 2025 payments), leaving out card and payment app payments, which go on a 1099-K. If it answers status running, call it again with the same arguments in about 30 seconds.
-3. Show the user the list, highest amounts first: each vendor's reportable amount, whether it is marked for 1099 in QuickBooks, whether a tax ID and an email are on file, and the evidence. The list never shows a tax ID; never ask the user to type one here.
-4. Go through the vendors not marked for 1099 and the ones with no tax ID on file with the user. A vendor with no tax ID on file needs a W-9 before filing. Corporations usually need no 1099 (lawyers and medical providers do), and QuickBooks cannot tell them apart: the user decides from each vendor's W-9.
-5. For the vendors the user wants marked for 1099, or unmarked, call ledgersync_preview_ledger_changes. Show each vendor's 1099 flag before and after, and the vendors it leaves as they are, with the reason. Nothing has changed yet. Marking from here is open to a few test firms first: if the preview says it is not open to this firm, or that this connection is read-only, tell the user to turn on 1099 tracking for those vendors in QuickBooks itself.
-6. Only after the user says yes, call ledgersync_apply_ledger_changes with the preview's confirmation_id and the same client_id and client_name. Then follow ledgersync_get_ledger_changes_status until it finishes, and tell the user which vendors were changed and which were left as they were, and why.
-7. If the user changes their mind, call ledgersync_undo_ledger_changes: the first call only shows which flags would go back. Only after the user says yes, call it again with the undo_id.
-8. Before you finish, tell the user what the list does not cover: royalties, gross proceeds paid to attorneys, and which 1099 form and box each payment goes in. For 2026 payments, 1099-NEC forms are due February 1, 2027; the firm files them through its own 1099 service.
-9. End by offering a dashboard of the list, and the same check on the firm's other clients.`} />
+3. Show the user the list, highest amounts first: each vendor's reportable amount, whether it is marked for 1099 in QuickBooks, whether a tax ID and an email are on file, the evidence, and the advice with its advice_reason. The advice comes from the expense accounts the vendor's payments were booked to: points_to_1099, points_away, or ask when the accounts do not settle it. It is advice: the user decides. The list never shows a tax ID; never ask the user to type one here.
+4. First ask the user about the vendors whose advice is ask, one at a time, with each one's advice_reason: for example, whether repairs were someone's work or parts bought on their own. Then point out the vendors marked for 1099 whose advice is points_away, and ask whether they should stay marked.
+5. If the user wants only some accounts to count, the way QuickBooks' own 1099 setup does, call ledgersync_get_1099_summary again with count_only_account_ids: the account ids from its expense_accounts, or from ledgersync_list_quickbooks_categories for any other account. Vendors paid only through other accounts drop off the list: tell the user how much the choice left out and how many vendors dropped off. Nothing is saved, so ask again next time.
+6. With the user, go through the vendors not marked for 1099 (the ones whose advice is points_to_1099 first) and the ones with no tax ID on file. A vendor with no tax ID on file needs a W-9 before filing. Corporations usually need no 1099 (lawyers and medical providers do), and QuickBooks cannot tell them apart: the user decides from each vendor's W-9.
+7. For the vendors the user wants marked for 1099, or unmarked, call ledgersync_preview_ledger_changes. Show each vendor's 1099 flag before and after, and the vendors it leaves as they are, with the reason. Nothing has changed yet. Marking from here is open to a few test firms first: if the preview says it is not open to this firm, or that this connection is read-only, tell the user to turn on 1099 tracking for those vendors in QuickBooks itself.
+8. Only after the user says yes, call ledgersync_apply_ledger_changes with the preview's confirmation_id and the same client_id and client_name. Then follow ledgersync_get_ledger_changes_status until it finishes, and tell the user which vendors were changed and which were left as they were, and why.
+9. If the user changes their mind, call ledgersync_undo_ledger_changes: the first call only shows which flags would go back. Only after the user says yes, call it again with the undo_id.
+10. Before you finish, tell the user what the list does not cover: royalties, gross proceeds paid to attorneys, medical and health care payments, and which 1099 form and box each payment goes in. The form shown for an account is suggested from its name, and the client's own 1099 setup in QuickBooks may map that account differently. For 2026 payments, 1099-NEC forms are due February 1, 2027; the firm files them through its own 1099 service.
+11. End by offering a dashboard of the list or of the advice by account, and the same check on the firm's other clients.`} />
 </div>
 
 1. Click **Copy** above.
@@ -194,6 +231,7 @@ these instructions.
 | A vendor is inactive in QuickBooks | QuickBooks refuses any change to an inactive vendor. Make it active in QuickBooks, then ask the AI to preview again. |
 | A vendor changed in QuickBooks since the preview | LedgerSync left it as it is. Ask the AI to preview it again. |
 | **LedgerSync has no default 1099 threshold for** a year | Tell the AI the amount to use for that year, for example 600. |
+| **None of these accounts is in the client's QuickBooks**, or **the client's QuickBooks has no account** you chose | Ask the AI to show the client's accounts, then tell it again which ones count. When only some are missing, the AI still shows the list for the others. |
 
 </Accordion>
 
@@ -221,7 +259,7 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
   <Accordion title="For developers: the 5 tools and what they change">
     | Tool | What it does | Changes data |
     | --- | --- | --- |
-    | `ledgersync_get_1099_summary` | The vendors a QuickBooks client paid at or over the 1099 threshold in a tax year, each with its QuickBooks 1099 flag, whether a tax ID and an email are on file (never the tax ID itself) and a suggested next step | No |
+    | `ledgersync_get_1099_summary` | The vendors a QuickBooks client paid at or over the 1099 threshold in a tax year, each with its QuickBooks 1099 flag, whether a tax ID and an email are on file (never the tax ID itself), a suggested next step, and advice from the expense accounts its payments were booked to; `count_only_account_ids` counts only the accounts the accountant chooses | No |
     | `ledgersync_preview_ledger_changes` | Checks marking up to 100 of the client's vendors for 1099, or unmarking them, and shows each one's 1099 flag before and after | No |
     | `ledgersync_apply_ledger_changes` | Marks or unmarks the previewed vendors for 1099 in the client's QuickBooks, in the background | Yes |
     | `ledgersync_get_ledger_changes_status` | How each vendor's change went, and after an undo how the undo went | No |
@@ -231,6 +269,10 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
       `client` and `tax_year` arguments. Claude Code lists it as a command.
     - Every ready answer of `ledgersync_get_1099_summary` ends its `next_step` with what the list does not cover,
       before its offers, so an AI that never sees the prompt still says it.
+    - Each vendor carries `advice` (`points_to_1099`, `points_away` or `ask`) and an `advice_reason`, and the first
+      page lists the accounts behind them in `expense_accounts`. The `next_step` asks about the `ask` vendors first,
+      then, when some vendors are in question or point away, offers `count_only_account_ids`. Nothing about the
+      choice is saved.
     - The list and the status need `read:accounting`; the preview, the apply and the undo need `write:accounting`.
       A read-only connection can read the list but cannot mark vendors.
     - Marking is open to a few test firms first. For any other firm, the preview and the apply answer
