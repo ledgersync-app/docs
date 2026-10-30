@@ -17,7 +17,7 @@ import { AiPage, AiBox, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
 | **Your LedgerSync password was changed, so this connection was turned off.** | [Connect again](#connect-again). Sign in again, with your new password if you changed it. |
 | **For now, only the firm owner can use LedgerSync in their own Claude or ChatGPT.** | Teammates can connect now. [Connect again](#connect-again) and sign in with your own LedgerSync login. |
 | **This LedgerSync login cannot use LedgerSync in AI apps.** Or: **This LedgerSync login cannot use LedgerSync in Claude or ChatGPT.** | [Connect again](#connect-again) and sign in with your own LedgerSync login. Still there? Email <AiEmail />. |
-| It asks you to disconnect and reconnect LedgerSync, or it doesn't know something new, like check images links | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](#after-an-update). |
+| It asks you to disconnect and reconnect LedgerSync, or says LedgerSync's tools changed, or it doesn't know something new, like check images links | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](#after-an-update). |
 | It doesn't seem to know LedgerSync | Start a new chat and ask again. In Claude or Grok, click **+** in the message box, then **Connectors**, and turn **LedgerSync** on. Not there in Grok? [Add it again](/ai/setup-grok). In ChatGPT, type **@** and pick **LedgerSync**. Not in that list? Open ChatGPT's [Plugins](https://chatgpt.com/plugins) page, click **Personal**, then **LedgerSync**, then **Install plugin**. |
 | Claude or ChatGPT says it could not connect to LedgerSync, or keeps asking you to sign in | [Connect again](#connect-again). Sign in with the username or email you use in the LedgerSync app. Still the same? Email <AiEmail />. |
 | Grok says **Connection failed** while you add LedgerSync | Click **Go Back** and add it again: see [Set up in Grok](/ai/setup-grok). When the small LedgerSync window opens, sign in right away. Grok waits only a couple of minutes. Still failing? Email <AiEmail />. |
@@ -108,15 +108,18 @@ Then start a new chat.
     | --- | --- |
     | **Too many requests for this API key. Slow down and try again.** Or: wait some seconds before trying again | Wait the time the AI says, then ask again. You have nothing to fix, and you do not need an API key.<br />It gives no wait time? Your firm's daily limit for refreshes is used up. Try again tomorrow. |
     | This connection has used a tool too many times this hour or this day, its limit | Try again next hour or tomorrow, as the AI says. Your firm also uses the LedgerSync app? You can do it there now. |
-    | **LedgerSync could not check your account just now.** | Try again in a minute. |
+    | **LedgerSync could not check your account just now.** Or: **LedgerSync could not check the client's name just now.** | Try again in a minute. |
     | **LedgerSync could not complete this request.** | Try again in a minute. If it keeps failing, email support. |
     | **This AI app is not supported yet.** | LedgerSync works in Claude, ChatGPT and Grok. To use another app, email support. |
   </Accordion>
 
-  <Accordion title="Clients and banks: it cannot find the client, it says you have no clients, a bank needs the desktop app">
+  <Accordion title="Clients and banks: it cannot find the client, it says the id is another client, it says you have no clients, a bank needs the desktop app">
     | The AI says | Do this |
     | --- | --- |
     | It cannot find the client, or something was **not found** | Ask "Find my client ..." first, then ask again. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. Ask your firm's LedgerSync owner to assign the client to you. |
+    | It says the client id it had is another client, or asks whether you mean another client | Nothing was read or changed. LedgerSync stopped the AI from using the wrong client, for example an id it remembered from an earlier chat. Tell the AI which client you mean, with the name LedgerSync shows. If several clients share a short name, give the full name. The AI then finds the client again. |
+    | It says LedgerSync's tools changed, or that a tool needs a **client_name** or a **client_id** | Your AI still has the older copy of LedgerSync's tools. Load the new copy once: do [After a LedgerSync update](#after-an-update). In Claude, connect again. In ChatGPT, click **Refresh tools**. In Grok, click **Reauthenticate**. Then start a new chat and ask again. |
+    | It says a category, payee or vendor id belongs to another client's list | Nothing was read or changed. Each client has its own categories, payees and vendors, so LedgerSync takes an id only for the client it came from. The AI gets this client's list again. You have nothing to fix. |
     | It says your firm has no clients, but your banks are connected in LedgerSync | Banks connected on your firm's own LedgerSync login, not for a client, show as one entry that ends in **(the firm's own accounts)**. Ask the AI to list your clients: that entry comes first. Only the firm owner and administrators see it. |
     | It shows another firm's clients, or you're not sure which LedgerSync login it uses | Ask "Which LedgerSync account am I connected to?" It names your firm and your login. Wrong one? [Connect again](#connect-again). If the LedgerSync page opens already signed in, click **Not you? Sign out** and sign in with the right login. |
     | **This bank needs the LedgerSync desktop app, and it is not connected right now.** | Open the desktop app on the computer where you set it up. Keep that computer on. Then ask the AI to try again. Not the firm owner? Ask your firm's LedgerSync owner to open it. |

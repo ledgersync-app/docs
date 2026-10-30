@@ -3,6 +3,24 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-10-30" tags={["AI connector"]}>
+  ## Your AI names each client, and LedgerSync stops it from using the wrong one
+
+  Your AI now gives LedgerSync each client's name with the client's id. LedgerSync checks they are the same client
+  before it reads or changes anything. If the AI uses another client's id, for example one it remembered from an
+  earlier chat, LedgerSync refuses it, and the AI looks the client up again. Every answer names the client it is
+  about, so you always see whose data you are looking at.
+
+  The same goes for a client's categories, payees and vendors: one taken from another client's list is refused, and
+  the AI gets this client's list again.
+
+  - Every tool that works on a client takes `client_name` with `client_id` (`client_names` with `client_ids`), and
+    `ledgersync_get_fix_link` now takes `client_id`. See [For developers](/ai/developers).
+  - Your AI app loads the new tool list once: connect again in Claude, click **Refresh tools** in ChatGPT, or
+    **Reauthenticate** in Grok, then start a new chat. See
+    [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+</Update>
+
 <Update label="2026-10-29" tags={["AI connector"]}>
   ## Your AI accepts For review transactions, and checks your rules
 

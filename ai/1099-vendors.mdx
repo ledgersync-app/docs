@@ -151,12 +151,12 @@ these instructions.
 
 <div className="lsai-prompt">
   <AiCopy label="Instructions for your AI" text={`Find who needs a 1099 for a LedgerSync client.
-1. Find the client with ledgersync_find_clients. The 1099 list works for QuickBooks Online clients.
+1. Find the client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. The 1099 list works for QuickBooks Online clients.
 2. Call ledgersync_get_1099_summary. It lists the vendors the client paid at or over the 1099-NEC threshold in the tax year (2,000.00 for 2026 payments, 600.00 for 2025 payments), leaving out card and payment app payments, which go on a 1099-K. If it answers status running, call it again with the same arguments in about 30 seconds.
 3. Show the user the list, highest amounts first: each vendor's reportable amount, whether it is marked for 1099 in QuickBooks, whether a tax ID and an email are on file, and the evidence. The list never shows a tax ID; never ask the user to type one here.
 4. Go through the vendors not marked for 1099 and the ones with no tax ID on file with the user. A vendor with no tax ID on file needs a W-9 before filing. Corporations usually need no 1099 (lawyers and medical providers do), and QuickBooks cannot tell them apart: the user decides from each vendor's W-9.
 5. For the vendors the user wants marked for 1099, or unmarked, call ledgersync_preview_ledger_changes. Show each vendor's 1099 flag before and after, and the vendors it leaves as they are, with the reason. Nothing has changed yet. Marking from here is open to a few test firms first: if the preview says it is not open to this firm, or that this connection is read-only, tell the user to turn on 1099 tracking for those vendors in QuickBooks itself.
-6. Only after the user says yes, call ledgersync_apply_ledger_changes with the preview's confirmation_id. Then follow ledgersync_get_ledger_changes_status until it finishes, and tell the user which vendors were changed and which were left as they were, and why.
+6. Only after the user says yes, call ledgersync_apply_ledger_changes with the preview's confirmation_id and the same client_id and client_name. Then follow ledgersync_get_ledger_changes_status until it finishes, and tell the user which vendors were changed and which were left as they were, and why.
 7. If the user changes their mind, call ledgersync_undo_ledger_changes: the first call only shows which flags would go back. Only after the user says yes, call it again with the undo_id.
 8. Before you finish, tell the user what the list does not cover: royalties, gross proceeds paid to attorneys, and which 1099 form and box each payment goes in. For 2026 payments, 1099-NEC forms are due February 1, 2027; the firm files them through its own 1099 service.
 9. End by offering a dashboard of the list, and the same check on the firm's other clients.`} />
@@ -235,6 +235,11 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
       A read-only connection can read the list but cannot mark vendors.
     - Marking is open to a few test firms first. For any other firm, the preview and the apply answer
       `access_not_active`.
+    - Each `vendor_id` in the 1099 list is sealed to its client: the id, a dot and 8 more characters. The preview takes
+      it only as the list gave it for that client: one from another client's list, or one with no seal (as
+      LedgerSync gave ids before), is refused with `invalid_request`, and its `next_step` tells the AI to list this client's vendors again. The apply
+      takes the preview's
+      `confirmation_id` with the same `client_id` and `client_name` the preview named.
     - On the sandbox connector, marking really changes the Intuit sandbox QuickBooks company the client is connected
       to. There is no dry run.
     - See [For developers](/ai/developers) for every field.

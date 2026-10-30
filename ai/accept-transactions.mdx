@@ -222,12 +222,12 @@ instructions.
 
 <div className="lsai-prompt">
   <AiCopy label="Instructions for your AI" text={`Accept a LedgerSync client's For review transactions, then report what moved and what did not.
-1. Find each client with ledgersync_find_clients. This works for QuickBooks Online and Manual clients, up to 10 clients in one preview.
+1. Find each client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool (client_names with client_ids, in the same order). Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. This works for QuickBooks Online and Manual clients, up to 10 clients in one preview.
 2. Call ledgersync_preview_accept_transactions with the clients. By default it takes the transactions an inclusion rule filed. Use rule_type exclusion for the ones exclusion rules filed (accepting moves them to Excluded) or any for both, only_rule_filed false to add the ones no rule filed, leave_out_categories for the GL codes or category names to keep in For review, and from and to for the posted dates. For example, "move the transactions with rules to Categorized, except exclusion rules and those coded to 8001 or 8002" is rule_type inclusion with leave_out_categories ["8001", "8002"].
 3. Show the user, client by client, what moves (to Categorized, or to Excluded for an exclusion rule's transactions), what LedgerSync would refuse and why, and what stays in For review and why. Nothing has moved yet.
-4. Only after the user says yes, call ledgersync_accept_transactions with the preview's confirmation_id. If a client is not done yet (upstream_unknown, not_reached or not_started), call it again with the same confirmation_id: it never accepts twice.
+4. Only after the user says yes, call ledgersync_accept_transactions with the preview's confirmation_id and the same client_ids and client_names. If a client is not done yet (upstream_unknown, not_reached or not_started), call it again with the same confirmation_id, client_ids and client_names: it never accepts twice.
 5. Report to the user, client by client: what moved, what LedgerSync refused and why, what changed since the preview, and what stayed in For review. Accepting posts nothing to QuickBooks: a QuickBooks client's Categorized transactions are synced in the LedgerSync app, and a Manual client's go in its next export.
-6. If the user wants them back in For review, call ledgersync_undo_accept_transactions with the accept_id. The first call only shows what would go back and what would stay. Only after the user says yes, call it again with the undo_id.
+6. If the user wants them back in For review, call ledgersync_undo_accept_transactions with the accept_id and, in client_ids and client_names, every client whose status is done. The first call only shows what would go back and what would stay. Only after the user says yes, call it again with the undo_id and the same client_ids and client_names.
 7. To check rules against the transactions they filed, list them with ledgersync_list_review_transactions, read each rule with ledgersync_get_rule, compare its conditions, category and payee with each transaction, and tell the user about every mismatch. Propose a fix with ledgersync_preview_rules_setup only after the user agrees.`} />
 </div>
 
@@ -294,13 +294,21 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     - The list needs `read:accounting`; the preview, the accept and the undo need `write:accounting`. A read-only
       connection can list but cannot preview, accept or undo. The preview changes nothing, so it is annotated
       read-only.
-    - The accept takes only the preview's `confirmation_id`. It works for 30 minutes, only for the person and the AI
+    - The preview takes each client's name with its id: `client_names` in the same order as `client_ids`. A call is
+      refused whole when one id is not a client the person sees, or its name is another client; a client LedgerSync
+      itself cannot preview (for example, one on another accounting app) gets its own `error` while the others are
+      previewed.
+    - The accept takes the preview's `confirmation_id` with the same `client_ids` and `client_names` the preview
+      took, and refuses other clients. It works for 30 minutes, only for the person and the AI
       app that made the preview, and accepts only the transactions that preview counted, and only while they still
       match. Calling it again with the same confirmation answers from what it kept, for 24 hours, and never accepts
       twice.
-    - The undo takes the `accept_id` the accept returned, in two calls. The first, without `undo_id`, changes nothing:
+    - The undo takes the `accept_id` the accept returned, with every client it moved transactions for (status `done`),
+      and only those, in `client_ids` and `client_names`: a call that names other clients is refused and shows
+      nothing. It works in two calls.
+      The first, without `undo_id`, changes nothing:
       it returns what would go back and what would stay and, when something would go back, an `undo_id`. Only a
-      second call with that `undo_id`,
+      second call with that `undo_id` and the same clients,
       within 15 minutes, moves them back. Both calls go to the same tool, marked as changing data, so Claude and
       ChatGPT ask before each one, the check included.
     - There is no MCP prompt for these tools: each tool's description and `next_step` carry the steps.

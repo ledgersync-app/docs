@@ -230,7 +230,7 @@ these instructions.
 <div className="lsai-prompt">
   <AiCopy label="Instructions for your AI" text={`Export my categorized transactions from LedgerSync that were not exported yet.
 
-1. Call ledgersync_get_categorized_export_link. Use format acs_xlsx (the ACS file), unless I ask below for the Default file: then use default_csv. It covers all my Manual clients. If I name one client below, find it first with ledgersync_find_clients and pass its client_id.
+1. Call ledgersync_get_categorized_export_link. Use format acs_xlsx (the ACS file), unless I ask below for the Default file: then use default_csv. It covers all my Manual clients. If I name one client below, find it first with ledgersync_find_clients in this chat and pass its client_name with its client_id. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name.
 2. If it returns a download_url, reply with how many transactions are ready and the link, nothing else. Do not open the link yourself.
 3. If nothing is ready, reply in one line: Nothing new to export.`} />
 </div>
@@ -294,7 +294,8 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     | `ledgersync_get_categorized_export_link` | How many of the Manual clients' categorized transactions are not exported yet, and a 24-hour link to them as the LedgerSync app's Default or ACS export file | No: pressing **Download** on the link's page marks them Synced |
 
     - `format` is `default_csv` (the app's Default export, a CSV file) or `acs_xlsx` (its ACS export, an Accounting
-      CS Excel file). The optional `client_id` (`cli_...`) names one Manual client. Without it, the tool covers
+      CS Excel file). The optional `client_id` (`cli_...`), with its `client_name` as `ledgersync_find_clients` lists
+      it in the same chat, names one Manual client. Without them, the tool covers
       every Manual client the person manages: an employee, the clients assigned to them.
     - It returns `ready_transactions`, `manual_clients` and `clients_left_out` (the clients with a QuickBooks, Zoho
       Books or other accounting connection, which it leaves out). When at least one transaction is ready, it also

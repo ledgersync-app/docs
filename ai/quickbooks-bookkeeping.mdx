@@ -180,14 +180,14 @@ these instructions.
 
 Use this for a client whose bank transactions do not come into QuickBooks through a QuickBooks bank feed. LedgerSync already has the transactions. You categorize them, and LedgerSync posts them into the client's QuickBooks.
 
-1. Find the client with ledgersync_find_clients, then call ledgersync_get_quickbooks_setup. QuickBooks must be connected. If an account has no QuickBooks bank account yet, ask the user which one it posts to.
+1. Find the client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. Then call ledgersync_get_quickbooks_setup. QuickBooks must be connected. If an account has no QuickBooks bank account yet, ask the user which one it posts to.
 2. Ask the user to confirm that these QuickBooks bank accounts do not have a QuickBooks bank feed. If one does, skip that account: posting next to a live bank feed creates duplicates.
 3. For each account, call ledgersync_list_transactions_to_categorize. Load the client's categories with ledgersync_list_quickbooks_categories and look up payees with ledgersync_search_quickbooks_payees. Only use categories and payees that exist. Create a new payee only when nothing matches, and say so.
 4. Show the user a table with a category and a payee for every transaction, and how sure you are. Keep the category and payee LedgerSync suggests unless the user changes them; if you think one is wrong, say so. Ask only about the ones you are not sure of. Follow any rules the user gives you for this client.
 5. A transaction with pending_global_rule matched one of the firm's global rules, but this client has no QuickBooks category mapped to the rule's global category. Ask the user which category to use instead of guessing, and suggest mapping it in LedgerSync's Categories Mapping, so the rule files these by itself next time.
 6. Leave out transfers between the client's own accounts, payments of an open bill or invoice, and anything LedgerSync flags as a possible duplicate. List them for the user instead.
 7. Call ledgersync_preview_quickbooks_push. Show the user the summary, the refused rows and the warnings. Nothing has changed yet.
-8. Only after the user says yes, call ledgersync_push_to_quickbooks. Then check ledgersync_get_quickbooks_push_status and tell the user what was posted, what failed and why.`} />
+8. Only after the user says yes, call ledgersync_push_to_quickbooks with the preview's confirmation_id and the same client_id and client_name. Then check ledgersync_get_quickbooks_push_status and tell the user what was posted, what failed and why.`} />
 </div>
 
 1. Click **Copy** above.
@@ -262,7 +262,12 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     | `ledgersync_push_to_quickbooks` | Posts a previewed set of transactions into the client's QuickBooks | Yes |
     | `ledgersync_get_quickbooks_push_status` | What a push posted, skipped or failed, and why | No |
 
-    - The push takes only the preview's `confirmation_id`. It works for 30 minutes, only for the person and the
+    - The QuickBooks category, payee and bank account ids the tools give are sealed to their client: the id, a dot
+      and 8 more characters. The preview takes each one back only for that client: an id from another client's list,
+      or one with no seal (as LedgerSync gave ids before), is refused with `invalid_request`, and its `next_step`
+      tells the AI to list this client's categories or payees again.
+    - The push takes the preview's `confirmation_id` with the same `client_id` and `client_name` as the preview, and
+      refuses another client. It works for 30 minutes, only for the person and the
       AI app that made the preview, and posts only the rows and account mappings the preview accepted. Calling
       the push again with the same confirmation returns the first answer; it never posts twice.
     - The preview and the push need `write:accounting`; the other five tools need `read:accounting`. A read-only

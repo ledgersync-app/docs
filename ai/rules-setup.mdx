@@ -512,9 +512,9 @@ them, give it these instructions.
 
 <div className="lsai-prompt">
   <AiCopy label="Instructions for your AI" text={`Set up or change categorization rules for a LedgerSync client.
-1. Find the client with ledgersync_find_clients, then call ledgersync_get_rules_setup. It works for QuickBooks Online and Manual clients; follow its next_step.
+1. Find the client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. Then call ledgersync_get_rules_setup. It works for QuickBooks Online and Manual clients; follow its next_step.
 2. Read what exists: ledgersync_list_rules (client and global), ledgersync_list_setup_categories (client and firm) and ledgersync_list_setup_vendors (client and firm).
-3. Link the firm's categories. ledgersync_list_setup_categories (kind firm) lists first the ones this client does not link yet, the ones its waiting transactions wait on (waiting_on_link) ahead of the rest, each with a link_suggestion. Level a: the client's own transactions decide it (in LedgerSync, or how its QuickBooks booked them), so propose its first candidate. Level b: propose the first candidate as your best guess and show the user the other candidates. Level c: ask the user which of the client's categories to link; for a QuickBooks client only when waiting_on_link is above 0, and say in one line how many others can wait. Put all these links in one preview (mappings); if there are more than one preview takes, start with the ones transactions wait on, then the ones the firm's global rules use, and ask before the rest. For a QuickBooks client a link is what lets the firm's global rules file its transactions at all; for a Manual client it sets the GL code they use. To link one firm category at every client of the firm that lacks it, not only this one, use ledgersync_preview_category_links: one preview for all of those clients, a page at a time. Show the totals and the clients that need a decision, call it again with overrides and skip_client_ids for the clients the user changes, and apply its confirmation_id after the user's yes.
+3. Link the firm's categories. ledgersync_list_setup_categories (kind firm) lists first the ones this client does not link yet, the ones its waiting transactions wait on (waiting_on_link) ahead of the rest, each with a link_suggestion. Level a: the client's own transactions decide it (in LedgerSync, or how its QuickBooks booked them), so propose its first candidate. Level b: propose the first candidate as your best guess and show the user the other candidates. Level c: ask the user which of the client's categories to link; for a QuickBooks client only when waiting_on_link is above 0, and say in one line how many others can wait. Put all these links in one preview (mappings); if there are more than one preview takes, start with the ones transactions wait on, then the ones the firm's global rules use, and ask before the rest. For a QuickBooks client a link is what lets the firm's global rules file its transactions at all; for a Manual client it sets the GL code they use. To link one firm category at every client of the firm that lacks it, not only this one, use ledgersync_preview_category_links: one preview for all of those clients, a page at a time. Show the totals and the clients that need a decision, call it again with overrides and skip_client_ids for the clients the user changes, each with the client's name next to its id as that preview lists it, and apply its confirmation_id after the user's yes.
 4. Call ledgersync_list_uncategorized_transactions and work through the groups, largest first. A group with waiting_on_link needs the link from step 3, not a new rule.
 5. For each group choose the category from the client's own categories or, for a global rule, from the firm's categories. Use names that exist, or propose new ones and say they are new. Never guess: ask the user when you are not sure. When a group looks like money that should be left out of the books (for example transfers between the client's own accounts), propose an exclusion rule (rule_type exclusion) for it: it still files to a category, and LedgerSync marks the transactions it matches for exclusion instead of categorizing them.
 6. Give every rule a payee the same way: one of the client's vendors (for a QuickBooks client, also one of its customers) for a client rule, one of the firm's vendors for a global rule, or a new vendor you say is new. The rule puts it on each transaction it fills as the payee, and the firm can accept a transaction only when it has a payee. An exclusion rule needs no payee: accepting its transactions moves them to Excluded.
@@ -522,7 +522,7 @@ them, give it these instructions.
 8. Follow the firm's naming pattern for rule names; you can see it in the existing rules.
 9. To change a rule that exists, read it first with ledgersync_get_rule, then put the change in the preview's changes, one per rule: edit (its name, money in or out, conditions, category or payee), turn_off, turn_on, move (before or after another rule of its list, or first or last) or delete. A change keeps the rule's type: an exclusion rule stays an exclusion rule. A change to a global rule applies at every client of the firm: say so when you propose it. Conditions, in new rules and edits, can also test the amount (equals, doesnt_equal, is_greater_than, is_less_than) with a plain amount such as 1200.50.
 10. Preview with ledgersync_preview_rules_setup (up to 100 rules and 50 changes at a time). Show the user what will be created (for a QuickBooks client, new categories and vendors are created in its QuickBooks after the yes), how many transactions each rule fills for this client and for other clients (for an exclusion rule, how many it marks for exclusion), which other clients still need a link (offer to link that firm category at every client that lacks it, with ledgersync_preview_category_links), for each change the rule before and after and the transactions it puts back for the other rules to file, here and, for a global rule, at the firm's other clients, and every warning.
-11. Only after the user says yes, call ledgersync_apply_rules_setup. Then follow ledgersync_get_rules_setup_status until it finishes and report the result. For a QuickBooks client, offer to post the filled transactions into its QuickBooks with the QuickBooks bookkeeping tools, as the status's next_step says.
+11. Only after the user says yes, call ledgersync_apply_rules_setup with the preview's confirmation_id and the same client_id and client_name. Then follow ledgersync_get_rules_setup_status until it finishes and report the result. For a QuickBooks client, offer to post the filled transactions into its QuickBooks with the QuickBooks bookkeeping tools, as the status's next_step says.
 12. Everything you create is marked LS-AI in LedgerSync for review, and a rule you change shows the change in its history. If the user wants a setup taken back, use ledgersync_undo_rules_setup: it removes what the setup created and puts the rules it changed back as they were; categories and vendors created in QuickBooks stay there, and an undo also puts back on For review the transactions the user moved to Excluded because of the setup's exclusion rules.`} />
 </div>
 
@@ -646,7 +646,8 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     | `ledgersync_get_rules_setup_status` | How a setup is going; what it created (in QuickBooks too), changed and filled, never counting an account hidden in LedgerSync; what failed and why | No |
     | `ledgersync_undo_rules_setup` | Shows what undoing a setup would remove, put back and keep, never counting an account hidden in LedgerSync (what it created in QuickBooks stays); after a yes, undoes it | Yes |
 
-    - The apply takes only the preview's `confirmation_id`. It works for 30 minutes, only for the person and the AI
+    - The apply takes the preview's `confirmation_id` with the same `client_id` and `client_name` the preview named,
+      and refuses one that names another client. It works for 30 minutes, only for the person and the AI
       app that made the preview, and saves only the items the preview accepted. Calling the apply again with the
       same confirmation returns the first answer; it never applies twice.
     - The undo works the same way. The first call changes nothing: it returns what would be removed and kept, and
@@ -657,8 +658,10 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     - `ledgersync_preview_category_links` takes a global category's `firm_category_id` and covers every client on
       its platform that has no category linked to it: up to 1,000, only the ones the person can see. Its answer
       comes a page at a time, each with the totals and the summary by category; the next pages do not count as
-      previews. To change clients, the AI calls it again with `overrides` (a client and the category to link there)
-      and `skip_client_ids`, up to 500 each. The apply takes its `confirmation_id`. The setup's `setup_id` starts
+      previews. To change clients, the AI calls it again with `overrides` (a client's `client_id` and `client_name`,
+      and the category to link there, as this preview lists it for that client) and `skip_client_ids` with their
+      `skip_client_names`, up to 500 each. The apply takes its `confirmation_id`, with no `client_id` or
+      `client_name`. The setup's `setup_id` starts
       with `rsl_`: the status and the undo take it without a `client_id`, and the undo takes back every link of the
       setup.
     - Rules setup can start without being asked. For a Manual or QuickBooks Online client, the first page of
@@ -672,6 +675,11 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
       turns on, moves and deletes client rules and global rules, exclusion rules included. A change to a global rule
       applies at every client of the firm on the client's platform, and its preview entry counts what it does there.
       A change keeps the rule's type (`rule_type`).
+    - The client's own category, vendor and customer ids (`cat_c_...`, `ven_c_...`, `cus_c_...`) are sealed to the
+      client: the id, a dot and 8 more characters. A preview takes each one back only for that client: one from
+      another client's list, or one with no seal (as LedgerSync gave ids before), is refused with `invalid_request`,
+      and its `next_step` tells the AI to list this client's categories or vendors again. The firm's ids (`cat_f_...`, `ven_f_...`) and rule ids
+      stay as they are.
     - The instructions above are also an MCP prompt, `rules_setup` ("Set up rules for a client"), with optional
       `client` and `focus` arguments. Claude Code lists it as a command.
     - For a client on another accounting app, such as Zoho Books, `ledgersync_get_rules_setup` answers
