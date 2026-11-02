@@ -4,6 +4,18 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-02" tags={["AI connector"]}>
+  ## Your AI checks a client's books for common mistakes
+
+  Ask your AI *"Review Acme's books for October"*. It now checks four things in your client's QuickBooks Online:
+  entries still waiting in Uncategorized or Ask My Accountant, expenses with no payee, entries booked to a parent
+  account instead of one of its sub-accounts, and large amounts. Each one comes with why it was flagged and, where the
+  client's history or the entry's own text makes it clear, a suggested fix that you then make in QuickBooks.
+
+  - See `ledgersync_run_review_report` in [For developers](/ai/developers).
+  - Your AI app loads the new tool list first (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-11-02" tags={["AI connector"]}>
   ## Your AI starts work on a client with one look at where things stand
 
   Ask your AI *"Where do things stand with Acme?"*. In one step it now sees which accounting software the client uses,
