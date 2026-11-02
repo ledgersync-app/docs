@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (52 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (53 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -64,12 +64,13 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">52</span>
+## Tools <span className="lsai-badge">53</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
 | `ledgersync_get_account_status` | Which firm and login it is connected as; is the connection ready; sandbox or live; refreshes left | No |
 | `ledgersync_find_clients` | Finds clients by name or email, and the firm's own accounts, each with the id and the name the other client tools take together | No |
+| `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, and the playbooks that fit | No |
 | `ledgersync_create_client` | Adds a client, checking for duplicates first | Yes |
 | `ledgersync_create_connect_link` | Secure page where the account holder picks a bank and what to connect: transactions, statements, check images | Yes |
 | `ledgersync_search_institutions` | Is a bank supported; does it give check images; does it need the desktop app | No |
@@ -122,7 +123,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
 <AccordionGroup>
-  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, accepting For review transactions and checking rules against them">
+  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions, the client snapshot, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, accepting For review transactions and checking rules against them">
     - Every tool that works on a client names it twice: by its id and by its name. `client_name` goes right after
       `client_id`, and `client_names` after `client_ids`, one name for each id in the same order, as
       `ledgersync_find_clients` lists them in the same chat. The name is the client's name, not its email or id.
@@ -304,6 +305,19 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - A conversion belongs to the person who made the upload link: the owner, an administrator or an employee.
       It also shows on that person's **PDF Converter** page in the LedgerSync app, where it can be exported
       again.
+    - `ledgersync_get_client_snapshot` starts work on one client in a single call. It returns the client's `ledger`
+      (`quickbooks_online`, `zoho_books`, `xero` or `none`) and `quickbooks`: its `state` (`connected`,
+      `not_connected`, or `broken` with `broken_reason`) and, while connected, `closing_date`. That is the date the
+      client's books are closed through in QuickBooks, `none_set` when QuickBooks has none, or `unavailable` when
+      QuickBooks did not answer this time (call again; it never means none is set).
+    - It also returns the client's first accounts, written as `ledgersync_list_accounts` writes them (accounts on
+      LedgerSync's own connection included), each with `last_statement` (`statement_id` and `statement_date`, as
+      `ledgersync_list_statements` gives them), and `accounts_total`. It names the `recommended_playbooks` that fit:
+      `form_1099_season` from November 1 to February 15 while QuickBooks works, and `quickbooks_bookkeeping` when an
+      account can post to QuickBooks. `data_as_of` says when it was read.
+    - The answer stays under 3,000 characters: when the client has more accounts than fit, it shows fewer, never counts
+      fewer, and its `next_step` points to `ledgersync_list_accounts`. It reads the client's QuickBooks once, for the
+      closing date, and changes nothing.
     - QuickBooks bookkeeping is for clients whose bank transactions do not come into QuickBooks through a
       QuickBooks bank feed. The AI categorizes the client's transactions waiting in LedgerSync and, after the user
       approves a preview, LedgerSync posts them into the client's QuickBooks Online. See
