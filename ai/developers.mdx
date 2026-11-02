@@ -110,7 +110,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove, put back and keep, never counting an account hidden in LedgerSync (what it created in QuickBooks stays); after a yes, undoes it | Yes |
 | `ledgersync_get_categorized_export_link` | How many of the Manual clients' categorized transactions are not exported yet, and a 24-hour link to them as the LedgerSync app's Default or ACS export file | No (pressing **Download** on the link's page marks them Synced) |
 | `ledgersync_get_1099_summary` | The vendors a QuickBooks client paid at or over the 1099 threshold in a tax year, with each one's QuickBooks 1099 flag, whether a tax ID and an email are on file (never the tax ID itself), a suggested next step and advice from the expense accounts its payments were booked to; card and payment app payments left out by default; can count only the accounts the accountant chooses | No |
-| `ledgersync_preview_ledger_changes` | Checks marking up to 100 of a QuickBooks client's vendors for 1099, or unmarking them: each vendor's 1099 flag before and after, and the vendors it would leave as they are, with the reason (open to a few test firms first) | No |
+| `ledgersync_preview_ledger_changes` | Checks marking up to 100 of a QuickBooks client's vendors for 1099, or unmarking them: each vendor's 1099 flag before and after, and the vendors it would leave as they are, with the reason | No |
 | `ledgersync_apply_ledger_changes` | Marks the previewed vendors for 1099 in the client's QuickBooks, in the background, changing nothing else on them | Yes |
 | `ledgersync_get_ledger_changes_status` | How marking vendors went: which were changed, which were left as they were and why, and how an undo went | No |
 | `ledgersync_undo_ledger_changes` | Shows which vendors' 1099 flags would go back and which would stay; after a yes, puts them back | Yes |
@@ -869,9 +869,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       QuickBooks since, inactive, no longer in QuickBooks, or already back), with an `undo_id` that works for 15
       minutes. The second, with that `undo_id`, starts the undo. Only vendors nobody changed in QuickBooks since
       go back. An undo that could not put a vendor back (`undo_failed`) can be run again.
-    - Marking vendors for 1099 is open to a few test firms first, and opens to everyone soon. Every firm sees the
-      tools; for any other firm, the preview and the apply answer `access_not_active`, and the 1099 list still
-      works. The status and the undo work for any change a firm made. LedgerSync keeps who approved each change
+    - Marking vendors for 1099 is open to every firm. On the sandbox connector it is still limited to test firms:
+      every firm sees the tools, and for any other firm there, the preview and the apply answer
+      `access_not_active` while the 1099 list still works. The status and the undo work for any change a firm made. LedgerSync keeps who approved each change
       and from which AI app.
     - Every ready answer of `ledgersync_get_1099_summary`, an empty list too, ends its `next_step` with what the
       list does not cover (royalties, gross proceeds paid to attorneys, medical and health care payments, and which

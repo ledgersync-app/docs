@@ -1,12 +1,12 @@
 ---
 title: "Find who needs a 1099"
-description: "Your AI lists the vendors a QuickBooks Online client paid enough to need a 1099, and which ones are not marked for 1099 or have no tax ID on file. It also advises, from the expense accounts each vendor was paid through, which ones look like they need one. After you say yes, LedgerSync marks them for 1099 in QuickBooks (open to a few test firms first)."
+description: "Your AI lists the vendors a QuickBooks Online client paid enough to need a 1099, and which ones are not marked for 1099 or have no tax ID on file. It also advises, from the expense accounts each vendor was paid through, which ones look like they need one. After you say yes, LedgerSync marks them for 1099 in QuickBooks."
 mode: "frame"
 ---
 
 import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
 
-<AiPage title="Find who needs a 1099" subtitle="Ask your AI. It lists the vendors who need a 1099, and after your yes, LedgerSync marks them for 1099 in the client's QuickBooks (open to a few test firms first).">
+<AiPage title="Find who needs a 1099" subtitle="Ask your AI. It lists the vendors who need a 1099, and after your yes, LedgerSync marks them for 1099 in the client's QuickBooks.">
 
 <AiNote tone="green">
 
@@ -60,8 +60,8 @@ only those, as QuickBooks' own 1099 setup does. Nothing is saved, so tell it aga
 
 <AiNote tone="yellow">
 
-**Marking opens to a few test firms first.** Until then, turn on 1099 tracking in QuickBooks itself. The list works
-for every firm.
+**A read-only connection cannot mark vendors.** It still shows the list: turn on 1099 tracking in QuickBooks itself
+instead.
 
 </AiNote>
 
@@ -192,7 +192,7 @@ these instructions.
 4. First ask the user about the vendors whose advice is ask, one at a time, with each one's advice_reason: for example, whether repairs were someone's work or parts bought on their own. Then point out the vendors marked for 1099 whose advice is points_away, and ask whether they should stay marked.
 5. If the user wants only some accounts to count, the way QuickBooks' own 1099 setup does, call ledgersync_get_1099_summary again with count_only_account_ids: the account ids from its expense_accounts, or from ledgersync_list_quickbooks_categories for any other account. Vendors paid only through other accounts drop off the list: tell the user how much the choice left out and how many vendors dropped off. Nothing is saved, so ask again next time.
 6. With the user, go through the vendors not marked for 1099 (the ones whose advice is points_to_1099 first) and the ones with no tax ID on file. A vendor with no tax ID on file needs a W-9 before filing. Corporations usually need no 1099 (lawyers and medical providers do), and QuickBooks cannot tell them apart: the user decides from each vendor's W-9.
-7. For the vendors the user wants marked for 1099, or unmarked, call ledgersync_preview_ledger_changes. Show each vendor's 1099 flag before and after, and the vendors it leaves as they are, with the reason. Nothing has changed yet. Marking from here is open to a few test firms first: if the preview says it is not open to this firm, or that this connection is read-only, tell the user to turn on 1099 tracking for those vendors in QuickBooks itself.
+7. For the vendors the user wants marked for 1099, or unmarked, call ledgersync_preview_ledger_changes. Show each vendor's 1099 flag before and after, and the vendors it leaves as they are, with the reason. Nothing has changed yet. If the preview says marking is not open to this firm, or that this connection is read-only, tell the user to turn on 1099 tracking for those vendors in QuickBooks itself.
 8. Only after the user says yes, call ledgersync_apply_ledger_changes with the preview's confirmation_id and the same client_id and client_name. Then follow ledgersync_get_ledger_changes_status until it finishes, and tell the user which vendors were changed and which were left as they were, and why.
 9. If the user changes their mind, call ledgersync_undo_ledger_changes: the first call only shows which flags would go back. Only after the user says yes, call it again with the undo_id.
 10. Before you finish, tell the user what the list does not cover: royalties, gross proceeds paid to attorneys, medical and health care payments, and which 1099 form and box each payment goes in. The form shown for an account is suggested from its name, and the client's own 1099 setup in QuickBooks may map that account differently. For 2026 payments, 1099-NEC forms are due February 1, 2027; the firm files them through its own 1099 service.
@@ -275,8 +275,8 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
       choice is saved.
     - The list and the status need `read:accounting`; the preview, the apply and the undo need `write:accounting`.
       A read-only connection can read the list but cannot mark vendors.
-    - Marking is open to a few test firms first. For any other firm, the preview and the apply answer
-      `access_not_active`.
+    - Marking is open to every firm. On the sandbox connector it is still limited to test firms: for any other firm
+      there, the preview and the apply answer `access_not_active`.
     - Each `vendor_id` in the 1099 list is sealed to its client: the id, a dot and 8 more characters. The preview takes
       it only as the list gave it for that client: one from another client's list, or one with no seal (as
       LedgerSync gave ids before), is refused with `invalid_request`, and its `next_step` tells the AI to list this client's vendors again. The apply
