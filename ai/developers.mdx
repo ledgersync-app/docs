@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (55 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (57 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -64,7 +64,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">55</span>
+## Tools <span className="lsai-badge">57</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -74,6 +74,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear | No |
 | `ledgersync_get_vendor_coding_history` | How a client has coded one vendor's entries over the last months: the accounts used, most used first, with how often, when last and the average amount. Takes the vendor, or the text of a bank row | No |
 | `ledgersync_create_client` | Adds a client, checking for duplicates first | Yes |
+| `ledgersync_get_client` | A client's details as the app's **Edit Client** screen shows them: its name, its main email and whether the client signs in with it, its main phone number (the one LedgerSync texts), and its extra emails and phone numbers | No |
+| `ledgersync_update_client` | Changes a client's name, main email, main phone number, or extra emails and phone numbers, as the app's **Edit Client** screen does; moves the client's sign-in to a new email only when asked | Yes |
 | `ledgersync_create_connect_link` | Secure page where the account holder picks a bank and what to connect: transactions, statements, check images | Yes |
 | `ledgersync_search_institutions` | Is a bank supported; does it give check images; does it need the desktop app | No |
 | `ledgersync_list_connections` | A client's bank connections and last refresh | No |
@@ -125,7 +127,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
 <AccordionGroup>
-  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, the firm's own accounts, duplicates, client messages and invitations, the desktop app, statement conversions, the client snapshot, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, accepting For review transactions and checking rules against them">
+  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, the firm's own accounts, duplicates, reading and changing a client's details, client messages and invitations, the desktop app, statement conversions, the client snapshot, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, accepting For review transactions and checking rules against them">
     - Every tool that works on a client names it twice: by its id and by its name. `client_name` goes right after
       `client_id`, and `client_names` after `client_ids`, one name for each id in the same order, as
       `ledgersync_find_clients` lists them in the same chat. The name is the client's name, not its email or id.
@@ -186,14 +188,62 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `firm_own: true` and with no email. Only the owner and administrators get it, never employees, and only
       when the owner's login holds a bank connection and the search is blank or matches the firm's name or the
       owner's name, username or email.
-    - The firm's own entry's id works with the other client tools, except client messages: LedgerSync never
-      messages the firm itself, so a reconnect preview leaves out the firm's own connections and an invitation
-      cannot go to it.
+    - The firm's own entry's id works with the other client tools, except client messages and client details:
+      LedgerSync never messages the firm itself, so a reconnect preview leaves out the firm's own connections and
+      an invitation cannot go to it. The entry is not a client and has no client details, so `ledgersync_get_client`
+      and `ledgersync_update_client` answer `not_found` for it; the firm's own details change in the LedgerSync app.
     - The firm's own entry's id goes with its name as listed. The firm's name alone, or "the firm's own accounts"
       alone, also works as its `client_name`.
     - `ledgersync_create_client` checks for an existing client with the same name or email first. A client
       added through the AI is like a client added in the app: they can sign in to LedgerSync, and a bank they
-      connect brings your firm's usual number of past statements.
+      connect brings your firm's usual number of past statements. It takes no phone number: once it creates the
+      client, its `next_step` tells the AI to add the phone number, or any other detail, with
+      `ledgersync_update_client`.
+    - `ledgersync_get_client` returns a client's details as the LedgerSync app's **Edit Client** screen shows them,
+      in `details`: `email` (the main email), `email_is_sign_in` (whether the client signs in to LedgerSync with
+      it), `phone` (the main number, the one LedgerSync texts, shown as (431) 432-4232), `extra_emails` (a list of
+      addresses) and `extra_phones` (each a `phone` and, when it has one, a `label`). `email` and `phone` are
+      `null` when the client has none, as for a client added through the AI without an email. LedgerSync emails every address
+      listed. It changes nothing and needs `read:clients`.
+    - `ledgersync_update_client` changes those details as the **Edit Client** screen does, in one call with no
+      preview: the tool tells the AI to say exactly what will change and get the user's yes first. Give only what
+      changes: `name` (at most 64 characters), `email` (the main email), `phone` (the main number) or
+      `remove_phone: true`, `add_emails` (extra emails, up to 10), and `add_phones` (each a `phone` and an optional
+      `label`, such as Cell or Office) and `remove_phones` (extra numbers). A client has at most 4 extra numbers.
+      Extra numbers are added or removed one by one, never replaced as a list, so a call never drops one the AI did
+      not know about. Adding a number already listed changes only its label.
+    - Extra emails can be added but not removed through the AI yet, and an extra email cannot become the main
+      email; for a client that signs in with its email, moving the sign-in to an extra address works.
+    - A phone number must be a US or Canadian number with its area code, such as 431 432 4232 (a +1 in front,
+      spaces, dots, dashes, slashes and brackets are fine). It is saved as its 10 digits and shown as
+      (431) 432-4232. Any other number, or one with an extension, is refused with `invalid_request`, and so is an
+      email address that is not valid; nothing is changed.
+    - A number in `remove_phones` that is not on file comes back in `not_on_file`, and the rest is saved. The main
+      email is replaced with `email`, never removed, and the main number is replaced with `phone` or removed with
+      `remove_phone`.
+    - If the client signs in to LedgerSync with its main email (`email_is_sign_in`), changing that email also needs
+      `move_login: true`. It moves the client's sign-in to the new email, as **Change login email** does in the app:
+      LedgerSync emails a sign-in link to the new address and a notice to the old one, and the client's old
+      password, two-step sign-in and phone app sign-ins stop working. The tool tells the AI to set it only after the
+      user agrees. Without it, the change is refused with `invalid_request`, nothing is saved, and the `next_step`
+      tells the AI to explain this to the user. A move to an email another LedgerSync account signs in with, or used
+      before, is refused, with nothing changed.
+    - The move goes first. Once it is done, the rest of the call is saved under the new sign-in; if that rest
+      fails, the error's `next_step` says the sign-in did move. At a firm whose own API integration finds its
+      clients by their login, a client's sign-in never moves: `move_login` is refused there, and the email changes
+      without it while the client keeps signing in as before.
+    - The answer gives `client_id`, `client_name` (after a rename, the new name, which the AI passes from then on),
+      `changed` (any of `name`, `email`, `sign_in`, `phone`, `extra_emails` and `extra_phones`), `sign_in_moved`
+      (only when the sign-in moved), `not_on_file` (only when something was not on file) and the client's
+      `details` after the change, read back from LedgerSync as `ledgersync_get_client` gives them. When a main
+      number was added or changed, its `next_step` offers to text the client an invitation to connect its bank
+      with `ledgersync_preview_client_message`.
+    - Both tools work through the LedgerSync app's own client routes, as the signed-in person: an employee reads
+      and changes only the clients assigned to them. `ledgersync_update_client` counts toward its daily limit only
+      when it has something to change. The same call again finds the change already made and answers that nothing
+      changed, and a change back to an earlier value is saved again. It needs `write:clients`: a read-only
+      connection gets `insufficient_scope`. It is marked as changing data, so Claude and ChatGPT ask before it
+      runs. In Grok, ask it to wait for your yes.
     - `ledgersync_create_connect_link` creates a secure page where the account holder picks their bank and
       what to connect (transactions, statements, check images), then signs in. It is the LedgerSync app's own
       bank picker: the same bank list as the app's **Add Bank Connection** screen, and the same choice of
@@ -266,13 +316,18 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
         include them;
       - the AI connector cannot reach the client's record;
       - for an email, the client has no email address (a client added through the AI without an email has
-        none);
-      - for a text, texts are turned off for the client, there is no phone number (the AI adds clients
-        without one), the client replied STOP (texts start again when they reply START), it is outside the
-        client's texting hours, or LedgerSync's assistant is texting with the client right now;
+        none until one is added with `ledgersync_update_client`);
+      - for a text, texts are turned off for the client, there is no phone number (a client added through the
+        AI has none until one is added with `ledgersync_update_client`), the client replied STOP (texts start
+        again when they reply START), it is outside the client's texting hours, or LedgerSync's assistant is
+        texting with the client right now;
       - for an invitation, the client was already invited through the AI in the last 24 hours (unless you
         asked to include them), is not one you can see in the LedgerSync app, or signs in through your firm's
         own integration instead of the LedgerSync app.
+    - When a client is skipped for having no phone number or no email address, the preview's `next_step` tells the
+      AI to add the number or address the user gives with `ledgersync_update_client`, after the user's yes, and
+      then preview again. An AI app that has not loaded that tool yet is told to reconnect LedgerSync, or to make
+      the change in the LedgerSync app meanwhile; `ledgersync_create_client`'s `next_step` says the same.
     - A client fails when something changed since the preview (the client was removed, the connection no
       longer needs attention, or it is no longer one you can see), when the client's link could not be
       created, or when the email or text service refused the message or could not confirm a text went out.
@@ -1120,8 +1175,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - Each AI app can start 50 refreshes a day on live (20 on sandbox). They also count against your firm's
       daily budget of 500 on live (100 on sandbox), shared with API keys, which is the number the AI shows as
       refreshes left.
-    - Per connected AI app: 50 new clients a day, 30 connect links an hour, 60 message previews an hour, 30
-      saved templates a day, and 120 tool calls a minute on sandbox (60 on live).
+    - Per connected AI app: 50 new clients a day, 100 changes to client details a day, 30 connect links an hour,
+      60 message previews an hour, 30 saved templates a day, and 120 tool calls a minute on sandbox (60 on live).
     - Statement conversions: 3 at a time and 500 a day per firm on live (2 and 50 on sandbox), shared with
       the firm's API keys, in UTC days. Each AI app can make 30 upload links an hour. The upload page takes 5
       tries a minute per link, and a link stops after 3 failed uploads. Every conversion is a real OCR read, on
@@ -1224,7 +1279,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     check `ledgersync_get_ledger_changes_status` before trying again. An accept of For review transactions that
     LedgerSync did not confirm comes back as `upstream_unknown` too: call `ledgersync_accept_transactions` again with
     the same `confirmation_id`, which never accepts twice. For its undo, call `ledgersync_undo_accept_transactions`
-    without `undo_id` to see what has not gone back yet.
+    without `undo_id` to see what has not gone back yet. A change to a client's details that LedgerSync did not
+    confirm comes back as `upstream_unavailable`: read the client with `ledgersync_get_client` before trying again.
 
     The client check adds no new codes. A client id with no name or with another client's name, an id sealed to
     another client or with no seal, a confirmed change that names other clients than its preview, or a client's id

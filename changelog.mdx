@@ -4,6 +4,23 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-03" tags={["AI connector"]}>
+  ## Your AI updates a client's phone numbers, emails and name
+
+  Ask your AI *"Add 431 432 4232 as Will's phone number"*. It now changes a client's details in LedgerSync, as the
+  **Edit Client** screen does in the app: the client's name, main email, main phone number (the one LedgerSync
+  texts) and extra phone numbers, and it can add extra emails. LedgerSync tells your AI to say exactly what will
+  change and to ask for your yes first. A client added through your AI can now get its phone number this way,
+  so LedgerSync can text it an invitation to connect its bank.
+
+  Changing the email a client signs in to LedgerSync with can also move its sign-in, so your AI asks you first. Once
+  it moves, the client signs in with the new email, LedgerSync emails a sign-in link to the new address and a notice
+  to the old one, and the client's old password, two-step sign-in and phone app sign-ins stop working.
+
+  - See `ledgersync_get_client` and `ledgersync_update_client` in [For developers](/ai/developers).
+  - Your AI app loads the new tool list first (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-11-03" tags={["AI connector"]}>
   ## Your AI spots entries coded differently than usual, and shows how a vendor is usually coded
 
   Ask your AI *"Review Acme's books for October"*. It now runs a fifth check: entries booked to an account the vendor
