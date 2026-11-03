@@ -3,6 +3,23 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-03" tags={["AI connector"]}>
+  ## Your AI spots entries coded differently than usual, and shows how a vendor is usually coded
+
+  Ask your AI *"Review Acme's books for October"*. It now runs a fifth check: entries booked to an account the vendor
+  rarely uses, such as a Home Depot purchase in Meals when Home Depot's entries almost always go to Job Supplies, with
+  the usual account as the suggested fix. Ask *"How is Home Depot usually coded for Acme?"* and it shows the accounts
+  the vendor's entries went to over the last 12 months, most used first, with how often, when last and the average
+  amount. It can also start from the text of a bank row.
+
+  - See `expense_inconsistency` and `ledgersync_get_vendor_coding_history` in [For developers](/ai/developers).
+  - The client snapshot now also says how many entries each check flagged, when a check read the client's books for
+    last month today.
+  - An expense with no payee now also gets its suggested payee from the bank rows LedgerSync sent to QuickBooks with
+    the same text.
+  - Your AI app loads the new tool list first (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
 <Update label="2026-11-02" tags={["v2 API"]}>
   ## The v2 API reference and guides are now on this site
 
