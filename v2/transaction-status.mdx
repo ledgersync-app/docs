@@ -1,0 +1,100 @@
+---
+title: "Transaction status"
+description: "What active, pending and shadow mean on FINICITY rows, what POSTED and PENDING mean on MX rows, and which rows to book."
+---
+
+Every row that `GET /api/v2/transactions/list` returns has a `status`. It tells you how final the bank's record of the transaction is, and its values depend on the `source` of the account's bank.
+
+| Source | Settled | Not settled yet | Retracted |
+| --- | --- | --- | --- |
+| FINICITY | `active` | `pending` | `shadow` |
+| MX | `POSTED` | `PENDING` | MX has no such status |
+
+FDE rows carry the status FDE reports.
+
+A transaction's status can change from one refresh to the next: each time LedgerSync refreshes a connection, it writes the status the bank reports now. Read recent transactions again on every sync and update the rows you stored, keyed on `transactionId`.
+
+## FINICITY
+
+### Active
+
+A transaction the bank has posted. LedgerSync does not delete an active row because a later refresh leaves it out, so it stays in the list.
+
+### Pending
+
+A transaction the bank has authorized but not posted yet. Its amount and description are provisional: either can change, or the charge can disappear, before it settles.
+
+- Pending rows have no posted date (`postedDate: null`). A request with `from` or `to` leaves them out. Omit both dates to include them.
+- Pending transactions are short-lived. Each refresh brings in the pending transactions the bank reports at that moment. When a later refresh no longer returns one, LedgerSync deletes it, so it drops out of the list.
+- A pending row that someone already worked on in LedgerSync, for example edited, excluded or synced to an accounting platform, is kept even after the bank stops reporting it.
+
+There is no guarantee that a pending row turns into an active one. When the bank posts the transaction, one of two things happens:
+
+| How it settles | What you see |
+| --- | --- |
+| In place | The same row, with the same `transactionId`, changes to `active`. |
+| As a new record | A new `active` row with a new `transactionId` appears, and the pending row is deleted. |
+
+Which one happens depends on the bank's reporting.
+
+### Shadow
+
+A transaction LedgerSync stored earlier that FINICITY now reports as retracted. LedgerSync never adds a new row as `shadow`: it marks the row it already has. When the bank replaced the transaction with a corrected one, the corrected transaction arrives as a separate `active` row, so the shadow row can look like a duplicate of it.
+
+Partners handle shadow rows in a few ways:
+
+- Do not display them.
+- Remove them from your data store.
+- Show them to the customer with a way to confirm the removal.
+- Ignore the status, which keeps the retracted row next to its replacement.
+
+LedgerSync's own transaction screens, rules and exports read only `active` FINICITY rows, and the v3 API never returns shadow rows.
+
+## MX
+
+### POSTED
+
+A transaction the bank has posted.
+
+### PENDING
+
+A transaction the bank has not posted yet. MX has no posted date for it, so its `postedDate` holds its transaction date. For MX, `from` and `to` filter on the transaction date, so pending rows stay in range.
+
+MX settles a pending transaction one of two ways:
+
+| How it settles | What you see |
+| --- | --- |
+| As a new record (the usual way) | MX deletes the pending record and sends the posted transaction as a new one: a new `POSTED` row with a new `transactionId`. |
+| In place | The same row, with the same `transactionId`, changes to `POSTED`. |
+
+When MX stops returning a pending transaction, LedgerSync deletes the row: right away when its posted copy, for the same amount, arrives in the same refresh, and otherwise once MX's record of it is more than 16 days old. At that point a pending row that the account's bank statement shows as posted is marked `POSTED` instead of deleted. As with FINICITY, a pending row that someone already worked on in LedgerSync is kept.
+
+LedgerSync's own rules wait for an MX pending row to settle before they categorize it.
+
+## Which rows to keep
+
+| Status | What it means for your books | What to do |
+| --- | --- | --- |
+| `active`, `POSTED` | Settled | Book it. Upsert by `transactionId`. |
+| `pending`, `PENDING` | Provisional | Show it as pending if it helps your users, but do not post it to a ledger. Expect the amount or description to change, the transaction to settle under a new `transactionId`, or the row to disappear. |
+| `shadow` | Retracted | Leave it out. If you stored or booked it while it was active, remove or reverse it. |
+
+To keep pending rows in step:
+
+<Steps>
+  <Step title="Read the account again on every sync">
+    MX pending rows come back in any `from` and `to` window that covers their transaction date. FINICITY pending rows come back only when you send neither `from` nor `to`.
+  </Step>
+  <Step title="Upsert every row by transactionId">
+    A row that changed status, amount or description overwrites the copy you stored.
+  </Step>
+  <Step title="Drop pending rows that are gone">
+    A pending row you stored that a read covering its date no longer returns was deleted in LedgerSync. If the transaction settled as a new record, the settled version is a separate row with its own `transactionId`.
+  </Step>
+</Steps>
+
+<Check>
+  Book `active` and `POSTED` rows, hold `pending` and `PENDING` rows until they settle, and leave out `shadow` rows. That way a pending charge and its settled copy, or a shadow row and its replacement, never both land in your books.
+</Check>
+
+See [Transactions](/v2/transactions) for the list endpoint, its parameters and how to choose a transaction key.

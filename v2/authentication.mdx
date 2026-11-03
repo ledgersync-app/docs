@@ -1,0 +1,164 @@
+---
+title: "v2 authentication"
+description: "Sign in with a LedgerSync login, send the token in an Auth-Token header, and sign in again every 30 minutes."
+---
+
+The v2 API has no API keys. Your integration signs in with the username and password of a LedgerSync login, gets back a token, and sends that token in an `Auth-Token` header on every other call. A token lasts 30 minutes.
+
+<Info>
+  **Sandbox:** `https://staging.ledgersyncappv2.com`. **Production:** `https://ledgersyncappv2.com`. Each environment has its own logins, so sign in to each with a login created there. Building on v3 instead? It uses API keys; see [Authentication](/authentication).
+</Info>
+
+## Sign in
+
+`POST /api/v2/public/authenticate` with the login's username and password:
+
+<CodeGroup>
+```bash Request
+curl -X POST "https://staging.ledgersyncappv2.com/api/v2/public/authenticate" \
+  -H "Content-Type: application/json" \
+  -d '{ "username": "you@yourfirm.com", "password": "your-password" }'
+```
+
+```json Response
+{
+  "authToken": "BearereyJhbGciOiJIUzUxMiJ9...",
+  "status": "OK",
+  "message": "Success",
+  "username": "you@yourfirm.com",
+  "validated": false
+}
+```
+</CodeGroup>
+
+| Request field | Required | Notes |
+| --- | --- | --- |
+| `username` | Yes | The login's username. For a login created at the sign-up page, it is the email address you signed up with. |
+| `password` | Yes | The login's password. |
+
+| Response field | Notes |
+| --- | --- |
+| `authToken` | The token. It starts with `Bearer` followed directly by the token itself, with no space between them. Send the whole value exactly as you received it. |
+| `status` | `OK` when you are signed in, otherwise the name of the HTTP status, for example `FORBIDDEN`. The response's HTTP status code matches it. |
+| `message` | `Success`, or the reason the sign-in was refused. |
+| `username` | The login's username. |
+| `validated` | `false` for the login you created at sign-up and for employee logins. Only a client login added through the API can read `true`, for the LedgerSync widget's use. The token works whatever its value. |
+
+<Note>
+  The old v2 reference also listed `fromApi`, `ipAddress` and `userAgent` in the request. Leave them out. `fromApi` already defaults to `true`, the value for API sign-ins; set to `false`, the sign-in follows the web app's rules instead and can be refused or come back without a token. LedgerSync ignores `ipAddress` and `userAgent` and reads both from your request.
+</Note>
+
+<Tip>
+  To keep the token in a shell variable for the calls that follow:
+
+  ```bash
+  export LS_TOKEN=$(curl -s -X POST "https://staging.ledgersyncappv2.com/api/v2/public/authenticate" \
+    -H "Content-Type: application/json" \
+    -d '{ "username": "you@yourfirm.com", "password": "your-password" }' | jq -r .authToken)
+  ```
+</Tip>
+
+## Sign in with an email address
+
+`POST /api/v2/public/authenticate-by-email` takes the login's email address instead of its username:
+
+```bash
+curl -X POST "https://staging.ledgersyncappv2.com/api/v2/public/authenticate-by-email" \
+  -H "Content-Type: application/json" \
+  -d '{ "email": "you@yourfirm.com", "password": "your-password" }'
+```
+
+The response has the same fields as above, and its `username` tells you the login's username. It works when exactly one LedgerSync login has that email address. When more than one does, it answers `403` with `This email is linked to more than one account. Please sign in with your username, or contact support.` Sign in with the username instead.
+
+## Send the token
+
+Put the `authToken` value in an `Auth-Token` header on every call outside `/api/v2/public/`:
+
+```bash
+curl "https://staging.ledgersyncappv2.com/api/v2/client/list" \
+  -H "Auth-Token: BearereyJhbGciOiJIUzUxMiJ9..."
+```
+
+<Warning>
+  v2 reads only the `Auth-Token` header. An `Authorization: Bearer ...` header, the v3 style, is not read, and the call answers `401` with `User not authorized to perform request!`. Keep the `Bearer` at the start of the token too: without it the call answers `401` with `Token has expired!`.
+</Warning>
+
+Calls under `/api/v2/public/`, such as sign-in and password reset, do not check the header.
+
+## How long a token lasts
+
+A token works for 30 minutes from sign-in, and using it does not extend that time. Sign in again before the 30 minutes are up, or as soon as a call answers `401`, and carry on with the new token.
+
+Signing in again does not end earlier tokens. Several jobs can sign in with the same login at the same time, and each token runs out on its own.
+
+## Log out
+
+`POST /api/v2/public/logout` with the token in the `Auth-Token` header ends it before its 30 minutes are up:
+
+```bash
+curl -X POST "https://staging.ledgersyncappv2.com/api/v2/public/logout" \
+  -H "Auth-Token: BearereyJhbGciOiJIUzUxMiJ9..." \
+  -H "Content-Length: 0"
+```
+
+It answers `204 No Content`, whatever the token, even one that has already expired. From then on the API answers `401` with `User not authorized to perform request!` to that token. Logging out is optional: a token also runs out by itself.
+
+<Note>
+  The logout request has no body, but it still needs a `Content-Length` header: a `POST` without one is refused with `411 Length Required`. curl sends none for a bare `-X POST`, hence the `-H "Content-Length: 0"`.
+</Note>
+
+## Errors
+
+### When signing in
+
+| Status | `message` | What happened |
+| --- | --- | --- |
+| `400` | None: the body is a generic error | `username`, `email` or `password` is missing or empty. |
+| `403` | `Bad credentials` | The username or password is wrong, or no such login exists. |
+| `403` | `Your login has been locked due to typing in a password incorrectly 3x. ...` | Three wrong passwords in a row, each less than five minutes after the one before, locked the login. See [Keep the login safe](#keep-the-login-safe). |
+| `403` | `Your account is locked because a subscription payment didn't go through. ...` | The subscription payment failed. Updating the card on file restores access. |
+| `403` | `This email is linked to more than one account. ...` | Email sign-in only. Sign in with the username instead. |
+
+A refused sign-in comes back in the same shape as a successful one:
+
+```json 403 Forbidden
+{
+  "authToken": null,
+  "status": "FORBIDDEN",
+  "message": "Bad credentials",
+  "username": null,
+  "validated": null
+}
+```
+
+A `400` has a different body:
+
+```json 400 Bad Request
+{
+  "timestamp": "2026-11-03T01:43:06.872+00:00",
+  "status": 400,
+  "error": "Bad Request",
+  "path": "/api/v2/public/authenticate"
+}
+```
+
+A few other refusals, for example a login whose LedgerSync setup is not complete, come back with another `4xx` status (`412`, `417` or `426`) and a `message`. Send that message to LedgerSync support.
+
+### On every other call
+
+| Status | Body | What happened |
+| --- | --- | --- |
+| `401` | `User not authorized to perform request!` | The `Auth-Token` header is missing, or the token was logged out. |
+| `401` | `Token has expired!` | LedgerSync no longer accepts the token: it is more than 30 minutes old, or it is not exactly the value sign-in returned. |
+
+Both bodies are plain text, not JSON. On either one, sign in again and retry with the new token.
+
+## Keep the login safe
+
+<Warning>
+  Your integration holds a real LedgerSync login. Three wrong passwords in a row, each less than five minutes after the one before, lock that login, in the LedgerSync web app as well as here. It then stays locked, even for the right password, until it is unlocked. Do not retry a refused sign-in in a loop.
+
+  Resetting the password unlocks it: `POST /api/v2/public/password/reset` with the login's `username` in the body emails a reset link to the login's email address, and setting a new password through that link unlocks the login. A client or employee login can also be unlocked by its firm, with `PATCH /api/v2/client/unlock/{username}` or `PATCH /api/v2/employee/unlock/{username}`.
+</Warning>
+
+Treat the password and the token like any other credential: keep them on your server, never in a browser or a mobile app.

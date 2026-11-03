@@ -83,6 +83,25 @@
         "openapi": "openapi.yaml"
       },
       {
+        "tab": "v2 API (legacy)",
+        "openapi": {
+          "source": "openapi-v2.json",
+          "directory": "v2/api-reference"
+        },
+        "groups": [
+          {
+            "group": "v2 guides",
+            "pages": [
+              "v2/overview",
+              "v2/authentication",
+              "v2/transactions",
+              "v2/transaction-status",
+              "v2/testing"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Changelog",
         "pages": [
           "changelog"

@@ -1,8 +1,9 @@
 name: Sync OpenAPI spec
 
-# Keeps the API Reference in lockstep with the live v3 spec. Runs on a
-# schedule and on demand; commits only when the spec actually changed, which
-# in turn triggers Mintlify to redeploy.
+# Keeps the API Reference in lockstep with the live v3 spec, and the v2 API
+# (legacy) tab with the live v2 spec. Runs on a schedule and on demand;
+# commits only when a spec actually changed, which in turn triggers Mintlify
+# to redeploy.
 on:
   schedule:
     - cron: "0 */6 * * *" # every 6 hours
@@ -37,5 +38,44 @@ jobs:
             git config user.email "docs@ledgersync.com"
             git add openapi.yaml
             git commit -m "chore: sync OpenAPI spec from api.ledgersyncappv2.com"
+            git push
+          fi
+
+      # The v2 (legacy) API Reference tab reads openapi-v2.json. These steps
+      # run after the v3 ones, so a v2 failure never holds back the v3 sync.
+      - name: Fetch live v2 spec
+        run: curl -fsSL https://ledgersyncappv2.com/api-v2/v3/api-docs -o openapi-v2.next.json
+
+      - name: Prepare v2 spec for Mintlify
+        # Three changes to the live spec: the playground gets the production
+        # and sandbox hosts (the live spec names a generated http:// one), the
+        # internal admin sign-in is left out, and double quotes and backslashes
+        # are stripped from operation summaries, as for v3 above.
+        run: |
+          jq '
+            .servers = [
+              {url: "https://ledgersyncappv2.com", description: "Production"},
+              {url: "https://staging.ledgersyncappv2.com", description: "Sandbox"}
+            ]
+            | del(.paths["/api/v2/public/authenticate-admin"])
+            | .paths[][] |= (
+                if type != "object" then .
+                elif (.summary | type) != "string" then .
+                else .summary |= (split("\"") | join("") | split("\\") | join(""))
+                end
+              )
+          ' openapi-v2.next.json > openapi-v2.prepared.json
+          mv openapi-v2.prepared.json openapi-v2.json
+          rm openapi-v2.next.json
+
+      - name: Commit v2 spec if changed
+        run: |
+          if git diff --quiet -- openapi-v2.json; then
+            echo "v2 spec unchanged."
+          else
+            git config user.name "ledgersync-docs-bot"
+            git config user.email "docs@ledgersync.com"
+            git add openapi-v2.json
+            git commit -m "chore: sync v2 OpenAPI spec from ledgersyncappv2.com"
             git push
           fi

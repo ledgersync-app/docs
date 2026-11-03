@@ -1,0 +1,4645 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "LedgerSync V2 API",
+    "version": "2.0"
+  },
+  "servers": [
+    {
+      "url": "https://ledgersyncappv2.com",
+      "description": "Production"
+    },
+    {
+      "url": "https://staging.ledgersyncappv2.com",
+      "description": "Sandbox"
+    }
+  ],
+  "tags": [
+    {
+      "name": "account-api",
+      "description": "Account REST APIs"
+    },
+    {
+      "name": "password-api",
+      "description": "Password REST APIs"
+    },
+    {
+      "name": "transaction-api",
+      "description": "Transaction REST APIs"
+    },
+    {
+      "name": "phone-verification-api",
+      "description": "Phone Verification REST APIs"
+    },
+    {
+      "name": "employee-api",
+      "description": "Employee REST APIs"
+    },
+    {
+      "name": "client-api",
+      "description": "Client REST APIs"
+    },
+    {
+      "name": "check-api",
+      "description": "Check REST APIs"
+    },
+    {
+      "name": "accounting-ai-api",
+      "description": "AI rule suggestion endpoints for external accounting integrations"
+    },
+    {
+      "name": "institution-api",
+      "description": "Institution REST APIs"
+    },
+    {
+      "name": "statement-api",
+      "description": "Statement REST APIs"
+    },
+    {
+      "name": "authentication-api",
+      "description": "Auth REST APIs"
+    }
+  ],
+  "paths": {
+    "/api/v2/employee/password/change": {
+      "put": {
+        "tags": [
+          "employee-api"
+        ],
+        "summary": "Change employee's password",
+        "operationId": "changePassword",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The password provided is incorrect",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User does not have permission to change password",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/client/update": {
+      "put": {
+        "tags": [
+          "client-api"
+        ],
+        "summary": "Update client details",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateClientRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Client was successfully updated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to update client",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Client not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/client/password/change": {
+      "put": {
+        "tags": [
+          "client-api"
+        ],
+        "summary": "Change client password",
+        "operationId": "changePassword_1",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The password provided is incorrect",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User does not have permission to change password",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Client not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/account/update": {
+      "put": {
+        "tags": [
+          "account-api"
+        ],
+        "summary": "Updates an existing account",
+        "operationId": "updateAccount",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Account successfully updated\n\nRenames the bank connection **bankAccountId** to **name**. Set the optional **source** field to **MX** to rename an MX connection; omit it (or use FINICITY) for a Finicity connection. Connection ids are per provider, so the same id can name a different connection under each source.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The bank account does not exist or this user may not manage it",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Bad credentials or the authentication system is down",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/transactions/refresh/{bankAccountId}": {
+      "post": {
+        "tags": [
+          "transaction-api"
+        ],
+        "summary": "Refresh the given bank account transactions",
+        "operationId": "refreshBankAccountTransactions",
+        "parameters": [
+          {
+            "name": "bankAccountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DEFAULT",
+                "FINICITY",
+                "FDE",
+                "MX"
+              ]
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bank account transactions was successfully refreshed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to refresh bank account transactions",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/transactions/refresh/historic": {
+      "post": {
+        "tags": [
+          "transaction-api"
+        ],
+        "summary": "Refresh user historic transactions",
+        "operationId": "refreshHistoricTransactions",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTransactionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Historic transactions was successfully refreshed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to refresh historic transactions",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/statements/refresh": {
+      "post": {
+        "tags": [
+          "statement-api"
+        ],
+        "summary": "Refresh account statements",
+        "description": "## Refresh account statements\nRefreshes account with the latest statements from the bank account.\n## Params\n**bankAccountId**: Id of the bank account to be refreshed.\n**requestParts**: List of accounts to be refreshed.\n - **accountId**: Account id to be refreshed.\n - **pullIndex**: Represents the month to be refreshed. \n    - Ex. 1= last month, 2= two months, 3= three months ago and so on.\n    - Min/Max allowed: 1-6\n\n<span style=\"color:red\">***Only 1 refresh is allowed per bank account in a period of 24 hours.**</span>\n## Handling response with MFA (Multi Factor Authentication)\n\nSome accounts are configured with MFA to improve security, so if you get a MFA challenge (Http Code - 203) you need to render the questions in your app and call  **/api/v2/statements/refresh/mfa** with a proper answer.\n\n## MFA Challenge types\n\n- **text**: Challenge text. E.g *Enter name of your first pet*.\n- **image**: Base64 encoded image with text to be rendered by your application. E.g. *data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/...*\n- **choices**: Multiple choice challenge with text/value.\n- **imageChoices**: Multiple choice challenge with base64 image/value.",
+        "operationId": "refreshStatements",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatementRefreshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Statements were successfully refreshed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementRefreshResponse"
+                }
+              }
+            }
+          },
+          "203": {
+            "description": "Some statements require MFA. Need to call */api/v2/statements/refresh/mfa* with the answer to the MFA challenge",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementRefreshResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to refresh statements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementRefreshResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/statements/refresh/mfa": {
+      "post": {
+        "tags": [
+          "statement-api"
+        ],
+        "summary": "Refresh bank statements with MFA",
+        "description": "## Refresh account statements with MFA (Multi Factor Authentication)\n\nThis API should be called only when the call to **/api/v2/statements/refresh** returns a MFA challenge, Http code: **203** or when the call to this API returns another MFA challenge.\n\n## Params\n\n**bankAccountId**: Id of the bank account to be refreshed.\n**accountId**: Id of the account to be refreshed.\n**pullIndex**: Represents the month to be refreshed. Please use the same value provided during the call to **/api/v2/statements/refresh**.\n**mfaRequest**: MFA challenge that could be a simple question, an image, a multiple choice question or multiple images.\n- **mfaSession**: Provided in the response of **/api/v2/statements/refresh**\n - **mfaBody**: Wrapper for questions.\n    - **questions**: Represents different types of challenges.\n        - **text**: Challenge text. E.g *Enter name of your first pet*.\n        - **image**: Not required.\n        - **choices**: Not required.\n        - **imageChoices**: Not required.\n        - **answer**: Answer to the question in text format.",
+        "operationId": "mfaRefreshStatements",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatementMfaChallenge"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Statements were successfully refreshed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementRefreshResponse"
+                }
+              }
+            }
+          },
+          "203": {
+            "description": "Some statements require MFA",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementRefreshResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to refresh statements",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementRefreshResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/statements/convert": {
+      "post": {
+        "tags": [
+          "statement-api"
+        ],
+        "summary": "OCR a PDF bank statement and return extracted transactions as JSON",
+        "description": "Runs the standard bank-statement OCR pipeline (Gemini Vision / Google Document OCR) against the uploaded PDF and returns the extracted transactions plus reconciliation status.\n\nFiles larger than 20 MB are processed asynchronously: the response returns `async_processing=true` with no transactions, and a download link is emailed to the address provided in the `email` form field. The `email` parameter is required for files larger than 20 MB.",
+        "operationId": "convert",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementConversionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/statements/convert/{format}": {
+      "post": {
+        "tags": [
+          "statement-api"
+        ],
+        "summary": "Convert a PDF statement to XLS or QBO",
+        "operationId": "upload",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/public/phone-verification/validate": {
+      "post": {
+        "tags": [
+          "phone-verification-api"
+        ],
+        "summary": "Phone verification",
+        "operationId": "validateCode",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhoneVerificationForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Phone verified successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The data provided is incorrect",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/public/password/setup": {
+      "post": {
+        "tags": [
+          "password-api"
+        ],
+        "summary": "setup user's password",
+        "operationId": "passwordSetup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordRecoveryForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password successfully setup",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Username not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/public/password/reset": {
+      "post": {
+        "tags": [
+          "password-api"
+        ],
+        "summary": "reset user's password",
+        "operationId": "passwordReset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordRecoveryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password successfully reset",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Username not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/public/password/reset-by-email": {
+      "post": {
+        "tags": [
+          "password-api"
+        ],
+        "summary": "reset user's password",
+        "operationId": "passwordReset_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordRecoveryByEmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password successfully reset",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Username not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/public/logout": {
+      "post": {
+        "tags": [
+          "authentication-api"
+        ],
+        "summary": "Logout an authenticated user",
+        "operationId": "logout",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Logging out successful"
+          },
+          "403": {
+            "description": "Provided credentials not valid"
+          }
+        }
+      }
+    },
+    "/api/v2/public/client/add": {
+      "post": {
+        "tags": [
+          "client-api"
+        ],
+        "summary": "Adds a client to a customer given the customer's token",
+        "operationId": "addClientByToken",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddClientWithTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Client was successfully added",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Client was successfully added",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to add client",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Username already in use",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/public/authenticate": {
+      "post": {
+        "tags": [
+          "authentication-api"
+        ],
+        "summary": "Authenticates an user",
+        "operationId": "signIn",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Provided credentials not valid",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/public/authenticate-by-email": {
+      "post": {
+        "tags": [
+          "authentication-api"
+        ],
+        "summary": "Authenticates an user by email",
+        "operationId": "signInByEmail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginByEmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Provided credentials not valid",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/employee/add": {
+      "post": {
+        "tags": [
+          "employee-api"
+        ],
+        "summary": "Adds an employee to the customer",
+        "operationId": "addEmployee",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddEmployeeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Employee was successfully added",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to add employee",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/client/add": {
+      "post": {
+        "tags": [
+          "client-api"
+        ],
+        "summary": "Adds a client to the customer",
+        "operationId": "addClient",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddClientRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Client was successfully added",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Client was successfully added",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to add client",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/accounting/{platform}/transactions/rules/ai/suggest-external": {
+      "post": {
+        "tags": [
+          "accounting-ai-api"
+        ],
+        "summary": "Generate an AI rule suggestion for a single transaction",
+        "operationId": "suggestRuleExternal",
+        "parameters": [
+          {
+            "name": "platform",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalAiRuleSuggestionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "AI rule suggestion produced",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalAiRuleSuggestionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Provided credentials not valid",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalAiRuleSuggestionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/account/refresh/{bankAccountId}": {
+      "post": {
+        "tags": [
+          "account-api"
+        ],
+        "summary": "Refresh all accounts data associated to the given bank account id",
+        "operationId": "refresh",
+        "parameters": [
+          {
+            "name": "bankAccountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "addOn",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DEFAULT",
+                "FINICITY",
+                "FDE",
+                "MX"
+              ]
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bank account was successfully refreshed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Bad credentials or the authentication system is down",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to refresh bank account, or the bank account does not exist or this user may not manage it",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/account/fix": {
+      "post": {
+        "tags": [
+          "account-api"
+        ],
+        "operationId": "fixAccount",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FixAccountRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/account/add": {
+      "post": {
+        "tags": [
+          "account-api"
+        ],
+        "summary": "Returns the add account widget's URL",
+        "operationId": "addAccount",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddAccountRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the add account URL widget to be invoked by the client\n\nSet the optional **source** field to **MX** to connect a bank via MX (for banks Finicity does not support); omit it (or use FINICITY) for the default Finicity flow. When **source=MX**, widgetUrl is an MX Connect URL (moneydesktop.com) loaded with the MX Connect widget instead of the Finicity SDK below; omit institutionId to let the user search for their bank in the widget.\n\nWhen the call succeed, returning code 200, grab the content of widgetUrl and make a call to this url. See below:\n\nExample of returning JSON:\n{\n  \"status\": \"OK\",\n  \"widgetUrl\": \"https://connect.finicity.com?analytics=google%3AUA-123456789-1&customerId=53829905&partnerId=2445582741601&redirectUri=https%3A%2F%2Fce5d9f86.ngrok.io%2Fapi%2Fpublic%2Fredirect-handler&signature=4837879cbdab90530c5191bec7209719cbb25657d38b6d6e862f809d44aaf661&timestamp=1589996840006&ttl=1590004040006&type=aggregation&webhook=https%3A%2F%2Fce5d9f86.ngrok.io%2Fapi%2Fpublic%2Fwebhook-handler&webhookContentType=application%2Fjson\"\n}\n\n** Include the below script on your page ** \n\t<script&nbsp;src=\"https://connect.finicity.com/assets/sdk/finicity-connect.min.js\"></script>\n\n** Make this call to trigger the widget ** \n\t\t\twindow['finicityConnect']['connectIFrame']('**ADD THE CONTENT OF widgetUrl HERE**', {\n                            success: () => {\n                                console.log('success');\n                            },\n                            cancel : () => {\n                                console.log('cancel');\n                            },\n                            error  : () => {\n                                console.log('error');\n                            },\n                            loaded : () => {\n                                console.log('loaded');\n                            }\n                        });\n",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Bad credentials or the authentication system is down",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/account/add/lite": {
+      "post": {
+        "tags": [
+          "account-api"
+        ],
+        "summary": "Returns the add account widget's URL",
+        "operationId": "addAccountLite",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddAccountRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the add account URL widget to be invoked by the client\n\nSet the optional **source** field to **MX** to connect a bank via MX (for banks Finicity does not support); omit it (or use FINICITY) for the default Finicity flow. When **source=MX**, widgetUrl is an MX Connect URL (moneydesktop.com) loaded with the MX Connect widget instead of the Finicity SDK; omit institutionId to let the user search for their bank in the widget.\n\nCall */api/v2/institutions/provider-options* first if you do not already know which provider covers the bank.\n\nWhen the call succeed, returning code 200, grab the content of widgetUrl and make a call to this url",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The requested **source** has no connect widget (only FINICITY and MX do)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Bad credentials or the authentication system is down",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/employee/{employeeId}/update": {
+      "patch": {
+        "tags": [
+          "employee-api"
+        ],
+        "summary": "Updates employee details",
+        "operationId": "update_1",
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Employee was successfully updated"
+          },
+          "403": {
+            "description": "You are not allowed to update employee"
+          },
+          "404": {
+            "description": "Employee not found"
+          }
+        }
+      }
+    },
+    "/api/v2/employee/unlock/{username}": {
+      "patch": {
+        "tags": [
+          "employee-api"
+        ],
+        "summary": "Unlock employee access",
+        "operationId": "unlock",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employee was successfully unlocked",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to unlock employee",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/employee/lock/{username}": {
+      "patch": {
+        "tags": [
+          "employee-api"
+        ],
+        "summary": "Lock employee access",
+        "operationId": "lock",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employee was successfully locked",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to lock employee",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/client/unlock/{username}": {
+      "patch": {
+        "tags": [
+          "client-api"
+        ],
+        "summary": "Unlock client access",
+        "operationId": "unlockClient",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client was successfully unlocked",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to unlock client",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Client not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/client/lock/{username}": {
+      "patch": {
+        "tags": [
+          "client-api"
+        ],
+        "summary": "Lock client access",
+        "operationId": "lockClient",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client was successfully locked",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to lock client",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Client not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/transactions/list": {
+      "get": {
+        "tags": [
+          "transaction-api"
+        ],
+        "summary": "List accounts transactions for the given client",
+        "description": "Reads the transactions LedgerSync has stored, newest first, and never contacts the bank, so a broken connection still returns what was collected before it broke. Send source (the bank's source from the account list) and accountId for each account. Parameters not listed here, such as id, are ignored.",
+        "operationId": "getAccountsTransactions",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "description": "The client's username, as returned by the client list.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The client's username, as returned by the client list."
+            }
+          },
+          {
+            "name": "bankAccountId",
+            "in": "query",
+            "description": "Limits the response to one connection: banks[].id from the account list. Prefer accountId.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "Limits the response to one connection: banks[].id from the account list. Prefer accountId."
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "query",
+            "description": "The account's id from the account list (banks[].accounts[].id). Without accountId or bankAccountId, the response holds every visible account of the client for that source.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "The account's id from the account list (banks[].accounts[].id). Without accountId or bankAccountId, the response holds every visible account of the client for that source."
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "First day to include, yyyy-MM-dd (MM/dd/yyyy is also accepted). FINICITY filters on the posted date, MX on the transaction date; FDE ignores the date range.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "First day to include, yyyy-MM-dd (MM/dd/yyyy is also accepted). FINICITY filters on the posted date, MX on the transaction date; FDE ignores the date range.",
+              "example": "2026-07-01"
+            },
+            "example": "2026-07-01"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Last day to include, yyyy-MM-dd; the whole day is included. FDE ignores it.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Last day to include, yyyy-MM-dd; the whole day is included. FDE ignores it.",
+              "example": "2026-09-29"
+            },
+            "example": "2026-09-29"
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "description": "Returns only transactions whose description contains this text, ignoring case. For MX the bank's original description is matched too. FDE ignores it.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Returns only transactions whose description contains this text, ignoring case. For MX the bank's original description is matched too. FDE ignores it."
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number, starting at 0.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "description": "Page number, starting at 0.",
+              "maximum": 2147483647,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "rowsPerPage",
+            "in": "query",
+            "description": "10, 20 or 50. FINICITY and MX return 50 rows per page for any other value; FDE needs one of the three.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50,
+              "description": "10, 20 or 50. FINICITY and MX return 50 rows per page for any other value; FDE needs one of the three.",
+              "enum": [
+                10,
+                20,
+                50
+              ]
+            }
+          },
+          {
+            "name": "addOn",
+            "in": "query",
+            "description": "Legacy: true reads FDE when source is not sent. Use source instead.",
+            "required": false,
+            "deprecated": true,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "deprecated": true,
+              "description": "Legacy: true reads FDE when source is not sent. Use source instead."
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "description": "Bank-data provider of the account: the bank's source from the account list, in uppercase. Defaults to FINICITY, so an MX account returns no transactions unless source=MX is sent. Takes precedence over addOn.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "FINICITY",
+              "description": "Bank-data provider of the account: the bank's source from the account list, in uppercase. Defaults to FINICITY, so an MX account returns no transactions unless source=MX is sent. Takes precedence over addOn.",
+              "enum": [
+                "FINICITY",
+                "MX",
+                "FDE"
+              ]
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Accounts Transactions data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionsResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to retrieve data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/statements/list": {
+      "get": {
+        "tags": [
+          "statement-api"
+        ],
+        "summary": "List accounts statements for the given client",
+        "operationId": "listStatements",
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/StatementFilter"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statements were successfully retrieved",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to retrieve statements",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/statements/download/{statementId}": {
+      "get": {
+        "tags": [
+          "statement-api"
+        ],
+        "summary": "Download PDF statement file as byte array",
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "statementId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "addOn",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DEFAULT",
+                "FINICITY",
+                "FDE",
+                "MX"
+              ]
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statement was successfully downloaded",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to download statement",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/institutions": {
+      "get": {
+        "tags": [
+          "institution-api"
+        ],
+        "summary": "List institutions",
+        "description": "Lists the institutions supported by a given bank-data provider.\n\nSet **source** to **MX** to search the banks reachable through MX (useful for banks Finicity does not support); omit it (or use FINICITY) for the default Finicity catalog.\n\n**name** filters by institution name. Each entry's **id** is the value to pass as **institutionId** when calling */api/v2/account/add*, and **allowStatements** tells whether that institution delivers statements — pick the institution before connecting so statements are requested at connect time.",
+        "operationId": "getInstitutions",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DEFAULT",
+                "FINICITY",
+                "FDE",
+                "MX"
+              ]
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Institutions data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionsResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to retrieve data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/institutions/provider-options": {
+      "get": {
+        "tags": [
+          "institution-api"
+        ],
+        "summary": "Find which providers cover a bank",
+        "description": "Answers *which provider should I connect this bank through* - call this before */api/v2/account/add* or */api/v2/account/add/lite*.\n\n**name** searches bank names as free text. Each entry is one bank at one provider, carrying the **source** and the **id** to pass together as **source** and **institutionId** on the add call, plus **allowTransactions** and **allowStatements** so the provider that delivers the data you need can be picked.\n\nA bank reachable through two providers appears twice, once per **source**, and either may be used. An **id** is only valid for the **source** listed beside it.\n\nUnlike */api/v2/institutions*, which lists one provider's catalog at a time, this covers every provider in a single call.",
+        "operationId": "getProviderOptions",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Banks with the providers that cover them",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderOptionsResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to retrieve data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderOptionsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/employee/list": {
+      "get": {
+        "tags": [
+          "employee-api"
+        ],
+        "summary": "List all employees for the given customer",
+        "operationId": "getEmployees",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employees data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to list employees",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/client/list": {
+      "get": {
+        "tags": [
+          "client-api"
+        ],
+        "summary": "List all clients for the given customer",
+        "operationId": "getClients",
+        "parameters": [
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Clients were successfully retrieved",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to retrieve clients",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/checks": {
+      "get": {
+        "tags": [
+          "check-api"
+        ],
+        "summary": "List accounts checks for the given client",
+        "operationId": "listChecks",
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CheckFilter"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Checks were successfully retrieved",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to retrieve checks",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/account/{username}": {
+      "get": {
+        "tags": [
+          "account-api"
+        ],
+        "summary": "List all accounts for a given user",
+        "operationId": "listAccounts",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of accounts for the given user",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAccountResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Bad credentials or the authentication system is down",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/account/summary/{bank_account_id}": {
+      "get": {
+        "tags": [
+          "account-api"
+        ],
+        "summary": "Get the account summary for a given account",
+        "operationId": "getSummary",
+        "parameters": [
+          {
+            "name": "bank_account_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DEFAULT",
+                "FINICITY",
+                "FDE",
+                "MX"
+              ]
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The bank account summary",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankAccountSummaryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Bad credentials or the authentication system is down",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid bank account id",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/account/sub-accounts/{username}/{bank_account_id}": {
+      "get": {
+        "tags": [
+          "account-api"
+        ],
+        "summary": "List all sub-accounts for a given account",
+        "operationId": "listSubAccounts",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "bank_account_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DEFAULT",
+                "FINICITY",
+                "FDE",
+                "MX"
+              ]
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of accounts for the given user",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Bad credentials or the authentication system is down",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid bank account id / username",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/employee/{employeeId}/delete": {
+      "delete": {
+        "tags": [
+          "employee-api"
+        ],
+        "summary": "Deletes an employee",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employee was successfully deleted"
+          },
+          "403": {
+            "description": "You are not allowed to delete employee"
+          },
+          "404": {
+            "description": "Employee not found"
+          }
+        }
+      }
+    },
+    "/api/v2/customer/{id}": {
+      "delete": {
+        "tags": [
+          "customer-controller"
+        ],
+        "operationId": "deleteCustomer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "ticket",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deletePermanently",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client was successfully deleted",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to delete client",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Client not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/client/delete/{username}": {
+      "delete": {
+        "tags": [
+          "client-api"
+        ],
+        "summary": "Delete client",
+        "operationId": "deleteClient",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client was successfully deleted",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Failed to delete client",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Client not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/account/{bank_account_id}": {
+      "delete": {
+        "tags": [
+          "account-api"
+        ],
+        "summary": "Delete a bank account and all it's sub-accounts",
+        "operationId": "delete_1",
+        "parameters": [
+          {
+            "name": "bank_account_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DEFAULT",
+                "FINICITY",
+                "FDE",
+                "MX"
+              ]
+            }
+          },
+          {
+            "name": "Auth-Token",
+            "in": "header",
+            "description": "Authentication token provided during the authentication process",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bank account successfully deleted",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Bad credentials or the authentication system is down",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The bank account does not exist or this user may not manage it",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid bank account id",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChangePasswordRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "pattern": "(?=(.*[a-zA-Z]){3})[0-9a-zA-Z]{8,}"
+          },
+          "currentPassword": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          }
+        },
+        "required": [
+          "username"
+        ]
+      },
+      "UpdateClientRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "allowSms": {
+            "type": "boolean"
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "emails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateEmailRequest"
+            }
+          }
+        }
+      },
+      "UpdateEmailRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateAccountRequest": {
+        "type": "object",
+        "properties": {
+          "bankAccountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "description": "Bank-data provider: FINICITY (default) or MX. Omit for Finicity.",
+            "enum": [
+              "DEFAULT",
+              "FINICITY",
+              "FDE",
+              "MX"
+            ]
+          }
+        }
+      },
+      "UpdateTransactionRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1
+          },
+          "accountsIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "uniqueItems": true
+          },
+          "bankAccountId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "bankAccountId",
+          "username"
+        ]
+      },
+      "StatementRefreshRequest": {
+        "type": "object",
+        "properties": {
+          "bankAccountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "source": {
+            "type": "string",
+            "description": "Bank-data provider: FINICITY (default) or MX.",
+            "enum": [
+              "DEFAULT",
+              "FINICITY",
+              "FDE",
+              "MX"
+            ]
+          },
+          "requestParts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatementRefreshRequestPart"
+            }
+          },
+          "userInterface": {
+            "type": "string",
+            "enum": [
+              "WEB",
+              "API"
+            ]
+          },
+          "refreshCaller": {
+            "type": "string"
+          }
+        }
+      },
+      "StatementRefreshRequestPart": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pullIndex": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "MfaBody": {
+        "type": "object",
+        "properties": {
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MfaQuestion"
+            }
+          }
+        }
+      },
+      "MfaChallenge": {
+        "type": "object",
+        "properties": {
+          "mfaSession": {
+            "type": "string"
+          },
+          "mfaBody": {
+            "$ref": "#/components/schemas/MfaBody"
+          }
+        }
+      },
+      "MfaImageOption": {
+        "type": "object",
+        "properties": {
+          "imageChoice": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "MfaQuestion": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MfaTextOption"
+            }
+          },
+          "imageChoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MfaImageOption"
+            }
+          },
+          "answer": {
+            "type": "string"
+          }
+        }
+      },
+      "MfaTextOption": {
+        "type": "object",
+        "properties": {
+          "choice": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "MfaWrapper": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "string",
+            "enum": [
+              "100 CONTINUE",
+              "101 SWITCHING_PROTOCOLS",
+              "102 PROCESSING",
+              "103 EARLY_HINTS",
+              "103 CHECKPOINT",
+              "200 OK",
+              "201 CREATED",
+              "202 ACCEPTED",
+              "203 NON_AUTHORITATIVE_INFORMATION",
+              "204 NO_CONTENT",
+              "205 RESET_CONTENT",
+              "206 PARTIAL_CONTENT",
+              "207 MULTI_STATUS",
+              "208 ALREADY_REPORTED",
+              "226 IM_USED",
+              "300 MULTIPLE_CHOICES",
+              "301 MOVED_PERMANENTLY",
+              "302 FOUND",
+              "302 MOVED_TEMPORARILY",
+              "303 SEE_OTHER",
+              "304 NOT_MODIFIED",
+              "305 USE_PROXY",
+              "307 TEMPORARY_REDIRECT",
+              "308 PERMANENT_REDIRECT",
+              "400 BAD_REQUEST",
+              "401 UNAUTHORIZED",
+              "402 PAYMENT_REQUIRED",
+              "403 FORBIDDEN",
+              "404 NOT_FOUND",
+              "405 METHOD_NOT_ALLOWED",
+              "406 NOT_ACCEPTABLE",
+              "407 PROXY_AUTHENTICATION_REQUIRED",
+              "408 REQUEST_TIMEOUT",
+              "409 CONFLICT",
+              "410 GONE",
+              "411 LENGTH_REQUIRED",
+              "412 PRECONDITION_FAILED",
+              "413 PAYLOAD_TOO_LARGE",
+              "413 REQUEST_ENTITY_TOO_LARGE",
+              "414 URI_TOO_LONG",
+              "414 REQUEST_URI_TOO_LONG",
+              "415 UNSUPPORTED_MEDIA_TYPE",
+              "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+              "417 EXPECTATION_FAILED",
+              "418 I_AM_A_TEAPOT",
+              "419 INSUFFICIENT_SPACE_ON_RESOURCE",
+              "420 METHOD_FAILURE",
+              "421 DESTINATION_LOCKED",
+              "422 UNPROCESSABLE_ENTITY",
+              "423 LOCKED",
+              "424 FAILED_DEPENDENCY",
+              "425 TOO_EARLY",
+              "426 UPGRADE_REQUIRED",
+              "428 PRECONDITION_REQUIRED",
+              "429 TOO_MANY_REQUESTS",
+              "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+              "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+              "500 INTERNAL_SERVER_ERROR",
+              "501 NOT_IMPLEMENTED",
+              "502 BAD_GATEWAY",
+              "503 SERVICE_UNAVAILABLE",
+              "504 GATEWAY_TIMEOUT",
+              "505 HTTP_VERSION_NOT_SUPPORTED",
+              "506 VARIANT_ALSO_NEGOTIATES",
+              "507 INSUFFICIENT_STORAGE",
+              "508 LOOP_DETECTED",
+              "509 BANDWIDTH_LIMIT_EXCEEDED",
+              "510 NOT_EXTENDED",
+              "511 NETWORK_AUTHENTICATION_REQUIRED"
+            ]
+          },
+          "noMfaResponse": {},
+          "mfaRequest": {
+            "$ref": "#/components/schemas/MfaChallenge"
+          },
+          "errorMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "StatementRefreshInfo": {
+        "type": "object",
+        "properties": {
+          "refreshStatus": {
+            "type": "string",
+            "enum": [
+              "SUCCESS",
+              "MFA",
+              "ERROR",
+              "FAILED",
+              "STMT_NOT_AVAILABLE"
+            ]
+          },
+          "bankAccountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pullIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mfaWrapper": {
+            "$ref": "#/components/schemas/MfaWrapper"
+          }
+        }
+      },
+      "StatementRefreshResponse": {
+        "type": "object",
+        "properties": {
+          "responseList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatementRefreshInfo"
+            }
+          },
+          "errorMsg": {
+            "type": "string"
+          }
+        }
+      },
+      "StatementMfaChallenge": {
+        "type": "object",
+        "properties": {
+          "bankAccountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pullIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "source": {
+            "type": "string",
+            "description": "Bank-data provider: FINICITY (default) or MX.",
+            "enum": [
+              "DEFAULT",
+              "FINICITY",
+              "FDE",
+              "MX"
+            ]
+          },
+          "mfaChallenge": {
+            "$ref": "#/components/schemas/MfaChallenge"
+          }
+        }
+      },
+      "BankStatementConverterTransaction": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      },
+      "StatementConversionResponse": {
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BankStatementConverterTransaction"
+            }
+          },
+          "validated": {
+            "type": "boolean"
+          },
+          "validation_message": {
+            "type": "string"
+          },
+          "async_processing": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PhoneVerificationForm": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "email"
+        ]
+      },
+      "PasswordRecoveryForm": {
+        "type": "object",
+        "properties": {
+          "recoveryCode": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          }
+        },
+        "required": [
+          "password",
+          "recoveryCode"
+        ]
+      },
+      "PasswordRecoveryRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "PasswordRecoveryByEmailRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "AddClientWithTokenRequest": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "fromApi": {
+            "type": "boolean"
+          },
+          "mobile": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "name",
+          "password",
+          "token",
+          "username"
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "fromApi": {
+            "type": "boolean"
+          },
+          "ipAddress": {
+            "type": "string"
+          },
+          "userAgent": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "password",
+          "username"
+        ]
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "authToken": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "100 CONTINUE",
+              "101 SWITCHING_PROTOCOLS",
+              "102 PROCESSING",
+              "103 EARLY_HINTS",
+              "103 CHECKPOINT",
+              "200 OK",
+              "201 CREATED",
+              "202 ACCEPTED",
+              "203 NON_AUTHORITATIVE_INFORMATION",
+              "204 NO_CONTENT",
+              "205 RESET_CONTENT",
+              "206 PARTIAL_CONTENT",
+              "207 MULTI_STATUS",
+              "208 ALREADY_REPORTED",
+              "226 IM_USED",
+              "300 MULTIPLE_CHOICES",
+              "301 MOVED_PERMANENTLY",
+              "302 FOUND",
+              "302 MOVED_TEMPORARILY",
+              "303 SEE_OTHER",
+              "304 NOT_MODIFIED",
+              "305 USE_PROXY",
+              "307 TEMPORARY_REDIRECT",
+              "308 PERMANENT_REDIRECT",
+              "400 BAD_REQUEST",
+              "401 UNAUTHORIZED",
+              "402 PAYMENT_REQUIRED",
+              "403 FORBIDDEN",
+              "404 NOT_FOUND",
+              "405 METHOD_NOT_ALLOWED",
+              "406 NOT_ACCEPTABLE",
+              "407 PROXY_AUTHENTICATION_REQUIRED",
+              "408 REQUEST_TIMEOUT",
+              "409 CONFLICT",
+              "410 GONE",
+              "411 LENGTH_REQUIRED",
+              "412 PRECONDITION_FAILED",
+              "413 PAYLOAD_TOO_LARGE",
+              "413 REQUEST_ENTITY_TOO_LARGE",
+              "414 URI_TOO_LONG",
+              "414 REQUEST_URI_TOO_LONG",
+              "415 UNSUPPORTED_MEDIA_TYPE",
+              "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+              "417 EXPECTATION_FAILED",
+              "418 I_AM_A_TEAPOT",
+              "419 INSUFFICIENT_SPACE_ON_RESOURCE",
+              "420 METHOD_FAILURE",
+              "421 DESTINATION_LOCKED",
+              "422 UNPROCESSABLE_ENTITY",
+              "423 LOCKED",
+              "424 FAILED_DEPENDENCY",
+              "425 TOO_EARLY",
+              "426 UPGRADE_REQUIRED",
+              "428 PRECONDITION_REQUIRED",
+              "429 TOO_MANY_REQUESTS",
+              "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+              "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+              "500 INTERNAL_SERVER_ERROR",
+              "501 NOT_IMPLEMENTED",
+              "502 BAD_GATEWAY",
+              "503 SERVICE_UNAVAILABLE",
+              "504 GATEWAY_TIMEOUT",
+              "505 HTTP_VERSION_NOT_SUPPORTED",
+              "506 VARIANT_ALSO_NEGOTIATES",
+              "507 INSUFFICIENT_STORAGE",
+              "508 LOOP_DETECTED",
+              "509 BANDWIDTH_LIMIT_EXCEEDED",
+              "510 NOT_EXTENDED",
+              "511 NETWORK_AUTHENTICATION_REQUIRED"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "validated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LoginByEmailRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "fromApi": {
+            "type": "boolean"
+          },
+          "ipAddress": {
+            "type": "string"
+          },
+          "userAgent": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "LoginAdminRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "onBehalfOf": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1
+          },
+          "fromApi": {
+            "type": "boolean"
+          },
+          "ipAddress": {
+            "type": "string"
+          },
+          "userAgent": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "onBehalfOf",
+          "password",
+          "username"
+        ]
+      },
+      "AddEmployeeRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "pattern": "(?=(.*[a-zA-Z]){3})[0-9a-zA-Z]{8,}"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*@([a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+|\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])$"
+          }
+        },
+        "required": [
+          "email",
+          "name",
+          "password",
+          "username"
+        ]
+      },
+      "AddClientRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "allowSms": {
+            "type": "boolean"
+          },
+          "fromApi": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "email",
+          "name",
+          "password",
+          "username"
+        ]
+      },
+      "ExternalAiRuleSuggestionRequest": {
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "bestRepresentation": {
+            "type": "string"
+          },
+          "normalizedPayeeName": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "transactionType": {
+            "type": "string"
+          },
+          "memo": {
+            "type": "string"
+          },
+          "existingCategoryNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "existingVendorNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "transactionId"
+        ]
+      },
+      "ExternalAiRuleConditionDto": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "ExternalAiRuleSuggestionResponse": {
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": "string"
+          },
+          "vendorName": {
+            "type": "string"
+          },
+          "ruleName": {
+            "type": "string"
+          },
+          "applyTo": {
+            "type": "string"
+          },
+          "conditionScope": {
+            "type": "string"
+          },
+          "conditions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalAiRuleConditionDto"
+            }
+          },
+          "categoryName": {
+            "type": "string"
+          }
+        }
+      },
+      "FixAccountRequest": {
+        "type": "object",
+        "properties": {
+          "bankAccountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "redirectUri": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "description": "Bank-data provider: FINICITY (default) or MX. Omit for Finicity.",
+            "enum": [
+              "DEFAULT",
+              "FINICITY",
+              "FDE",
+              "MX"
+            ]
+          }
+        }
+      },
+      "AddAccountRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "redirectUri": {
+            "type": "string"
+          },
+          "institutionId": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "description": "Bank-data provider: FINICITY (default) or MX. Omit for Finicity. Applies to both /api/v2/account/add and /api/v2/account/add/lite. Use /api/v2/institutions/provider-options to find which providers cover a given bank.",
+            "enum": [
+              "DEFAULT",
+              "FINICITY",
+              "FDE",
+              "MX"
+            ]
+          }
+        }
+      },
+      "EmployeeUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*@([a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+|\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])$"
+          }
+        }
+      },
+      "TransactionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "LedgerSync transaction id. Ids are numbered separately per source, so store the id together with the source, or use transactionId."
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "The source and the id together, for example FINICITY_119874 or MX_628988. Unique across sources.",
+            "example": "FINICITY_119874"
+          },
+          "transactionHash": {
+            "type": "string",
+            "description": "FINICITY only; null for MX. A 32-character hash of the transaction's details that stays the same when a connection is disconnected and reconnected. Use it to match transactions across a reconnect; two identical purchases on the same day share it."
+          },
+          "postedDate": {
+            "type": "string",
+            "description": "The day the bank posted the transaction. The format depends on the source: FINICITY and FDE send yyyy-MM-ddTHH:mm:ss in UTC with no offset (read the first 10 characters as the date), MX sends MM/dd/yyyy. Null on FINICITY pending transactions. On MX pending transactions it holds the transaction date.",
+            "example": "2023-04-01T12:00:00"
+          },
+          "bankName": {
+            "type": "string"
+          },
+          "bankAccount": {
+            "type": "string"
+          },
+          "bankAccountId": {
+            "type": "string",
+            "description": "FINICITY: the provider's account id. MX: the LedgerSync connection id (banks[].id in the account list). FDE: the account code."
+          },
+          "accountNumber": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The LedgerSync account id, the same id as in the account list (banks[].accounts[].id)."
+          },
+          "status": {
+            "type": "string",
+            "description": "FINICITY: active, pending or shadow. MX: POSTED or PENDING. FDE: as FDE reports it."
+          },
+          "transactionDate": {
+            "type": "string",
+            "description": "The day the transaction happened as the bank reports it (for a card, the purchase date). Same format rules as postedDate. LedgerSync passes the bank's value through unchanged.",
+            "example": "2023-04-01T12:00:00"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "As the institution reports it. MX sends DEBIT or CREDIT."
+          },
+          "amount": {
+            "type": "number",
+            "format": "double",
+            "description": "Signed amount: negative means money out of the account."
+          },
+          "normalizePayeeName": {
+            "type": "string"
+          },
+          "categorization": {
+            "type": "string"
+          },
+          "payee": {
+            "type": "string"
+          },
+          "memo": {
+            "type": "string"
+          },
+          "currencySymbol": {
+            "type": "string"
+          },
+          "checkNum": {
+            "type": "string"
+          },
+          "runningBalance": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "TransactionsResponse": {
+        "type": "object",
+        "properties": {
+          "totalItems": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Number of matching transactions across all pages."
+          },
+          "selectedPage": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The page returned, starting at 0. A page past the end returns an empty list."
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransactionResponse"
+            }
+          }
+        }
+      },
+      "StatementFilter": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "bankAccountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "from": {
+            "type": "string",
+            "description": "MM/dd/yyyy"
+          },
+          "to": {
+            "type": "string",
+            "description": "MM/dd/yyyy"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 2147483647,
+            "minimum": 0
+          },
+          "addOn": {
+            "type": "boolean"
+          },
+          "source": {
+            "type": "string",
+            "description": "Bank-data provider: FINICITY (default) or MX. Takes precedence over addOn.",
+            "enum": [
+              "DEFAULT",
+              "FINICITY",
+              "FDE",
+              "MX"
+            ]
+          }
+        }
+      },
+      "InstitutionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Pass this value as institutionId when adding an account with the same source."
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "homeUrl": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "accountTypeDescription": {
+            "type": "string"
+          },
+          "oauthEnabled": {
+            "type": "boolean"
+          },
+          "source": {
+            "type": "string",
+            "description": "Bank-data provider this institution is reachable through.",
+            "enum": [
+              "DEFAULT",
+              "FINICITY",
+              "FDE",
+              "MX"
+            ]
+          },
+          "allowStatements": {
+            "type": "boolean",
+            "description": "Whether this institution delivers statements through the given provider."
+          },
+          "allowTransactions": {
+            "type": "boolean",
+            "description": "Whether this institution delivers transactions through the given provider."
+          }
+        }
+      },
+      "InstitutionsResponse": {
+        "type": "object",
+        "properties": {
+          "totalItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "institutions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InstitutionDto"
+            }
+          }
+        }
+      },
+      "ProviderOptionsResponse": {
+        "type": "object",
+        "properties": {
+          "totalItems": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total rows available to page through for this search."
+          },
+          "truncated": {
+            "type": "boolean",
+            "description": "True when the search matched more banks than could be returned. The answer is a prefix rather than the whole set; narrow name rather than paging further."
+          },
+          "institutions": {
+            "type": "array",
+            "description": "One entry per bank and provider pair. A bank reachable through two providers appears twice, once per source, and either may be used to connect it.",
+            "items": {
+              "$ref": "#/components/schemas/InstitutionDto"
+            }
+          }
+        }
+      },
+      "EmployeeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "employeeName": {
+            "type": "string"
+          },
+          "dateCreated": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "locked": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "EmployeeListResponse": {
+        "type": "object",
+        "properties": {
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeDto"
+            }
+          }
+        }
+      },
+      "ClientDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "emails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmailDto"
+            }
+          },
+          "firstLogin": {
+            "type": "string"
+          },
+          "lastLogin": {
+            "type": "string"
+          },
+          "numberOfAccounts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "allowSms": {
+            "type": "boolean"
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "isCustomer": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ClientListResponse": {
+        "type": "object",
+        "properties": {
+          "clients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientDto"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "100 CONTINUE",
+              "101 SWITCHING_PROTOCOLS",
+              "102 PROCESSING",
+              "103 EARLY_HINTS",
+              "103 CHECKPOINT",
+              "200 OK",
+              "201 CREATED",
+              "202 ACCEPTED",
+              "203 NON_AUTHORITATIVE_INFORMATION",
+              "204 NO_CONTENT",
+              "205 RESET_CONTENT",
+              "206 PARTIAL_CONTENT",
+              "207 MULTI_STATUS",
+              "208 ALREADY_REPORTED",
+              "226 IM_USED",
+              "300 MULTIPLE_CHOICES",
+              "301 MOVED_PERMANENTLY",
+              "302 FOUND",
+              "302 MOVED_TEMPORARILY",
+              "303 SEE_OTHER",
+              "304 NOT_MODIFIED",
+              "305 USE_PROXY",
+              "307 TEMPORARY_REDIRECT",
+              "308 PERMANENT_REDIRECT",
+              "400 BAD_REQUEST",
+              "401 UNAUTHORIZED",
+              "402 PAYMENT_REQUIRED",
+              "403 FORBIDDEN",
+              "404 NOT_FOUND",
+              "405 METHOD_NOT_ALLOWED",
+              "406 NOT_ACCEPTABLE",
+              "407 PROXY_AUTHENTICATION_REQUIRED",
+              "408 REQUEST_TIMEOUT",
+              "409 CONFLICT",
+              "410 GONE",
+              "411 LENGTH_REQUIRED",
+              "412 PRECONDITION_FAILED",
+              "413 PAYLOAD_TOO_LARGE",
+              "413 REQUEST_ENTITY_TOO_LARGE",
+              "414 URI_TOO_LONG",
+              "414 REQUEST_URI_TOO_LONG",
+              "415 UNSUPPORTED_MEDIA_TYPE",
+              "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+              "417 EXPECTATION_FAILED",
+              "418 I_AM_A_TEAPOT",
+              "419 INSUFFICIENT_SPACE_ON_RESOURCE",
+              "420 METHOD_FAILURE",
+              "421 DESTINATION_LOCKED",
+              "422 UNPROCESSABLE_ENTITY",
+              "423 LOCKED",
+              "424 FAILED_DEPENDENCY",
+              "425 TOO_EARLY",
+              "426 UPGRADE_REQUIRED",
+              "428 PRECONDITION_REQUIRED",
+              "429 TOO_MANY_REQUESTS",
+              "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+              "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+              "500 INTERNAL_SERVER_ERROR",
+              "501 NOT_IMPLEMENTED",
+              "502 BAD_GATEWAY",
+              "503 SERVICE_UNAVAILABLE",
+              "504 GATEWAY_TIMEOUT",
+              "505 HTTP_VERSION_NOT_SUPPORTED",
+              "506 VARIANT_ALSO_NEGOTIATES",
+              "507 INSUFFICIENT_STORAGE",
+              "508 LOOP_DETECTED",
+              "509 BANDWIDTH_LIMIT_EXCEEDED",
+              "510 NOT_EXTENDED",
+              "511 NETWORK_AUTHENTICATION_REQUIRED"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "EmailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "email": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "PRIMARY",
+              "ADDITIONAL"
+            ]
+          }
+        }
+      },
+      "CheckFilter": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "bankAccountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "from": {
+            "type": "string",
+            "description": "MM/dd/yyyy"
+          },
+          "to": {
+            "type": "string",
+            "description": "MM/dd/yyyy"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 2147483647,
+            "minimum": 0
+          }
+        }
+      },
+      "AccountDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "LedgerSync account id. Send it as accountId to the transaction list."
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The provider's own id for this account. Use id to identify the account in LedgerSync."
+          },
+          "name": {
+            "type": "string"
+          },
+          "lastTransactionRefreshDate": {
+            "type": "string"
+          },
+          "lastStatementRefreshDate": {
+            "type": "string"
+          },
+          "lastTransactionDate": {
+            "type": "string"
+          },
+          "oldestTransactionDate": {
+            "type": "string"
+          },
+          "accountNumber": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "accountNumberDisplay": {
+            "type": "string"
+          }
+        }
+      },
+      "BankAccountDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Connection id. Numbered separately per source."
+          },
+          "name": {
+            "type": "string"
+          },
+          "lastTransactionUpdateDate": {
+            "type": "string"
+          },
+          "lastStatementUpdateDate": {
+            "type": "string"
+          },
+          "lastFdeUpdateDate": {
+            "type": "string"
+          },
+          "transactionUpdateStatus": {
+            "type": "string",
+            "description": "Result of the latest transaction refresh, for example UPDATED or FAILED. FAILED together with transactionErrorMessage means the connection needs attention; its stored transactions are still returned by the transaction list."
+          },
+          "statementUpdateStatus": {
+            "type": "string"
+          },
+          "fdeUpdateStatus": {
+            "type": "string"
+          },
+          "bankImageUrl": {
+            "type": "string"
+          },
+          "institutionId": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "description": "The data provider of this connection: FINICITY, MX, FDE or PDF. Send it as source to the transaction list for this connection's accounts. PDF connections are not served by the transaction list.",
+            "example": "FINICITY"
+          },
+          "statementErrorMessage": {
+            "type": "string"
+          },
+          "transactionErrorMessage": {
+            "type": "string"
+          },
+          "fdeErrorMessage": {
+            "type": "string"
+          },
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountDto"
+            }
+          },
+          "balanceUpdateStatus": {
+            "type": "string"
+          },
+          "balanceUpdateErrorMsg": {
+            "type": "string"
+          },
+          "aggregationStatusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "initialRefreshStatus": {
+            "type": "string"
+          },
+          "allowStatements": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ListAccountResponse": {
+        "type": "object",
+        "properties": {
+          "banks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BankAccountDto"
+            }
+          },
+          "finCustomerId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "100 CONTINUE",
+              "101 SWITCHING_PROTOCOLS",
+              "102 PROCESSING",
+              "103 EARLY_HINTS",
+              "103 CHECKPOINT",
+              "200 OK",
+              "201 CREATED",
+              "202 ACCEPTED",
+              "203 NON_AUTHORITATIVE_INFORMATION",
+              "204 NO_CONTENT",
+              "205 RESET_CONTENT",
+              "206 PARTIAL_CONTENT",
+              "207 MULTI_STATUS",
+              "208 ALREADY_REPORTED",
+              "226 IM_USED",
+              "300 MULTIPLE_CHOICES",
+              "301 MOVED_PERMANENTLY",
+              "302 FOUND",
+              "302 MOVED_TEMPORARILY",
+              "303 SEE_OTHER",
+              "304 NOT_MODIFIED",
+              "305 USE_PROXY",
+              "307 TEMPORARY_REDIRECT",
+              "308 PERMANENT_REDIRECT",
+              "400 BAD_REQUEST",
+              "401 UNAUTHORIZED",
+              "402 PAYMENT_REQUIRED",
+              "403 FORBIDDEN",
+              "404 NOT_FOUND",
+              "405 METHOD_NOT_ALLOWED",
+              "406 NOT_ACCEPTABLE",
+              "407 PROXY_AUTHENTICATION_REQUIRED",
+              "408 REQUEST_TIMEOUT",
+              "409 CONFLICT",
+              "410 GONE",
+              "411 LENGTH_REQUIRED",
+              "412 PRECONDITION_FAILED",
+              "413 PAYLOAD_TOO_LARGE",
+              "413 REQUEST_ENTITY_TOO_LARGE",
+              "414 URI_TOO_LONG",
+              "414 REQUEST_URI_TOO_LONG",
+              "415 UNSUPPORTED_MEDIA_TYPE",
+              "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+              "417 EXPECTATION_FAILED",
+              "418 I_AM_A_TEAPOT",
+              "419 INSUFFICIENT_SPACE_ON_RESOURCE",
+              "420 METHOD_FAILURE",
+              "421 DESTINATION_LOCKED",
+              "422 UNPROCESSABLE_ENTITY",
+              "423 LOCKED",
+              "424 FAILED_DEPENDENCY",
+              "425 TOO_EARLY",
+              "426 UPGRADE_REQUIRED",
+              "428 PRECONDITION_REQUIRED",
+              "429 TOO_MANY_REQUESTS",
+              "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+              "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+              "500 INTERNAL_SERVER_ERROR",
+              "501 NOT_IMPLEMENTED",
+              "502 BAD_GATEWAY",
+              "503 SERVICE_UNAVAILABLE",
+              "504 GATEWAY_TIMEOUT",
+              "505 HTTP_VERSION_NOT_SUPPORTED",
+              "506 VARIANT_ALSO_NEGOTIATES",
+              "507 INSUFFICIENT_STORAGE",
+              "508 LOOP_DETECTED",
+              "509 BANDWIDTH_LIMIT_EXCEEDED",
+              "510 NOT_EXTENDED",
+              "511 NETWORK_AUTHENTICATION_REQUIRED"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "accountId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "CHECKING",
+              "SAVINGS",
+              "CD",
+              "MONEY_MARKET",
+              "CREDIT_CARD",
+              "BANK",
+              "LINE_OF_CREDIT",
+              "INVESTMENT",
+              "INVESTMENT_TAX_DEFERRED",
+              "EMPLOYEE_STOCK_PURCHASE_PLAN",
+              "IRA",
+              "ROTH",
+              "ROLLOVER",
+              "UGMA",
+              "UTMA",
+              "KEOGH",
+              "MORTGAGE",
+              "LOAN",
+              "PLAN_401K",
+              "PLAN_403B",
+              "PLAN_529",
+              "PLAN_457",
+              "PLAN_401A",
+              "DEFAULT"
+            ]
+          },
+          "balance": {
+            "type": "number",
+            "format": "double"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdDate": {
+            "type": "string"
+          },
+          "lastTransactionRefreshDate": {
+            "type": "string"
+          },
+          "lastStatementRefreshDate": {
+            "type": "string"
+          },
+          "balanceUpdateStatus": {
+            "type": "string"
+          },
+          "lastTransactionDate": {
+            "type": "string"
+          },
+          "accountNumber": {
+            "type": "string"
+          },
+          "accountCode": {
+            "type": "string"
+          },
+          "lastStatementDate": {
+            "type": "string"
+          },
+          "balanceDate": {
+            "type": "string"
+          },
+          "isHidden": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AccountSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "CHECKING",
+              "SAVINGS",
+              "CD",
+              "MONEY_MARKET",
+              "CREDIT_CARD",
+              "BANK",
+              "LINE_OF_CREDIT",
+              "INVESTMENT",
+              "INVESTMENT_TAX_DEFERRED",
+              "EMPLOYEE_STOCK_PURCHASE_PLAN",
+              "IRA",
+              "ROTH",
+              "ROLLOVER",
+              "UGMA",
+              "UTMA",
+              "KEOGH",
+              "MORTGAGE",
+              "LOAN",
+              "PLAN_401K",
+              "PLAN_403B",
+              "PLAN_529",
+              "PLAN_457",
+              "PLAN_401A",
+              "DEFAULT"
+            ]
+          },
+          "account": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountResponse"
+            }
+          },
+          "total": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "BankAccountSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "100 CONTINUE",
+              "101 SWITCHING_PROTOCOLS",
+              "102 PROCESSING",
+              "103 EARLY_HINTS",
+              "103 CHECKPOINT",
+              "200 OK",
+              "201 CREATED",
+              "202 ACCEPTED",
+              "203 NON_AUTHORITATIVE_INFORMATION",
+              "204 NO_CONTENT",
+              "205 RESET_CONTENT",
+              "206 PARTIAL_CONTENT",
+              "207 MULTI_STATUS",
+              "208 ALREADY_REPORTED",
+              "226 IM_USED",
+              "300 MULTIPLE_CHOICES",
+              "301 MOVED_PERMANENTLY",
+              "302 FOUND",
+              "302 MOVED_TEMPORARILY",
+              "303 SEE_OTHER",
+              "304 NOT_MODIFIED",
+              "305 USE_PROXY",
+              "307 TEMPORARY_REDIRECT",
+              "308 PERMANENT_REDIRECT",
+              "400 BAD_REQUEST",
+              "401 UNAUTHORIZED",
+              "402 PAYMENT_REQUIRED",
+              "403 FORBIDDEN",
+              "404 NOT_FOUND",
+              "405 METHOD_NOT_ALLOWED",
+              "406 NOT_ACCEPTABLE",
+              "407 PROXY_AUTHENTICATION_REQUIRED",
+              "408 REQUEST_TIMEOUT",
+              "409 CONFLICT",
+              "410 GONE",
+              "411 LENGTH_REQUIRED",
+              "412 PRECONDITION_FAILED",
+              "413 PAYLOAD_TOO_LARGE",
+              "413 REQUEST_ENTITY_TOO_LARGE",
+              "414 URI_TOO_LONG",
+              "414 REQUEST_URI_TOO_LONG",
+              "415 UNSUPPORTED_MEDIA_TYPE",
+              "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+              "417 EXPECTATION_FAILED",
+              "418 I_AM_A_TEAPOT",
+              "419 INSUFFICIENT_SPACE_ON_RESOURCE",
+              "420 METHOD_FAILURE",
+              "421 DESTINATION_LOCKED",
+              "422 UNPROCESSABLE_ENTITY",
+              "423 LOCKED",
+              "424 FAILED_DEPENDENCY",
+              "425 TOO_EARLY",
+              "426 UPGRADE_REQUIRED",
+              "428 PRECONDITION_REQUIRED",
+              "429 TOO_MANY_REQUESTS",
+              "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+              "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+              "500 INTERNAL_SERVER_ERROR",
+              "501 NOT_IMPLEMENTED",
+              "502 BAD_GATEWAY",
+              "503 SERVICE_UNAVAILABLE",
+              "504 GATEWAY_TIMEOUT",
+              "505 HTTP_VERSION_NOT_SUPPORTED",
+              "506 VARIANT_ALSO_NEGOTIATES",
+              "507 INSUFFICIENT_STORAGE",
+              "508 LOOP_DETECTED",
+              "509 BANDWIDTH_LIMIT_EXCEEDED",
+              "510 NOT_EXTENDED",
+              "511 NETWORK_AUTHENTICATION_REQUIRED"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "source": {
+            "type": "string",
+            "description": "Which provider this connection is on: FINICITY, MX, FDE or PDF. The same value the account list returns for this connection, and the value to send as the source parameter on the other per-connection calls."
+          },
+          "customerId": {
+            "type": "string"
+          },
+          "bankAccount": {
+            "type": "string",
+            "description": "The provider's own identifier for this connection: the institution login id for Finicity, the member guid for MX, the account code for FDE."
+          },
+          "name": {
+            "type": "string"
+          },
+          "addedBy": {
+            "type": "string",
+            "description": "Username of the accounting firm the connection was added under, recorded when the connection was created: the firm itself when the firm owns the connection, otherwise the client's firm. It is not the person who completed the bank login. For FDE connections it is the username of the connection's owner."
+          },
+          "institutionUrl": {
+            "type": "string"
+          },
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountSummaryResponse"
+            }
+          },
+          "extractTransactionsFrom": {
+            "type": "string"
+          },
+          "extractStatementsFrom": {
+            "type": "string"
+          },
+          "accountCode": {
+            "type": "string",
+            "description": "FDE connections only: the FDE account code, the same value as bankAccount. Omitted for Finicity and MX connections, whose identifier is in bankAccount."
+          },
+          "customerCode": {
+            "type": "string"
+          },
+          "statusType": {
+            "type": "string"
+          },
+          "statusMessage": {
+            "type": "string"
+          },
+          "balanceUpdateStatus": {
+            "type": "string"
+          },
+          "balanceUpdateErrorMsg": {
+            "type": "string"
+          },
+          "aggregationStatusCode": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,298 @@
+---
+title: "Transactions"
+description: "List a client's banks and accounts, then page through each account's stored transactions."
+---
+
+Reading a client's transactions takes two calls. `GET /api/v2/account/{username}` lists the client's banks, with each bank's `source` and the `id` of each account. `GET /api/v2/transactions/list` then returns the transactions LedgerSync has stored for an account, newest first, one page at a time.
+
+<Info>
+  **Base URL:** `https://ledgersyncappv2.com` &nbsp;·&nbsp; **Sandbox:** `https://staging.ledgersyncappv2.com`, same paths, with its own sign-up at `https://staging.ledgersyncappv2.com/sign-up` &nbsp;·&nbsp; **Auth:** sign in with `POST /api/v2/public/authenticate` and send the `authToken` it returns as the `Auth-Token` header on every call. See [v2 authentication](/v2/authentication).
+</Info>
+
+## How to call it
+
+<Steps>
+  <Step title="List the client's banks and accounts">
+    Put the client's username in the path. It is the username `GET /api/v2/client/list` returns.
+
+    ```bash
+    curl "https://ledgersyncappv2.com/api/v2/account/jane@example.com" \
+      -H "Auth-Token: $LS_TOKEN"
+    ```
+
+    ```json Response (trimmed)
+    {
+      "banks": [
+        {
+          "id": 276,
+          "name": "FinBank",
+          "transactionUpdateStatus": "UPDATED",
+          "source": "FINICITY",
+          "transactionErrorMessage": "",
+          "accounts": [
+            { "id": 654, "accountId": "7000123456", "name": "Checking", "accountNumber": "1111" }
+          ]
+        },
+        {
+          "id": 905,
+          "name": "MX Bank",
+          "transactionUpdateStatus": "UPDATED",
+          "source": "MX",
+          "transactionErrorMessage": null,
+          "accounts": [
+            { "id": 8810, "accountId": "ACT-5b6f2a8e-1c3d-4e7f-9a0b-2c4d6e8f0a1b", "name": "Credit Card", "accountNumber": "4321" }
+          ]
+        }
+      ],
+      "status": "OK"
+    }
+    ```
+
+    Each entry in `banks` is one bank connection. Keep two values from it: the bank's `source` (`FINICITY`, `MX`, `FDE` or `PDF`) and the `id` of each account in `accounts`.
+  </Step>
+  <Step title="List each account's transactions">
+    For every account, send the bank's `source` in uppercase and the account's `id` as `accountId`:
+
+    ```bash
+    curl "https://ledgersyncappv2.com/api/v2/transactions/list?username=jane@example.com&source=MX&accountId=8810&from=2026-07-01&to=2026-09-29&page=0" \
+      -H "Auth-Token: $LS_TOKEN"
+    ```
+
+    <Warning>
+      `source` defaults to `FINICITY`. Leave it out for an MX account and the call reads FINICITY data instead: it answers `200`, without that account's transactions and without an error. Always send the `source` of the account's bank.
+    </Warning>
+
+    A `PDF` bank cannot be read here: `source` takes `FINICITY`, `MX` or `FDE` only.
+  </Step>
+  <Step title="Read every page">
+    `page` starts at 0. Ask for the next page until one comes back with fewer rows than `rowsPerPage` (50 unless you set it). See [Paging](#paging).
+  </Step>
+  <Step title="Store each row under its transactionId">
+    Upsert on `transactionId`, so reading the same days again updates the rows you already have instead of adding copies. See [Choosing a transaction key](#choosing-a-transaction-key).
+  </Step>
+</Steps>
+
+## Example: a FINICITY account
+
+<CodeGroup>
+```bash Request
+curl "https://ledgersyncappv2.com/api/v2/transactions/list?username=jane@example.com&source=FINICITY&accountId=654&from=2026-07-01&to=2026-09-29&page=0" \
+  -H "Auth-Token: $LS_TOKEN"
+```
+
+```json Response (trimmed)
+{
+  "totalItems": 137,
+  "selectedPage": 0,
+  "transactions": [
+    {
+      "id": 119874,
+      "transactionId": "FINICITY_119874",
+      "transactionHash": "3f9a1c0e7b2d4a6f8e5c1b0a9d7e6f42",
+      "postedDate": "2026-09-28T12:00:00",
+      "bankName": "FinBank",
+      "bankAccount": "Checking",
+      "bankAccountId": "7000123456",
+      "accountId": 654,
+      "status": "active",
+      "transactionDate": "2026-09-27T12:00:00",
+      "description": "COFFEE HOUSE #221",
+      "type": "debit",
+      "amount": -42.17
+    },
+    {
+      "id": 119870,
+      "transactionId": "FINICITY_119870",
+      "transactionHash": "8c2e0b7d1f4a3c6e9b5d0a2f7e1c4b38",
+      "postedDate": "2026-09-26T12:00:00",
+      "bankName": "FinBank",
+      "bankAccount": "Checking",
+      "bankAccountId": "7000123456",
+      "accountId": 654,
+      "status": "active",
+      "transactionDate": "2026-09-26T12:00:00",
+      "description": "PAYROLL ACME INC",
+      "type": "direct deposit",
+      "amount": 1500.0
+    }
+  ]
+}
+```
+</CodeGroup>
+
+- Dates are `yyyy-MM-ddTHH:mm:ss` in UTC with no offset. Read the first 10 characters as the date.
+- `bankAccountId` in a FINICITY row is the provider's account id, the same value as `accounts[].accountId` in the account list.
+- FINICITY pending rows have `postedDate: null`, so this request, which sends `from` and `to`, leaves them out. See [Dates](#dates).
+
+## Example: an MX account
+
+<CodeGroup>
+```bash Request
+curl "https://ledgersyncappv2.com/api/v2/transactions/list?username=jane@example.com&source=MX&accountId=8810&from=2026-07-01&to=2026-09-29&page=0" \
+  -H "Auth-Token: $LS_TOKEN"
+```
+
+```json Response (trimmed)
+{
+  "totalItems": 64,
+  "selectedPage": 0,
+  "transactions": [
+    {
+      "id": 731204,
+      "transactionId": "MX_731204",
+      "transactionHash": null,
+      "postedDate": "09/28/2026",
+      "bankName": "MX Bank",
+      "bankAccount": "Credit Card",
+      "bankAccountId": "905",
+      "accountId": 8810,
+      "status": "PENDING",
+      "transactionDate": "09/28/2026",
+      "description": "GAS STATION 0412",
+      "type": "DEBIT",
+      "amount": -35.5
+    },
+    {
+      "id": 731198,
+      "transactionId": "MX_731198",
+      "transactionHash": null,
+      "postedDate": "09/27/2026",
+      "bankName": "MX Bank",
+      "bankAccount": "Credit Card",
+      "bankAccountId": "905",
+      "accountId": 8810,
+      "status": "POSTED",
+      "transactionDate": "09/25/2026",
+      "description": "PAYMENT THANK YOU",
+      "type": "CREDIT",
+      "amount": 250.0
+    }
+  ]
+}
+```
+</CodeGroup>
+
+- Dates are `MM/dd/yyyy`.
+- The `PENDING` row has no posted date yet, so its `postedDate` holds its transaction date.
+- `transactionHash` is always `null` on MX rows.
+- `bankAccountId` in an MX row is the LedgerSync connection id, the same value as `banks[].id` in the account list.
+
+## Parameters
+
+| Parameter | Required | What it does |
+| --- | --- | --- |
+| `username` | Yes | The client's username. |
+| `source` | No | `FINICITY`, `MX` or `FDE`, in uppercase: the `source` of the account's bank. Defaults to `FINICITY`. |
+| `accountId` | No | The account's `id` from the account list (`banks[].accounts[].id`). Returns that account only. |
+| `bankAccountId` | No | A connection's `id` from the account list (`banks[].id`). Returns every account of that connection. Ignored when `accountId` is sent. Prefer `accountId`. |
+| `from` | No | First day to include, `yyyy-MM-dd` or `MM/dd/yyyy`. |
+| `to` | No | Last day to include, same formats. The whole day is included. |
+| `description` | No | Only rows whose description contains this text, ignoring case. |
+| `page` | No | Page number, starting at 0. Default 0. |
+| `rowsPerPage` | No | 10, 20 or 50. Default 50. |
+| `addOn` | No | Legacy. `true` reads FDE when `source` is not sent. Use `source` instead. |
+
+Without `accountId` or `bankAccountId`, the response holds every account of the client for that source. An `accountId` that is not one of this client's accounts for that source returns `200` with no rows. Parameters this endpoint does not define, such as `id`, are ignored.
+
+What each parameter does depends on the source:
+
+| | FINICITY | MX | FDE |
+| --- | --- | --- | --- |
+| `from` and `to` filter on | the posted date | the transaction date | nothing, the range is ignored |
+| `description` matches | the description | the description or the bank's original description | nothing, it is ignored |
+| `rowsPerPage` other than 10, 20 or 50 | returns 50 rows | returns 50 rows | must be 10, 20 or 50 |
+| Rows come | newest posted date first | newest transaction date first | newest posted date first |
+
+## Dates
+
+- FINICITY and FDE send `postedDate` and `transactionDate` as `yyyy-MM-ddTHH:mm:ss` in UTC with no offset, for example `2026-09-28T12:00:00`. Read the first 10 characters as the date.
+- MX sends `MM/dd/yyyy`, for example `09/28/2026`.
+- `postedDate` is the day the bank posted the transaction. `transactionDate` is the day it happened, for a card the purchase date. Both are the bank's own values: LedgerSync does not adjust them.
+- `from` and `to` are both included.
+- FINICITY pending rows have `postedDate: null`. A request with `from` or `to` leaves them out. Omit both dates to include them.
+- MX pending rows carry their transaction date in `postedDate`, and for MX `from` and `to` filter on the transaction date, so they stay in range.
+
+## Paging
+
+- `page` starts at 0. `rowsPerPage` is 10, 20 or 50, default 50.
+- `totalItems` counts every matching transaction across all pages. `selectedPage` is the page you asked for.
+- A page past the end returns an empty `transactions` list with the same `totalItems`.
+- To read everything, request page 0, 1, 2 and so on until a page holds fewer rows than `rowsPerPage`.
+
+## Broken connections
+
+The transaction list reads only what LedgerSync has stored and never contacts the bank. A broken connection still returns every transaction collected before it broke, and one connection's status never affects another connection's transactions.
+
+Connection health is in the account list:
+
+| Field | What it tells you |
+| --- | --- |
+| `banks[].transactionUpdateStatus` | `UPDATED`, or `FAILED` when the connection needs attention. For FINICITY it is the result of the latest transaction refresh and can also be `UPDATING` or `WARNING`. For MX it is `UPDATED` while MX reports the connection as connected and `FAILED` otherwise. |
+| `banks[].transactionErrorMessage` | Why, when there is a problem. |
+
+A `FAILED` connection keeps its stored transactions, and the transaction list keeps returning them.
+
+## Ids
+
+| Field | What it is |
+| --- | --- |
+| `banks[].id` | The connection. Numbered separately per source. |
+| `banks[].accounts[].id` | The account. Numbered separately per source. Send it as `accountId`. |
+| `banks[].accounts[].accountId` | The provider's own id for the account. |
+| `transactions[].id` | The transaction. Numbered separately per source. |
+| `transactions[].transactionId` | The source and the id together, such as `FINICITY_119874` or `MX_731204`. Unique across sources. |
+| `transactions[].accountId` | The account, the same value as `banks[].accounts[].id`. |
+| `transactions[].bankAccountId` | Depends on the source. FINICITY: the provider's account id (`banks[].accounts[].accountId`). MX: the connection id (`banks[].id`). FDE: the account code (`banks[].accounts[].accountId`). |
+
+<Warning>
+  Because ids are numbered separately per source, the same number can name a FINICITY account and an MX account. Sending the wrong `source` returns no rows, or the rows of a different account that has that id under that source. Always send the `source` of the account's bank.
+</Warning>
+
+<Note>
+  The `bankAccountId` request parameter is always a connection id (`banks[].id`). The `bankAccountId` field in a transaction row is not: it means something different per source, as the table shows.
+</Note>
+
+## Transaction fields
+
+| Field | FINICITY | MX |
+| --- | --- | --- |
+| `status` | `active`, `pending` or `shadow` | `POSTED` or `PENDING` |
+| `postedDate` | The posting day. `null` while pending. | The posting day, or the transaction day when MX sends none, as on pending rows. |
+| `transactionDate` | The day it happened, when the bank sends it. | The day it happened. |
+| `transactionHash` | 32 characters, can be `null` | Always `null` |
+| `type` | The bank's type in lowercase words, see below. An empty string when the bank sent none. | `DEBIT` or `CREDIT` |
+| `amount` | Negative is money out of the account. | Negative is money out of the account. |
+| `bankName` | The connection's name: the bank's name unless the connection was renamed. | The bank's name. |
+| `bankAccount` | The account's name. | The account's name. |
+
+FINICITY `type` values: `atm`, `cash`, `check`, `credit`, `debit`, `deposit`, `direct debit`, `direct deposit`, `dividend`, `fee`, `interest`, `other`, `payment`, `point of sale`, `repeat payment`, `service charge`, `transfer`.
+
+Rows also carry `accountNumber`, `normalizePayeeName`, `categorization`, `payee`, `memo`, `currencySymbol`, `checkNum` and `runningBalance`. Any of them can be `null`.
+
+## Choosing a transaction key
+
+Store `transactionId`. It joins the source and the id, so it is unique across sources. A refresh updates the stored row in place, so a FINICITY or MX transaction keeps its `transactionId` for as long as the bank keeps reporting it.
+
+- If you store `id` instead, store `source` with it: `FINICITY` 119874 and `MX` 119874 can both exist.
+- Do not use `transactionHash` as the key. It is built from the account's last 4 digits, the transaction date, the first 30 characters of the description, the amount and the type, so two identical purchases on the same day share it. MX rows have none, and a FINICITY row has none when its account number has fewer than 4 digits or it has no transaction date.
+
+A transaction can still come back under a new `transactionId`:
+
+| What happened | What you see | What to do |
+| --- | --- | --- |
+| A pending transaction settled as a new record (both sources) | A new settled row with a new `transactionId`. The pending row drops out of later responses. | Remove the pending row you stored. See [Transaction status](/v2/transaction-status). |
+| FINICITY marked a transaction `shadow` | The old row comes back with `status: "shadow"`. Any corrected transaction is a separate row. | Hide or remove the shadow row. |
+| A FINICITY bank was deleted and connected again | New connection, account and transaction ids for everything. | Match on `transactionHash`. It is computed from the transaction's details, so it comes out the same after the reconnect and tells you which transactions you already have. |
+
+## Statuses
+
+FINICITY rows carry `active`, `pending` or `shadow`. MX rows carry `POSTED` or `PENDING`. Book settled rows (`active`, `POSTED`), hold pending ones, and leave out `shadow` rows. [Transaction status](/v2/transaction-status) explains each value and how pending rows settle.
+
+## Errors and empty answers
+
+| Answer | Why |
+| --- | --- |
+| `401` `User not authorized to perform request!` | The request has no `Auth-Token` header. |
+| `401` `Token has expired!` | The token is invalid or expired. Sign in again. |
+| `403` | The signed-in user cannot read this client's data. The transaction list answers with the text `You are not allowed to retrieve data`. |
+| `200` with `totalItems: 0` | `source` is not the source of the account's bank, or `accountId` is not one of this client's accounts for that source. |

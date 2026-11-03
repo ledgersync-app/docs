@@ -1,0 +1,159 @@
+---
+title: "Testing in the sandbox"
+description: "Test a v2 integration end to end: get a sandbox account, link the FinBank, MX Bank and Ledgersync Bank test banks, and read their data back."
+---
+
+The sandbox is a separate LedgerSync environment for building and testing a v2 integration. It answers the same `/api/v2/...` paths as production on its own host, and it links the aggregators' test banks instead of real ones: Finicity's **FinBank**, MX's **MX Bank** and FDE's **Ledgersync Bank**. You sign in to them with test logins, then read the results back with the same calls you will use in production.
+
+<Info>
+  **Sandbox:** `https://staging.ledgersyncappv2.com` · **Production:** `https://ledgersyncappv2.com` · The paths are the same on both hosts, for example `POST https://staging.ledgersyncappv2.com/api/v2/public/authenticate`.
+</Info>
+
+## Get a sandbox account
+
+<Steps>
+  <Step title="Sign up in the sandbox">
+    Create an account at [staging.ledgersyncappv2.com/sign-up](https://staging.ledgersyncappv2.com/sign-up). The sandbox and production keep separate accounts and separate data, so signing up in one does not give you an account in the other.
+  </Step>
+  <Step title="Authenticate against the sandbox host">
+    Call `POST /api/v2/public/authenticate` on the sandbox host with that account, then send the `authToken` it returns in the `Auth-Token` header of every other call. See [Authentication](/v2/authentication) for the details. The examples on this page assume:
+
+    ```bash
+    export LS_BASE="https://staging.ledgersyncappv2.com"
+    export LS_TOKEN="<authToken from /api/v2/public/authenticate>"
+    ```
+  </Step>
+  <Step title="Add a test client">
+    The add, account list and transaction calls below all name the client by its `username`. Add a client with `POST /api/v2/client/add` and use its `username` (here `jane.client`).
+  </Step>
+</Steps>
+
+## The sandbox test banks
+
+| Source | Test bank | Test login | How to link it |
+| --- | --- | --- | --- |
+| `FINICITY` | FinBank | `demo` / `go` | `POST /api/v2/account/add` without `source` |
+| `MX` | MX Bank | `mxuser` / `correct` | `POST /api/v2/account/add` with `"source": "MX"` |
+| `FDE` | Ledgersync Bank | any username and password | Only in the sandbox web app: the v2 API cannot open FDE connections |
+
+- **Finicity reaches FinBank only.** The sandbox registers its clients with Finicity as testing customers, and Mastercard lets testing customers use its FinBank test institutions only, never a real bank. The widget is Mastercard Connect on `connect2.finicity.com`.
+- **MX Bank is MX's test bank.** The sandbox uses MX's integration environment: its widget runs on `int-widgets.moneydesktop.com`, and MX Bank's institution code there is `mxbank`.
+- **FDE has no separate test environment.** The sandbox uses the same FDE service as production, so link only Ledgersync Bank there, never a real bank login.
+
+<Note>
+  Avoid one client name: a client whose name has `Active` as its second word (for example `Jane Active`) is registered with Finicity as a billable customer instead of a testing one, and billable customers cannot use FinBank.
+</Note>
+
+<Tip>
+  Mastercard and MX publish more test logins for these two banks, such as MFA prompts and refused sign-ins. The v3 [Testing in sandbox](/guides/testing) page lists them. They behave the same here, because the v2 sandbox opens the same Finicity and MX test widgets. Only what v3 reports afterwards, such as its webhooks and connection statuses, is specific to v3.
+</Tip>
+
+## Link FinBank (Finicity)
+
+<Steps>
+  <Step title="Get a widget URL">
+    ```bash
+    curl -X POST "$LS_BASE/api/v2/account/add" \
+      -H "Auth-Token: $LS_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"username": "jane.client", "redirectUri": "https://yourapp.example.com/bank-linked"}'
+    ```
+
+    ```json
+    {
+      "status": "OK",
+      "widgetUrl": "https://connect2.finicity.com?customerId=...&partnerId=...&redirectUri=...&signature=..."
+    }
+    ```
+
+    <Warning>
+      Always send `redirectUri` for Finicity. Mastercard returns the browser there when the user finishes, and in the sandbox a Finicity add call without it fails with HTTP `500`.
+    </Warning>
+  </Step>
+  <Step title="Sign in to FinBank">
+    Open `widgetUrl` in a browser within two hours, which is how long Mastercard keeps the link valid. After Mastercard's opening screens, search for **FinBank** and pick the row named exactly **FinBank**. The search also lists Mastercard's FinBank variants for edge cases, and FinBank Billable is not open to testing customers.
+
+    Sign in with `demo` / `go` (`customer1` / `go` also works). No MFA question is asked. Choose the accounts to share and finish.
+  </Step>
+  <Step title="Find the new connection">
+    LedgerSync records the connection when Finicity reports it, so it can take a moment to appear after the user finishes. Then `GET /api/v2/account/jane.client` lists it under `banks` with `"source": "FINICITY"`, and each of its `accounts[].id` is an `accountId` for List Transactions.
+  </Step>
+  <Step title="Read the transactions">
+    ```bash
+    curl "$LS_BASE/api/v2/transactions/list?username=jane.client&source=FINICITY&accountId=$ACCOUNT_ID&page=0" \
+      -H "Auth-Token: $LS_TOKEN"
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  To skip Mastercard's bank search, call `POST /api/v2/account/add/lite` with the same body plus `"institutionId": "101732"`. That is FinBank's id in Finicity's catalog, and the `id` that `GET /api/v2/institutions?name=FinBank` returns for the row named FinBank. The widget then opens straight on FinBank.
+</Tip>
+
+**What FinBank data looks like.** A new FinBank connection comes with posted transactions from about the three months before you linked it, plus a few pending ones. Pending rows have the status `pending` and no posted date, so a request with `from` and `to` leaves them out: leave both dates off to see them. Dates come back as `yyyy-MM-ddTHH:mm:ss` in UTC, with no offset.
+
+## Link MX Bank (MX)
+
+<Steps>
+  <Step title="Get an MX widget URL">
+    ```bash
+    curl -X POST "$LS_BASE/api/v2/account/add" \
+      -H "Auth-Token: $LS_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"username": "jane.client", "source": "MX", "institutionId": "mxbank"}'
+    ```
+
+    `widgetUrl` is now an MX Connect URL. With `"institutionId": "mxbank"` it opens on MX Bank and skips MX's bank search; leave it out to search in the widget. MX does not use `redirectUri`.
+  </Step>
+  <Step title="Sign in to MX Bank">
+    Open `widgetUrl` and sign in with `mxuser` / `correct`.
+  </Step>
+  <Step title="Read it with source=MX">
+    Once MX reports the new connection, `GET /api/v2/account/jane.client` lists it with `"source": "MX"`. Send `source=MX` to List Transactions for its accounts.
+  </Step>
+</Steps>
+
+<Warning>
+  Without `source=MX`, List Transactions reads FINICITY data, so an MX Bank account answers `200` with `totalItems: 0` and no error.
+</Warning>
+
+MX Bank rows have the status `POSTED` or `PENDING` and dates in `MM/dd/yyyy`. `from` and `to` filter on the transaction date, and a pending row carries its transaction date in `postedDate`.
+
+## Ledgersync Bank (FDE)
+
+FDE has no connect widget, so `POST /api/v2/account/add` and `POST /api/v2/account/add/lite` answer `422` for `"source": "FDE"`. The v2 API still reads FDE connections, so create the test connection in the sandbox web app and read it back through the API:
+
+<Steps>
+  <Step title="Add it in the web app">
+    Sign in at [staging.ledgersyncappv2.com](https://staging.ledgersyncappv2.com) with your sandbox account, open the client's bank list, click **Add Bank Connection** and search for **Ledgersync Bank**. Follow the prompts: any username and password are accepted.
+  </Step>
+  <Step title="Find it through the API">
+    `GET /api/v2/account/jane.client` lists it with `"source": "FDE"`.
+  </Step>
+</Steps>
+
+<Note>
+  Ledgersync Bank produces no transactions in the sandbox, so List Transactions with `source=FDE` returns an empty list for its accounts. Use FinBank or MX Bank to test transaction reads.
+</Note>
+
+## MFA questions
+
+A v2 integration meets MFA questions in two places:
+
+- **While linking a bank.** The bank's sign-in questions are asked and answered inside the Finicity or MX widget. Your app only handles the widget URL.
+- **While refreshing statements.** `POST /api/v2/statements/refresh` answers `203` when a statement needs an answer first. Show the challenge to the user, then send the answer to `POST /api/v2/statements/refresh/mfa` with the same `bankAccountId`, `accountId`, `pullIndex` and `source`, plus the `mfaSession` from the 203 response. That call can answer `203` again with a new challenge. A challenge is a `text` question, an `image` (base64), `choices` or `imageChoices`.
+
+FinBank statement refreshes can return these challenges in the sandbox, so you can exercise this path there. For Finicity connections, LedgerSync also keeps the answers the bank accepted and replays them the next time the same question comes back. After one successful answer, a later refresh of the same connection can therefore finish without a `203`.
+
+## Clean up
+
+`DELETE /api/v2/account/{bank_account_id}` removes a test bank and its accounts. Send the bank's `source` with it, for example `?source=MX`: connection ids are numbered separately per source, and without `source` the call acts on the FINICITY connection with that id.
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/v2/authentication">
+    Get the `Auth-Token` every sandbox call needs.
+  </Card>
+  <Card title="Transactions" icon="list" href="/v2/transactions">
+    How List Transactions reads each source.
+  </Card>
+</CardGroup>

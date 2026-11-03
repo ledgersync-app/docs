@@ -1,0 +1,144 @@
+---
+title: "v2 API overview"
+description: "The LedgerSync v2 partner API: who it is for, its base URLs, and how an integration reads its clients' bank data."
+---
+
+<Info>
+  **Starting a new integration? Use v3.** These pages cover the v2 API for integrations that are already built on it. New integrations should start with the [v3 API](/introduction).
+</Info>
+
+The v2 API gives your software the bank data LedgerSync collects for your clients: their bank connections and accounts, transactions, bank statements and checks. It also manages your clients and employees, and hands out the Finicity or MX connect widget your clients use to link a bank. Requests and responses are JSON over HTTPS, apart from file uploads and downloads such as statement PDFs.
+
+You authenticate by signing in with a LedgerSync login, and the API then acts as that login. For example, `GET /api/v2/client/list` returns all of your clients when you sign in with the login you created at sign-up, and only the clients assigned to an employee when you sign in as that employee.
+
+## Base URLs
+
+<CardGroup cols={2}>
+  <Card title="Sandbox" icon="flask">
+    `https://staging.ledgersyncappv2.com`
+
+    A separate LedgerSync environment for building and testing. Create a login at [staging.ledgersyncappv2.com/sign-up](https://staging.ledgersyncappv2.com/sign-up).
+  </Card>
+  <Card title="Production" icon="rocket">
+    `https://ledgersyncappv2.com`
+
+    Your clients' real bank data. Create a login at [ledgersyncappv2.com/sign-up](https://ledgersyncappv2.com/sign-up).
+  </Card>
+</CardGroup>
+
+Both environments serve the same paths, all under `/api/v2/`. They do not share logins or data: a login you create in the sandbox does not exist in production, so sign up in each. When you sign up, the email address you enter becomes your username. Try your integration in the sandbox first; [Testing](/v2/testing) covers what it offers.
+
+<Note>
+  The sandbox address in the old v2 docs, `104.196.54.242.sslip.io`, no longer works. Use `https://staging.ledgersyncappv2.com`.
+</Note>
+
+## Sign in first
+
+Every call outside `/api/v2/public/` needs a token. Get one by signing in:
+
+```bash
+curl -X POST "https://staging.ledgersyncappv2.com/api/v2/public/authenticate" \
+  -H "Content-Type: application/json" \
+  -d '{ "username": "you@yourfirm.com", "password": "your-password" }'
+```
+
+The response's `authToken` starts with `Bearer`. Send that whole value in an `Auth-Token` header on every other call. It lasts 30 minutes, then you sign in again. [Authentication](/v2/authentication) has the details, the errors and logout.
+
+## How an integration reads data
+
+Reading a client's transactions takes three calls after sign-in, and each one hands you the values the next one needs. The snippets assume two variables:
+
+```bash
+export LS_BASE="https://staging.ledgersyncappv2.com"
+export LS_TOKEN="BearereyJhbGciOiJIUzUxMiJ9..."   # the authToken from sign-in
+```
+
+<Steps>
+  <Step title="List your clients">
+    ```bash
+    curl "$LS_BASE/api/v2/client/list" \
+      -H "Auth-Token: $LS_TOKEN"
+    ```
+
+    Each entry in `clients` has a `username`. That username is how every other endpoint names the client. When you sign in with the login you created at sign-up, the list also includes that login itself, under its own username.
+  </Step>
+  <Step title="List the client's bank accounts">
+    ```bash
+    curl "$LS_BASE/api/v2/account/jane@example.com" \
+      -H "Auth-Token: $LS_TOKEN"
+    ```
+
+    The response lists the client's `banks`. Each bank carries its `source`, the data provider behind it, and its `accounts`, each with an `id`. Trimmed:
+
+    ```json
+    {
+      "banks": [
+        {
+          "id": 276,
+          "name": "Main Street Bank",
+          "source": "FINICITY",
+          "accounts": [{ "id": 654, "name": "Checking" }]
+        },
+        {
+          "id": 1093,
+          "name": "Harbor Credit Union",
+          "source": "MX",
+          "accounts": [{ "id": 8810, "name": "Savings" }]
+        }
+      ],
+      "status": "OK"
+    }
+    ```
+
+    Ids are numbered separately per source, so the same number can belong to a FINICITY account and to an MX account. Always keep an account's `id` together with its bank's `source`.
+  </Step>
+  <Step title="List each account's transactions">
+    ```bash
+    curl "$LS_BASE/api/v2/transactions/list?username=jane@example.com&source=MX&accountId=8810&page=0" \
+      -H "Auth-Token: $LS_TOKEN"
+    ```
+
+    Send the bank's `source` and the account's `id` as `accountId`. Leave `source` out and the call reads FINICITY data, so an MX account comes back `200` with no transactions and no error. Results are newest first and paged: `page` starts at 0, and `rowsPerPage` is 10, 20 or 50 (default 50).
+  </Step>
+</Steps>
+
+<Tip>
+  The transaction list reads what LedgerSync has stored and never contacts the bank, so a connection that has broken still returns everything collected before it broke. Dates, paging and ids for each source are in [Transactions](/v2/transactions).
+</Tip>
+
+## Endpoint groups
+
+Every endpoint, with its parameters and responses, is in the API reference pages of this tab. In short:
+
+| Group | Endpoints | What they do |
+| --- | --- | --- |
+| Authentication | `POST /api/v2/public/authenticate`, `/api/v2/public/authenticate-by-email`, `/api/v2/public/logout` | Sign in for a token, and sign out. |
+| Clients | `/api/v2/client/...` | List, add, update, lock, unlock and delete clients, and change a client's password. |
+| Accounts | `/api/v2/account/...` | List a client's banks and accounts, get a connect-widget link to add a bank or repair a connection, read an account summary or sub-accounts, and rename, refresh or delete a bank connection. |
+| Transactions | `/api/v2/transactions/...` | List stored transactions, refresh a bank's transactions, and refresh historic transactions for chosen accounts. |
+| Statements | `/api/v2/statements/...` | List statements and download their PDFs, refresh statements (answering the bank's MFA question when it asks one), convert a PDF statement to XLS or QBO, or extract its transactions as JSON. |
+| Checks | `GET /api/v2/checks` | List checks with their images, payee, amount and check number. |
+| Institutions | `GET /api/v2/institutions`, `GET /api/v2/institutions/provider-options` | Search one provider's list of banks, and find which providers cover a bank before you add it. |
+| Employees | `/api/v2/employee/...` | Add, list, update, lock, unlock and delete your employees' logins, and change an employee's password. |
+| Passwords and phone | `/api/v2/public/password/...`, `/api/v2/public/phone-verification/validate` | Send a password reset email by username or email, set a new password, and check a phone verification code. |
+| Accounting AI | `POST /api/v2/accounting/{platform}/transactions/rules/ai/suggest-external` | Generate an AI rule suggestion for one transaction. |
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/v2/authentication">
+    Sign in, send the token, and sign in again every 30 minutes.
+  </Card>
+  <Card title="Transactions" icon="receipt" href="/v2/transactions">
+    The transaction list in full: parameters, dates and paging for each source.
+  </Card>
+  <Card title="Transaction status" icon="list-check" href="/v2/transaction-status">
+    The status values each source returns on a transaction.
+  </Card>
+  <Card title="Testing" icon="flask" href="/v2/testing">
+    Build against the sandbox before you go live.
+  </Card>
+  <Card title="v3 API" icon="rocket" href="/introduction">
+    Starting a new integration? Start here.
+  </Card>
+</CardGroup>
