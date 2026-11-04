@@ -133,10 +133,18 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `ledgersync_find_clients` lists them in the same chat. The name is the client's name, not its email or id.
       Before the tool runs, LedgerSync checks that each id is a client the person sees and that the name is that
       client. When it is not, nothing is read or changed: an id the person does not see answers `not_found`, and a
-      missing name or a name of another client answers `invalid_request`, with a `next_step` that tells the AI to
-      find the client again in this chat. For a name of another client, the error also gives `client_id`,
-      `client_name` (the client that id really is) and `given_client_name`. A call that names several clients is
-      refused whole when one of them is wrong.
+      missing name (except in the older reads below) or a name of another client answers `invalid_request`, with a
+      `next_step` that tells the AI to find the client again in this chat. For a name of another client, the error
+      also gives `client_id`, `client_name` (the client that id really is) and `given_client_name`. A call that names
+      several clients is refused whole when one of them is wrong.
+    - An AI app that still holds LedgerSync's tool list from before October 30, 2026, when names began, sends client
+      ids without names: ChatGPT keeps that list until you click **Refresh tools**. The tools that read one client and
+      existed then still answer such a call: the id must be a client the person sees, a name it does give must be
+      that client, other ids must be the client's, and the answer names the client. Those are the list, get and status
+      tools of connections, accounts, transactions, statements, rules, rules setup, For review transactions,
+      QuickBooks and the 1099 list. Previews, the categorized export link (its Download marks the transactions
+      Synced), refreshes, fix and connect links, changes and every tool added since still need the name, and their
+      `next_step` says how to load the new tool list.
     - A name copied from `ledgersync_find_clients` always matches. So does the same name in another order or
       spacing, and, for a client named with a code, the code alone or the rest of its name alone (`ACME1234` or
       `Acme Plumbing` for `ACME1234 - Acme Plumbing`). A shorter name matches only when no other client the person

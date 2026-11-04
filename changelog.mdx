@@ -3,6 +3,22 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-04" tags={["AI connector"]}>
+  ## Your AI reads your clients again before it loads LedgerSync's new tools
+
+  Since October 30, LedgerSync asks your AI for each client's name with the client's id. An AI app that still had
+  the older copy of LedgerSync's tools could not send the name, so it could not look at any client. ChatGPT keeps
+  that older copy until you click **Refresh tools**. Now it can still read a client's accounts, statements,
+  transactions, connections, rules and QuickBooks details without the name, and each answer says which client it
+  is about. Previews and changes still ask you to load the new tools first.
+
+  - The one-client reads that existed before October 30 answer without `client_name`. Previews, the categorized
+    export link, refreshes, fix and connect links, changes and tools added since still need it. See
+    [For developers](/ai/developers).
+  - To use everything again, load the new tool list once: see
+    [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+</Update>
+
 <Update label="2026-11-03" tags={["AI connector"]}>
   ## Your AI updates a client's phone numbers, emails and name
 
