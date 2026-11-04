@@ -1,0 +1,232 @@
+---
+title: "Review a client's books"
+description: "Your AI checks a month of a QuickBooks Online client's books: entries still waiting for a category, expenses with no payee, entries on a parent account, vendors coded differently than usual, and large amounts. Each one comes with the reason, and a suggested fix when the client's history shows one. Nothing changes in QuickBooks."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="Review a client's books" subtitle="Ask your AI. It runs five checks on a month of your client's QuickBooks books and shows what to fix, with the reason for each.">
+
+<AiNote tone="green">
+
+**For QuickBooks Online clients.** Not set up yet? Go to [Start here](/ai/start-here). Added it a while ago? Do
+[After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+
+</AiNote>
+
+## Start
+
+<AiStep id="new-chat" n={1} total={5} title="Start a new chat">
+
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
+
+</AiStep>
+
+<AiStep id="ask" n={2} total={5} title="Ask the AI">
+
+Type *"Review Acme's books for October"*, with your client's name and the month, and press **Enter**. No month?
+It reviews last month.
+
+</AiStep>
+
+<AiStep id="check" n={3} total={5} title="Go through the five checks">
+
+The AI runs five checks, one after another: entries still waiting for a category, expenses with no payee, entries on
+a parent account instead of one of its sub-accounts, entries coded differently than the vendor's usual account, and
+amounts over $1,000. For each entry it flags, it says why, and suggests a fix when the client's history shows one.
+
+</AiStep>
+
+<AiStep id="questions" n={4} total={5} title="Answer its questions">
+
+An unusual account is not always a mistake, and a large amount is not wrong in itself. The AI asks you about the ones
+you don't recognize. You decide.
+
+</AiStep>
+
+<AiStep id="fix" n={5} total={5} title="Make the fixes in QuickBooks">
+
+The AI lists the fixes you agreed with, entry by entry. Make them in QuickBooks. Fixing them from the chat comes in a
+later update.
+
+</AiStep>
+
+<AiNote tone="green">
+
+**It only reads.** Nothing changes in QuickBooks.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**Another amount or period?** Tell the AI, for example *"amounts over 5,000"*, or the dates to review, up to a year.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**A busy client?** The first check can take a minute or two. The AI says LedgerSync is still reading and asks again
+about 30 seconds later. After that, the other checks answer right away.
+
+</AiNote>
+
+## More details
+
+<AccordionGroup>
+
+<Accordion title="What happens after you ask">
+
+1. The AI finds the client and takes a first look: whether its QuickBooks connection works and the date its books are
+   closed through.
+2. LedgerSync reads the month's entries from the client's QuickBooks, and the last 12 months of its expenses and bills
+   to learn how each vendor is usually coded. For a busy client, the AI may say LedgerSync is still reading, and asks
+   again about 30 seconds later. LedgerSync keeps that reading for the day, so the other checks answer right away.
+3. The AI runs the five checks in order. For each entry it flags: the date, the amount, the payee, the account, the
+   reason, and the suggested fix when there is one.
+4. When a fix is unclear, it looks at how that vendor is usually coded, most used account first.
+5. It asks you about the unusual accounts and the large amounts you don't recognize. You decide.
+6. It lists the fixes you agreed with, for you to make in QuickBooks.
+7. At the end, it tells you what the review does not check, and offers a dashboard of the five checks or the same
+   review for your other clients.
+
+</Accordion>
+
+<Accordion title="The five checks">
+
+- **Waiting for a category:** entries in an Uncategorized account or in Ask My Accountant, or in an account under
+  them. The suggested fix is the account the vendor's entries usually go to.
+- **No payee:** expenses, checks and card charges with no payee. The suggested payee comes from the bank text: the
+  payee LedgerSync already sent to QuickBooks with the same text, or the payee the text names.
+- **Parent account:** entries on an account that has sub-accounts, instead of one of them. The suggested fix is the
+  sub-account the vendor usually gets, or the sub-accounts to choose from.
+- **Coded differently than usual:** a vendor's entry on an account it uses less than 1 time in 10, while one account
+  holds at least half of its entries. The suggested fix is that usual account, with the counts, for example *"coded
+  to Job Supplies 212 of 214 times"*.
+- **Large amounts:** entries over $1,000, or the amount you choose, largest first. There is no fix to suggest: the AI
+  asks you about the ones you don't recognize.
+
+</Accordion>
+
+<Accordion title="What it does not check">
+
+- Bill payments and customer payments.
+- Invoices, sales receipts, refund receipts and credit memos.
+- Estimates and time entries.
+- Voided entries.
+- Balances left in suspense accounts.
+- What you already checked: an entry you accepted shows again the next time you run the same check.
+- Clients that use another accounting app, such as QuickBooks Desktop, Zoho Books or Xero.
+
+</Accordion>
+
+<Accordion title="Before you start">
+
+- **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
+  a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the review
+  tools.
+- **The client is connected to QuickBooks in LedgerSync**, the same connection you use to sync transactions from
+  the LedgerSync app.
+- **The client uses QuickBooks Online.**
+
+</Accordion>
+
+<Accordion title="Your client's data">
+
+<AiNote tone="yellow">
+
+**Your client's entries go through your AI account.** The AI app reads the entries the checks flag, with their
+payees and accounts, and keeps the chat under your AI account's settings. Check that account's data settings before
+you start.
+
+</AiNote>
+
+</Accordion>
+
+<Accordion title="Optional: the full instructions to paste">
+
+You don't need these: LedgerSync already gives your AI the same steps. If your AI does not follow them, give it
+these instructions.
+
+<div className="lsai-prompt">
+  <AiCopy label="Instructions for your AI" text={`Review a LedgerSync client's books for the month.
+1. Find the client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. The review works for QuickBooks Online clients.
+2. Call ledgersync_get_client_snapshot. Tell the user whether the client's QuickBooks connection works and the date its books are closed through, if one is set. If QuickBooks is not connected or not working, tell the user how to fix it, as the snapshot's next_step says, and stop.
+3. Run ledgersync_run_review_report once for each report, in this order: uncategorized, no_payee, parent_account, expense_inconsistency, over_amount. Use the same period for all five: last month, unless the user names another period (from and to, YYYY-MM-DD, at most a year). over_amount flags entries above 1,000.00 unless the user gives another amount_threshold. If a report answers status running, call it again with the same arguments in about 30 seconds.
+4. For each report, tell the user how many entries it flagged and their total, then show each row: its date, amount, payee, account and reason, and its suggested_fix with the fix's evidence when it has one. If a report has more rows than it showed, say how many and offer the rest (call again with next_cursor).
+5. When a fix is unclear, or before suggesting that a vendor's entry move to another account, call ledgersync_get_vendor_coding_history for that payee to see how its entries are usually coded. An unusual account is not always a mistake, and a large amount is not wrong in itself: ask the user about the ones they do not recognize.
+6. LedgerSync cannot change these entries yet. List the fixes the user agrees with, entry by entry, for them to make in QuickBooks.
+7. Before you finish, tell the user what the review does not check: bill payments, customer payments, invoices, sales receipts, refund receipts, credit memos, estimates, time entries, voided entries, and balances left in suspense accounts.
+8. End by offering a dashboard of the five checks' counts, and the same review for the firm's other clients.`} />
+</div>
+
+1. Click **Copy** above.
+2. In Claude, ChatGPT or Grok, start a new chat.
+3. Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
+4. At the end, type the client's name and the month. For example: *Acme, October 2026*. Then press **Enter**.
+
+<AiNote tone="gray">
+
+**Using Claude Code?** The instructions are also a LedgerSync command there. Type **/**, pick **month_end_review**
+(it says **(MCP)** next to it) and press **Enter**. Then tell it the client and the month.
+
+</AiNote>
+
+</Accordion>
+
+</AccordionGroup>
+
+## If something goes wrong
+
+<AccordionGroup>
+
+<Accordion title="Most common messages">
+
+| The AI says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| **QuickBooks is not connected for this client in LedgerSync.** | In the LedgerSync app, click **Rules Engine**, then **QuickBooks**. In the menu on the left, click **Manage Connections**. Find the client and click **Authorize**, then sign in to the client's QuickBooks. Then ask the AI again. |
+| **The client's QuickBooks connection in LedgerSync stopped working.** | Open **Manage Connections** the same way. At the top, next to the client's name, click **Reconnect** and sign in to QuickBooks again. Then ask the AI again. |
+| LedgerSync is still reading the client's entries | Wait. The AI asks again about 30 seconds later. |
+| **This client's books are not in QuickBooks Online.** | LedgerSync reviews QuickBooks Online books only for now. |
+| **This client has more entries in that period than one review reads. Choose a shorter period.** | Ask for a shorter period, for example one month. |
+| LedgerSync is busy, or QuickBooks did not answer | Wait a minute, then ask the AI again. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+
+</Accordion>
+
+</AccordionGroup>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the 3 tools">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected, the date its books are closed through, its first accounts with their latest statements, the playbooks that fit and, when a check read last month today, how many entries each check flagged | No |
+    | `ledgersync_run_review_report` | One of the five checks on a client's QuickBooks books for a period: `uncategorized`, `no_payee`, `parent_account`, `expense_inconsistency` or `over_amount`, each row with its `reason` and, where history or text supports one, a `suggested_fix` | No |
+    | `ledgersync_get_vendor_coding_history` | How the client has coded one payee's entries over the last 12 months, the accounts most used first, from a payee or from the text of a bank row | No |
+
+    - The instructions above are also an MCP prompt, `month_end_review` ("Review a client's books for the month"),
+      with optional `client` and `month` arguments. Claude Code lists it as a command.
+    - The client snapshot recommends `month_end_review` for every client whose QuickBooks connection works, and
+      offers the review until a check read last month today.
+    - Each check's `next_step` offers the next one in the month-end order. The last, `over_amount`, ends with what
+      the review does not check, before its offers, so an AI that never sees the prompt still says it.
+    - All three need `read:accounting` and change nothing.
+    - See [For developers](/ai/developers) for every field.
+  </Accordion>
+
+  <Accordion title="For developers: limits">
+    - A period is at most 366 days, the last full calendar month by default.
+    - A check shows 25 rows by default, up to 100, and pages with `next_cursor`. Each answer stays under 15,000
+      characters: a page whose rows do not fit is cut, and its `next_step` gives the `limit` to page with.
+    - LedgerSync reads a period from QuickBooks once and keeps it for the day. `refresh` reads again, unless the last
+      read is under 5 minutes old.
+    - A period with more than 60,000 entries is refused: choose a shorter one.
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>

@@ -4,6 +4,21 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-04" tags={["AI connector"]}>
+  ## Your AI reviews a client's month in one go
+
+  Ask your AI *"Review Acme's books for October"*. It now walks through all five checks on the month, one after
+  another: entries still waiting for a category, expenses with no payee, entries on a parent account, entries coded
+  differently than the vendor's usual account, and amounts over $1,000. For each entry it shows the reason and, when
+  the client's history shows one, a suggested fix. It asks you about the ones only you can settle, lists the fixes for
+  you to make in QuickBooks, and says what the review does not check. See
+  [Review a client's books](/ai/review-my-client).
+
+  - The steps are also an MCP prompt, `month_end_review`. The client snapshot now recommends and offers the review,
+    and the short menu a new connection shows includes it. See [For developers](/ai/developers).
+  - No new tools: your AI gets the new steps in LedgerSync's answers, without loading a new tool list.
+</Update>
+
+<Update label="2026-11-04" tags={["AI connector"]}>
   ## Your AI reads your clients again before it loads LedgerSync's new tools
 
   Since October 30, LedgerSync asks your AI for each client's name with the client's id. An AI app that still had

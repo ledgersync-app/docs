@@ -189,7 +189,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       and end with one offer. Until the connection has run another tool that worked, it also has
       `suggested_questions`, a short menu of what this connection can ask: reads only for a read-only connection,
       and, for a firm still under review, adding a client and converting a statement PDF (finding a client when
-      read-only). Both menus of a reviewed firm ask which vendors need a 1099, since the 1099 list is a read.
+      read-only). Both menus of a reviewed firm ask which vendors need a 1099, since the 1099 list is a read, and to
+      review a client's books for last month, since the review only reads too.
     - `ledgersync_find_clients` also returns the firm's own accounts: the banks connected on the firm owner's
       own LedgerSync login rather than for a client, as the LedgerSync app's client list shows them. They come
       back as one entry, first in the list, whose name ends in "(the firm's own accounts)", marked
@@ -378,8 +379,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - It also returns the client's first accounts, written as `ledgersync_list_accounts` writes them (accounts on
       LedgerSync's own connection included), each with `last_statement` (`statement_id` and `statement_date`, as
       `ledgersync_list_statements` gives them), and `accounts_total`. It names the `recommended_playbooks` that fit:
-      `form_1099_season` from November 1 to February 15 while QuickBooks works, and `quickbooks_bookkeeping` when an
-      account can post to QuickBooks. `data_as_of` says when it was read.
+      `month_end_review` while QuickBooks works, `form_1099_season` from November 1 to February 15 while QuickBooks
+      works, and `quickbooks_bookkeeping` when an account can post to QuickBooks. `data_as_of` says when it was read.
+    - Its `next_step` ends with one or two offers, the first two of: the month-end review (until a review of last
+      month finished today), the 1099 check in its season, bookkeeping, connecting a bank when the client has no
+      accounts yet, and a dashboard of the client's status.
     - The answer stays under 3,000 characters: when the client has more accounts than fit, it shows fewer, never counts
       fewer, and its `next_step` points to `ledgersync_list_accounts`. It reads the client's QuickBooks once, for the
       closing date, and changes nothing.
@@ -395,7 +399,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       (a vendor's entries coded to an account it rarely uses: under 10% of the vendor's lines on regular accounts, not
       Uncategorized, Ask My Accountant or parent accounts, over the last 12 months, the entry's own line counted, while
       its most-used regular account holds at least half of them and is still active) or `over_amount` (entries above
-      `amount_threshold`, 1,000.00 by default, the largest first). For a month-end review, run them in that order.
+      `amount_threshold`, 1,000.00 by default, the largest first). For a month-end review, run them in that order:
+      each answer's `next_step` offers the next one, and the last (`over_amount`) ends with what the review does not
+      check (bill payments, customer payments, invoices, sales receipts, refund receipts, credit memos, estimates,
+      time entries, voided entries and balances left in suspense accounts), then offers a dashboard of the five counts or
+      the same review for the firm's other clients.
+    - The instructions on [Review a client's books](/ai/review-my-client) are also an MCP prompt, `month_end_review`
+      ("Review a client's books for the month"), with optional `client` and `month` arguments. Claude Code lists it as
+      a command.
     - An `expense_inconsistency` row's `reason` reads like *"Home Depot coded to Job Supplies 212 of 214 times since
       2025-11; Meals 1 time"*, and its `suggested_fix` is the vendor's usual account. An unusual account is not always
       a mistake, so the AI asks before suggesting the change.
