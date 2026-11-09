@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (58 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (59 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -64,7 +64,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">58</span>
+## Tools <span className="lsai-badge">59</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -74,6 +74,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear | No |
 | `ledgersync_get_vendor_coding_history` | How a client has coded one vendor's entries over the last months: the accounts used, most used first, with how often, when last and the average amount. Takes the vendor, or the text of a bank row | No |
 | `ledgersync_compare_statement_to_books` | Why a bank or card statement does not reconcile: LedgerSync's copy of the statement against the client's QuickBooks register for its period, the difference on its last day split into parts that add up to it, and the rows on each side that nothing matched | No |
+| `ledgersync_get_financials` | One financial report of a client straight from QuickBooks Online: profit and loss, balance sheet, cash flow, trial balance, A/R aging or A/P aging, for one period (one day for the as-of reports) or compared with another, each line with its change and the big changes flagged | No |
 | `ledgersync_create_client` | Adds a client, checking for duplicates first | Yes |
 | `ledgersync_get_client` | A client's details as the app's **Edit Client** screen shows them: its name, its main email and whether the client signs in with it, its main phone number (the one LedgerSync texts), and its extra emails and phone numbers | No |
 | `ledgersync_update_client` | Changes a client's name, main email, main phone number, or extra emails and phone numbers, as the app's **Edit Client** screen does; moves the client's sign-in to a new email only when asked | Yes |
@@ -191,8 +192,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `suggested_questions`, a short menu of what this connection can ask: reads only for a read-only connection,
       and, for a firm still under review, adding a client and converting a statement PDF (finding a client when
       read-only). Both menus of a reviewed firm ask which vendors need a 1099, since the 1099 list is a read, to
-      review a client's books for last month, since the review only reads too, and why a client's bank account won't
-      reconcile for last month, since the reconciliation check only reads as well.
+      review a client's books for last month, since the review only reads too, why a client's bank account won't
+      reconcile for last month, since the reconciliation check only reads as well, and to pull last month's P&L or
+      balance sheet for a client, a read too.
     - `ledgersync_find_clients` also returns the firm's own accounts: the banks connected on the firm owner's
       own LedgerSync login rather than for a client, as the LedgerSync app's client list shows them. They come
       back as one entry, first in the list, whose name ends in "(the firm's own accounts)", marked
@@ -502,6 +504,34 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       PDF, a loan or mortgage account, an account with no statement in the last 24 months, a statement missing its
       balances or rows, a statement of several accounts whose part for this account LedgerSync cannot tell, and a
       QuickBooks account kept in another currency than the company's. A client on Zoho Books or Xero is refused too.
+    - `ledgersync_get_financials` reads one financial report of a QuickBooks Online client straight from QuickBooks.
+      `report` is `profit_and_loss`, `balance_sheet`, `cash_flow`, `trial_balance`, `ar_aging` or `ap_aging`. The P&L
+      and the cash flow cover a period (`from` and `to`, both or neither; default: last month). The other reports are
+      as of one day (`to`; default: the last day of last month), and `from` is not used there. Dates are YYYY-MM-DD,
+      not before 2000-01-01 and not after today.
+    - To compare, give `compare_from` and `compare_to` (`compare_to` alone for the balance sheet); the trial balance
+      and the aging reports are not compared. Each line then has `compare_amount`, `change` (a blank counts as 0) and
+      `change_pct` (none when the compare amount is blank or zero), as QuickBooks' own previous-period columns count
+      them. `flagged` lists up to 10 account lines whose change is at least `flag_amount` and at least `flag_percent`
+      (default 1,000.00 and 10; an account with no compare amount is flagged on the amount alone), the largest change
+      first, each with its evidence, and `flagged_count` counts them all.
+    - `basis` is `accrual` or `cash` for the P&L, the balance sheet and the trial balance, by default the client's
+      QuickBooks report setting (`basis_source` says which). The cash flow is QuickBooks' standard statement
+      (`basis_source: standard`), and the aging reports have no basis.
+    - The answer gives `summary` (the report's headline totals, such as total income, gross profit and net income on
+      the P&L), `lines` in QuickBooks' order with QuickBooks' own amounts, `currency`, `data_as_of` and `notes` (for
+      example, QuickBooks has nothing for these dates, or an input the report does not use). Each line has its
+      `label`, `level` and `kind`: `heading`, `account`, `line` (a row with no account, such as net income) or
+      `total`. The trial balance gives `debit` and `credit`, and the aging reports `current`, `days_1_30`,
+      `days_31_60`, `days_61_90`, `days_91_and_over` and `total`. Amounts are strings with 2 decimals, and a blank
+      amount is left out.
+    - Each answer stays under 15,000 characters: the first page carries the summary and the flagged lines, then the
+      lines, and a long report gives `next_cursor` for the next page. Each page reads QuickBooks again, so a cursor is
+      refused when the period, the basis or the client's books changed since.
+    - LedgerSync reads QuickBooks while the call waits, usually a few seconds, and stores nothing. When QuickBooks is
+      busy for the client, the call answers `upstream_unavailable`: try again in a few minutes. A report QuickBooks
+      cuts short is refused with `invalid_request` on `from`, or on `to` for the as-of reports. A client on Zoho Books
+      or Xero is refused too. It changes nothing.
     - QuickBooks bookkeeping is for clients whose bank transactions do not come into QuickBooks through a
       QuickBooks bank feed. The AI categorizes the client's transactions waiting in LedgerSync and, after the user
       approves a preview, LedgerSync posts them into the client's QuickBooks Online. See

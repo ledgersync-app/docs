@@ -4,6 +4,19 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-09" tags={["AI connector"]}>
+  ## Your AI pulls a client's financial reports from QuickBooks
+
+  Ask your AI *"Show Acme's P&L for October, compared with September."*. It reads the report straight from the
+  client's QuickBooks Online, with QuickBooks' own amounts: profit and loss, balance sheet, cash flow, trial balance,
+  A/R aging or A/P aging. Compared with another period, each line shows its change, and the big changes are flagged
+  with what moved. Your AI can then turn the report into a PDF or a spreadsheet to send. In an AI app that runs
+  scheduled tasks, you can ask for it every month.
+
+  - See `ledgersync_get_financials` in [For developers](/ai/developers).
+  - Your AI app loads the new tool list first (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-11-09" tags={["AI connector"]}>
   ## Your AI walks you through why an account won't reconcile
 
   Ask your AI *"Why won't Acme's Chase checking reconcile for September?"*. It now follows the same steps every time:
