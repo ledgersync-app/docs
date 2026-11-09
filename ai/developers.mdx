@@ -456,6 +456,16 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       open from earlier statements, or an earlier error), `on_statement_not_in_books`, `in_books_not_on_statement`,
       `dated_after_statement_end_in_books` and `statement_gap`. Items not yet at the bank, such as a check not cashed
       yet, are timing, not errors.
+    - `likely_causes` name what made the difference, the strongest first. Each gives its `cause`
+      (`statement_incomplete`, `sign_flip`, `transposed_digits`, `duplicate`, `missing_fee_or_interest`, `date_shift`,
+      `missing_in_books`, `opening_difference` or `not_yet_at_bank`), its `confidence` (`high`, `medium` or `low`), its
+      `effect` (its signed share of the difference; the effects of every cause found add up to the difference), its
+      `evidence` (one sentence with dates, amounts and names) and the rows it names in `statement_rows` and
+      `books_rows`, with `more_rows` counting the ones not shown. Each unmatched row goes to one cause at most. The
+      statement's own `statement_incomplete` comes first; then, at each confidence, mistakes come before timing
+      (`date_shift`, `opening_difference`, `not_yet_at_bank`). The summary shows up to 10 causes, fewer when the answer
+      runs long, and `counts.likely_causes` counts them all. An entry the bank has not shown that QuickBooks marks
+      reconciled or cleared stays `not_yet_at_bank`, with the mark named in the evidence.
     - The summary lists the first rows of `on_statement_not_in_books` (statement rows nothing in the books matched) and
       `in_books_not_on_statement` (books entries of the period that neither this statement nor the previous one
       shows), and `counts` counts every row of each list. `list` pages one list at a time

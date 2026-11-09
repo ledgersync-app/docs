@@ -4,6 +4,19 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-09" tags={["AI connector"]}>
+  ## The reconciliation check names the likely causes
+
+  When your AI compares a bank or card statement with the client's QuickBooks Online books, it now also names what made
+  the difference, the strongest first, each with its evidence and its share of the difference: a bank fee or interest
+  the books do not have, two swapped digits, an entry entered twice, a wrong sign, an entry dated on the other side of
+  the statement's end, or items the bank has not shown yet. Timing, such as a check not cashed yet, is told apart from
+  mistakes.
+
+  - See `likely_causes` under `ledgersync_compare_statement_to_books` in [For developers](/ai/developers).
+  - No new tool: your AI app keeps the tool list it has.
+</Update>
+
+<Update label="2026-11-09" tags={["AI connector"]}>
   ## Your AI checks why a bank or card statement does not reconcile
 
   Ask your AI *"Why won't Acme's checking account reconcile for September?"*. It compares LedgerSync's copy of the
