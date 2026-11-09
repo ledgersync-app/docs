@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (57 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (58 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -64,7 +64,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">57</span>
+## Tools <span className="lsai-badge">58</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -73,6 +73,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, and the playbooks that fit | No |
 | `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear | No |
 | `ledgersync_get_vendor_coding_history` | How a client has coded one vendor's entries over the last months: the accounts used, most used first, with how often, when last and the average amount. Takes the vendor, or the text of a bank row | No |
+| `ledgersync_compare_statement_to_books` | Why a bank or card statement does not reconcile: LedgerSync's copy of the statement against the client's QuickBooks register for its period, the difference on its last day split into parts that add up to it, and the rows on each side that nothing matched | No |
 | `ledgersync_create_client` | Adds a client, checking for duplicates first | Yes |
 | `ledgersync_get_client` | A client's details as the app's **Edit Client** screen shows them: its name, its main email and whether the client signs in with it, its main phone number (the one LedgerSync texts), and its extra emails and phone numbers | No |
 | `ledgersync_update_client` | Changes a client's name, main email, main phone number, or extra emails and phone numbers, as the app's **Edit Client** screen does; moves the client's sign-in to a new email only when asked | Yes |
@@ -439,6 +440,47 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `other_lines` count the rest. A bill with three lines counts three times.
     - It uses the same read of last month as the review reports, so a large client's first call can answer
       `status: running`: call again in about 30 seconds. It changes nothing.
+    - `ledgersync_compare_statement_to_books` compares one LedgerSync statement of a bank or card account with the
+      client's QuickBooks Online register for the account it is linked to, over the statement's period. Give
+      `account_id` and, for a statement other than the account's newest, `statement_id` (from
+      `ledgersync_list_statements`, of the same source as the account). A statement that covers several accounts is
+      compared on the account's own part of it.
+    - It returns the `statement` (its `period`, `opening` and `closing` balances, `row_count`, and `statement_check`:
+      `adds_up`, or `does_not_add_up` with the `statement_gap` when the statement's own rows do not add up to its
+      balances), the `books` balance before the period and on the statement's last day (`confirmed` when QuickBooks'
+      balance sheet agrees, and `balance_sheet_at_end` when it does not), and the `difference`: the statement's
+      closing balance minus the books balance on its last day. Balances read as the statement states them: money held
+      for a bank account, the amount owed for a card. Row amounts carry the bank's sign: money into the account is
+      positive.
+    - `parts` split the difference into amounts that always add up to it: `from_before_this_statement` (items still
+      open from earlier statements, or an earlier error), `on_statement_not_in_books`, `in_books_not_on_statement`,
+      `dated_after_statement_end_in_books` and `statement_gap`. Items not yet at the bank, such as a check not cashed
+      yet, are timing, not errors.
+    - The summary lists the first rows of `on_statement_not_in_books` (statement rows nothing in the books matched) and
+      `in_books_not_on_statement` (books entries of the period that neither this statement nor the previous one
+      shows), and `counts` counts every row of each list. `list` pages one list at a time
+      (`on_statement_not_in_books`, `in_books_not_on_statement` or `matched`) with `next_cursor`, 25 rows by default and
+      up to 100. A books row gives its `date`, `amount`, `type`, `number`, `payee`, `memo`, `quickbooks_cleared`
+      (QuickBooks' own cleared mark, when the row has one) and `qbo_ref`. `previous_statement_id` names the account's
+      statement before this one.
+    - Rows are matched as LS Close matches them: the same amount within 4 days, 10 days for a card and 21 for a check
+      whose bank text starts "CHECK #", then combinations of rows.
+    - An account with no QuickBooks account to compare with (not linked, or linked to one that is gone, inactive or not
+      a bank or card account) answers `status: needs_quickbooks_account` with the client's bank and card accounts in
+      `choices`. The AI asks the user which one, then calls again with its id as `qbo_bank_account_id`, which is used
+      for that comparison only and never saved.
+    - `warnings` names `kinds_differ` (the statement, the bank and QuickBooks disagree on whether the account holds
+      money or is owed money), `shared_link` (another LedgerSync account of the client posts to the same QuickBooks
+      account, listed in `shared_with`), `books_balance_unconfirmed` and `combinations_cut` (some combinations of rows
+      were not tried).
+    - LedgerSync compares in the background and keeps the comparison for the day, so a large account's first call can
+      answer `status: running`: the same call about 30 seconds later answers it. `refresh` compares again, unless the
+      last comparison is under 5 minutes old (`data_as_of` says when QuickBooks was read). Each answer stays under
+      15,000 characters. It changes nothing.
+    - It refuses with `invalid_request` and a step, on the argument concerned: a statement converted from an uploaded
+      PDF, a loan or mortgage account, an account with no statement in the last 24 months, a statement missing its
+      balances or rows, a statement of several accounts whose part for this account LedgerSync cannot tell, and a
+      QuickBooks account kept in another currency than the company's. A client on Zoho Books or Xero is refused too.
     - QuickBooks bookkeeping is for clients whose bank transactions do not come into QuickBooks through a
       QuickBooks bank feed. The AI categorizes the client's transactions waiting in LedgerSync and, after the user
       approves a preview, LedgerSync posts them into the client's QuickBooks Online. See

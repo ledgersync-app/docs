@@ -3,6 +3,20 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-09" tags={["AI connector"]}>
+  ## Your AI checks why a bank or card statement does not reconcile
+
+  Ask your AI *"Why won't Acme's checking account reconcile for September?"*. It compares LedgerSync's copy of the
+  statement with the client's QuickBooks Online register for that account and month, says how far apart they are on
+  the statement's last day, and splits the difference into parts that always add up: what started before this
+  statement, rows on the statement the books do not have (a bank fee, for example), entries in the books the bank has
+  not shown yet (a check not cashed), and entries the books date after the statement ends. It shows the rows on each
+  side that nothing matched. When the account is not linked to a QuickBooks account, it asks which one to use.
+
+  - See `ledgersync_compare_statement_to_books` in [For developers](/ai/developers).
+  - Your AI app loads the new tool list first (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
 <Update label="2026-11-04" tags={["AI connector"]}>
   ## Your AI reviews a client's month in one go
 
