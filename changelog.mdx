@@ -4,6 +4,23 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-09" tags={["AI connector"]}>
+  ## Your AI walks you through why an account won't reconcile
+
+  Ask your AI *"Why won't Acme's Chase checking reconcile for September?"*. It now follows the same steps every time:
+  it finds the month's statement, compares it with the client's QuickBooks account, asks which QuickBooks account to
+  use when the account is not linked, tells you the difference and its likely causes in plain words, lists what to fix
+  in QuickBooks, and says what the check does not do. See [Explain my reconciliation](/ai/explain-my-reconciliation).
+
+  - The steps are also an MCP prompt, `explain_rec_difference`. The client snapshot now recommends it, and the short
+    menu a new connection shows includes it. See [For developers](/ai/developers).
+  - The check now offers the previous statement only when part of the difference started before this statement and
+    no entry explains it.
+  - No new tools. The recommendation and the offers arrive in LedgerSync's answers right away; the full steps reach
+    your AI app once it reloads LedgerSync's tools (see
+    [After a LedgerSync update](/ai/troubleshooting#after-an-update)).
+</Update>
+
+<Update label="2026-11-09" tags={["AI connector"]}>
   ## The reconciliation check names the likely causes
 
   When your AI compares a bank or card statement with the client's QuickBooks Online books, it now also names what made

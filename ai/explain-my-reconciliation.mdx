@@ -1,0 +1,243 @@
+---
+title: "Explain my reconciliation"
+description: "Your AI compares LedgerSync's copy of a client's bank or card statement with the client's QuickBooks Online account for that month, splits the difference into parts that add up, and names the likely causes, strongest first, each with its evidence. Nothing changes in QuickBooks."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="Explain my reconciliation" subtitle="Ask your AI why an account won't reconcile. It compares the bank statement with your client's QuickBooks account and tells you what made the difference.">
+
+<AiNote tone="green">
+
+**For QuickBooks Online clients**, on bank and card accounts that have statements in LedgerSync. Not set up yet? Go
+to [Start here](/ai/start-here). Added it a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update)
+once.
+
+</AiNote>
+
+## Start
+
+<AiStep id="new-chat" n={1} total={5} title="Start a new chat">
+
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
+
+</AiStep>
+
+<AiStep id="ask" n={2} total={5} title="Ask the AI">
+
+Type *"Why won't Acme's Chase checking reconcile for September?"*, with your client's name, the account and the
+month, and press **Enter**. No month? It checks last month's statement.
+
+</AiStep>
+
+<AiStep id="account" n={3} total={5} title="Pick the QuickBooks account, if asked">
+
+When the account is not linked to a QuickBooks account in LedgerSync, the AI shows the client's bank and card
+accounts in QuickBooks and asks which one it is. It uses your answer for this check only.
+
+</AiStep>
+
+<AiStep id="causes" n={4} total={5} title="Read the difference and its causes">
+
+The AI shows the statement's closing balance, the QuickBooks balance on the statement's last day, and the difference.
+Then it names the likely causes, strongest first, each with its evidence and how much of the difference it explains:
+for example a bank fee the books don't have, two swapped digits, or an entry entered twice. A check not cashed yet
+or a deposit in transit is normal timing, not a mistake.
+
+</AiStep>
+
+<AiStep id="fix" n={5} total={5} title="Make the fixes in QuickBooks">
+
+The AI lists what to fix, entry by entry. Make the fixes in QuickBooks, then reconcile the account there. Fixing them
+from the chat comes in a later update.
+
+</AiStep>
+
+<AiNote tone="green">
+
+**It only reads.** Nothing changes in QuickBooks, and no entry is marked cleared or reconciled.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**Another month or account?** Tell the AI, for example *"the August statement"* or *"the Visa card"*.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**A busy account?** The first answer can take a minute. The AI says LedgerSync is still comparing and asks again
+about 30 seconds later. LedgerSync keeps the result for the day, so asking again answers right away.
+
+</AiNote>
+
+## More details
+
+<AccordionGroup>
+
+<Accordion title="What happens after you ask">
+
+1. The AI finds the client and checks that its QuickBooks connection works.
+2. It finds the account, and the statement for the month: the one dated in that month.
+3. LedgerSync lines up the statement's rows with the entries of the client's QuickBooks account for the statement's
+   period, entry by entry, the way LS Close matches them. When the account is not linked to a QuickBooks account, the
+   AI asks you which one first.
+4. It splits the difference into parts that always add up to it: what started before this statement, rows on the
+   statement that the books don't have, entries in the books the bank hasn't shown, and entries the books date after
+   the statement's last day.
+5. The AI explains the difference, the likely causes first, in plain words.
+6. It lists what to fix, for you to fix in QuickBooks.
+7. At the end, it tells you what the check does not do, and offers a dashboard of the reconciliation, and to check
+   the previous statement or your client's other accounts.
+
+</Accordion>
+
+<Accordion title="The likely causes">
+
+- **The statement itself doesn't add up:** its rows don't add up to its balances, so LedgerSync may have missed rows
+  when it read it. The AI says this first.
+- **A wrong sign:** the books have the amount as money in where the bank shows money out, or the other way.
+- **Two swapped digits:** for example 1,234.56 in the books for 1,243.56 at the bank.
+- **An entry entered twice** in the books, where the bank shows it once.
+- **A bank fee or interest** on the statement that the books don't have.
+- **A date on the other side:** an entry the books date after the statement's last day, or a few days off.
+- **Rows the books don't have:** anything else on the statement with no entry in the books.
+- **A difference from before this statement:** entries still open from the month before, or an earlier mistake. When
+  no entry explains it, the AI offers to check the previous statement.
+- **Not at the bank yet:** checks not cashed and deposits in transit. This is normal timing, not a mistake.
+
+</Accordion>
+
+<Accordion title="What it does not do">
+
+- Mark entries cleared or reconciled in QuickBooks: you reconcile in QuickBooks.
+- Fix entries.
+- Compare statement PDFs you uploaded and converted: it compares the statements LedgerSync reads from the bank.
+- Loan and mortgage accounts.
+- QuickBooks accounts kept in another currency than the company's own.
+- A statement that covers several accounts when LedgerSync can't tell which part is this account's.
+- Clients that use another accounting app, such as QuickBooks Desktop, Zoho Books or Xero.
+
+</Accordion>
+
+<Accordion title="Before you start">
+
+- **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
+  a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the
+  reconciliation check.
+- **The client is connected to QuickBooks in LedgerSync**, the same connection you use to sync transactions from
+  the LedgerSync app.
+- **The client uses QuickBooks Online.**
+- **LedgerSync has statements of the account**, from the client's bank connection.
+
+</Accordion>
+
+<Accordion title="Your client's data">
+
+<AiNote tone="yellow">
+
+**Your client's entries go through your AI account.** The AI app reads the statement's rows and the QuickBooks
+entries that don't match, with their payees and memos, and keeps the chat under your AI account's settings. Check
+that account's data settings before you start.
+
+</AiNote>
+
+</Accordion>
+
+<Accordion title="Optional: the full instructions to paste">
+
+You don't need these: LedgerSync already gives your AI the same steps. If your AI does not follow them, give it
+these instructions.
+
+<div className="lsai-prompt">
+  <AiCopy label="Instructions for your AI" text={`Explain why a LedgerSync client's bank or card account does not reconcile for a month.
+1. Find the client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. The check works for QuickBooks Online clients.
+2. Call ledgersync_get_client_snapshot. If QuickBooks is not connected or not working, tell the user how to fix it, as the snapshot's next_step says, and stop.
+3. Find the account with ledgersync_list_accounts, and ask the user which one when it is not clear. Then find its statement for the month with ledgersync_list_statements: the one whose statement_date falls in that month, last month unless the user names another.
+4. Call ledgersync_compare_statement_to_books with account_id and statement_id. If it answers status running, call it again with the same arguments in about 30 seconds. If it answers status needs_quickbooks_account, ask the user which of its choices is this account in QuickBooks, then call again with that id as qbo_bank_account_id; when it has no choices, do what its next_step says.
+5. Tell the user the statement's closing balance, the QuickBooks balance on the statement's last day and the difference. If the statement's own rows do not add up, say that first. Then explain the difference in plain words, starting with likely_causes, strongest first, each with its evidence and the amount it explains. Entries the bank has not shown yet, such as a check not cashed or a deposit in transit, are normal timing, not mistakes.
+6. LedgerSync cannot change entries yet. List the fixes to make in QuickBooks, entry by entry, with each entry's date, amount and payee and what to change.
+7. Before you finish, tell the user what this check does not do: it does not mark entries cleared or reconciled in QuickBooks, it does not fix entries, and it compares only statements LedgerSync reads from the bank, not statement PDFs the user uploads, loans or mortgages.
+8. End with two offers: a dashboard of this reconciliation, and either to compare the previous statement, when the check's next_step offers it, or to run the same check on the client's other accounts.`} />
+</div>
+
+1. Click **Copy** above.
+2. In Claude, ChatGPT or Grok, start a new chat.
+3. Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
+4. At the end, type the client's name, the account and the month. For example: *Acme, Chase checking, September
+   2026*. Then press **Enter**.
+
+<AiNote tone="gray">
+
+**Using Claude Code?** The instructions are also a LedgerSync command there. Type **/**, pick
+**explain_rec_difference** (it says **(MCP)** next to it) and press **Enter**. Then tell it the client, the account
+and the month.
+
+</AiNote>
+
+</Accordion>
+
+</AccordionGroup>
+
+## If something goes wrong
+
+<AccordionGroup>
+
+<Accordion title="Most common messages">
+
+| The AI says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| **QuickBooks is not connected for this client in LedgerSync.** | In the LedgerSync app, click **Rules Engine**, then **QuickBooks**. In the menu on the left, click **Manage Connections**. Find the client and click **Authorize**, then sign in to the client's QuickBooks. Then ask the AI again. |
+| **The client's QuickBooks connection in LedgerSync stopped working.** | Open **Manage Connections** the same way. At the top, next to the client's name, click **Reconnect** and sign in to QuickBooks again. Then ask the AI again. |
+| LedgerSync is still comparing the statement | Wait. The AI asks again about 30 seconds later. |
+| **This client's books are not in QuickBooks Online.** | LedgerSync checks QuickBooks Online books only for now. |
+| **This account holds statement PDFs that LedgerSync converted, not statements it reads from the bank, so they cannot be compared with the books.** | Ask about one of the client's connected bank or card accounts instead. |
+| **This is a loan or mortgage account.** | The check covers bank and card accounts. |
+| **This statement has no transactions in LedgerSync**, or it is missing its date or balances | Ask about another statement of the account, for example the month before. |
+| **This statement covers several accounts, and LedgerSync cannot tell which part of it is this account's.** | Ask about another statement of the account. |
+| **This QuickBooks account is kept in another currency than the company's own** | The check covers accounts kept in the company's own currency. |
+| **This account has more QuickBooks entries around this statement than QuickBooks can report** | Reconcile this account in QuickBooks. |
+| LedgerSync is busy, or QuickBooks did not answer | Wait a minute, then ask the AI again. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+
+</Accordion>
+
+</AccordionGroup>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the tools">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_get_client_snapshot` | One call to start work on a client: whether QuickBooks is connected, its first accounts with their latest statements, and the playbooks that fit | No |
+    | `ledgersync_list_accounts` and `ledgersync_list_statements` | The client's accounts, and an account's statements with their `statement_date` | No |
+    | `ledgersync_compare_statement_to_books` | One statement against the client's QuickBooks register for its period: the difference on its last day, split into `parts` that add up to it, the `likely_causes`, strongest first, and the rows on each side that nothing matched | No |
+
+    - The instructions above are also an MCP prompt, `explain_rec_difference` ("Explain why an account does not
+      reconcile"), with optional `client`, `account` and `month` arguments. Claude Code lists it as a command.
+    - The client snapshot recommends `explain_rec_difference` when the client's QuickBooks connection works and one
+      of its first accounts has a statement and is not a loan.
+    - The check's `next_step` ends with one or two offers: the list of fixes when there are causes; the previous
+      statement when part of the difference started before this statement and no entry explains it, or else the
+      client's other accounts when the statement and the books agree; and a dashboard of the reconciliation while
+      fewer than two apply.
+    - `ledgersync_compare_statement_to_books` needs `read:accounting` and changes nothing.
+    - See [For developers](/ai/developers) for every field.
+  </Accordion>
+
+  <Accordion title="For developers: limits">
+    - A summary shows 25 rows of each list by default, up to 100, and pages one list at a time with `list` and
+      `next_cursor`. Each answer stays under 15,000 characters.
+    - LedgerSync compares in the background and keeps the comparison for the day. `refresh` compares again, unless the
+      last comparison is under 5 minutes old.
+    - A QuickBooks account the user picks (`qbo_bank_account_id`) is used for that comparison only and never saved.
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>

@@ -190,8 +190,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       and end with one offer. Until the connection has run another tool that worked, it also has
       `suggested_questions`, a short menu of what this connection can ask: reads only for a read-only connection,
       and, for a firm still under review, adding a client and converting a statement PDF (finding a client when
-      read-only). Both menus of a reviewed firm ask which vendors need a 1099, since the 1099 list is a read, and to
-      review a client's books for last month, since the review only reads too.
+      read-only). Both menus of a reviewed firm ask which vendors need a 1099, since the 1099 list is a read, to
+      review a client's books for last month, since the review only reads too, and why a client's bank account won't
+      reconcile for last month, since the reconciliation check only reads as well.
     - `ledgersync_find_clients` also returns the firm's own accounts: the banks connected on the firm owner's
       own LedgerSync login rather than for a client, as the LedgerSync app's client list shows them. They come
       back as one entry, first in the list, whose name ends in "(the firm's own accounts)", marked
@@ -380,8 +381,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - It also returns the client's first accounts, written as `ledgersync_list_accounts` writes them (accounts on
       LedgerSync's own connection included), each with `last_statement` (`statement_id` and `statement_date`, as
       `ledgersync_list_statements` gives them), and `accounts_total`. It names the `recommended_playbooks` that fit:
-      `month_end_review` while QuickBooks works, `form_1099_season` from November 1 to February 15 while QuickBooks
-      works, and `quickbooks_bookkeeping` when an account can post to QuickBooks. `data_as_of` says when it was read.
+      `month_end_review` while QuickBooks works, `explain_rec_difference` while QuickBooks works and one of the
+      accounts it returns has a `last_statement` and is not a loan, `form_1099_season` from November 1 to February 15
+      while QuickBooks works, and `quickbooks_bookkeeping` when an account can post to QuickBooks. `data_as_of` says
+      when it was read.
     - Its `next_step` ends with one or two offers, the first two of: the month-end review (until a review of last
       month finished today), the 1099 check in its season, bookkeeping, connecting a bank when the client has no
       accounts yet, and a dashboard of the client's status.
@@ -487,6 +490,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       answer `status: running`: the same call about 30 seconds later answers it. `refresh` compares again, unless the
       last comparison is under 5 minutes old (`data_as_of` says when QuickBooks was read). Each answer stays under
       15,000 characters. It changes nothing.
+    - Every ready answer's `next_step` ends with one or two offers: the list of fixes when there are causes; the
+      previous statement (`previous_statement_id`) when part of the difference started before this statement and no
+      entry explains it, or else the client's other accounts when the statement and the books agree; and a dashboard of
+      the reconciliation while fewer than two apply.
+    - The instructions on [Explain my reconciliation](/ai/explain-my-reconciliation) are also an MCP prompt,
+      `explain_rec_difference` ("Explain why an account does not reconcile"), with optional `client`, `account` and
+      `month` arguments. Claude Code lists it as a command. The tool's description carries the same steps for AI apps
+      that do not show prompts.
     - It refuses with `invalid_request` and a step, on the argument concerned: a statement converted from an uploaded
       PDF, a loan or mortgage account, an account with no statement in the last 24 months, a statement missing its
       balances or rows, a statement of several accounts whose part for this account LedgerSync cannot tell, and a
