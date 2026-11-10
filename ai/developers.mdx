@@ -69,7 +69,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | Tool | What it does | Changes data |
 | --- | --- | --- |
 | `ledgersync_get_account_status` | Which firm and login it is connected as; is the connection ready; sandbox or live; refreshes left | No |
-| `ledgersync_find_clients` | Finds clients by name or email, and the firm's own accounts, each with the id and the name the other client tools take together | No |
+| `ledgersync_find_clients` | Finds clients by name or email, and the firm's own accounts, each with the id and the name the other client tools take together; says how many clients match in all and, with no search, how many have banks connected and how many need attention | No |
 | `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, and the playbooks that fit | No |
 | `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear | No |
 | `ledgersync_get_vendor_coding_history` | How a client has coded one vendor's entries over the last months: the accounts used, most used first, with how often, when last and the average amount. Takes the vendor, or the text of a bank row | No |
@@ -129,7 +129,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
 <AccordionGroup>
-  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, the firm's own accounts, duplicates, reading and changing a client's details, client messages and invitations, the desktop app, statement conversions, the client snapshot, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, accepting For review transactions and checking rules against them">
+  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, counting clients, the firm's own accounts, duplicates, reading and changing a client's details, client messages and invitations, the desktop app, statement conversions, the client snapshot, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, accepting For review transactions and checking rules against them">
     - Every tool that works on a client names it twice: by its id and by its name. `client_name` goes right after
       `client_id`, and `client_names` after `client_ids`, one name for each id in the same order, as
       `ledgersync_find_clients` lists them in the same chat. The name is the client's name, not its email or id.
@@ -195,6 +195,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       review a client's books for last month, since the review only reads too, why a client's bank account won't
       reconcile for last month, since the reconciliation check only reads as well, and to pull last month's P&L or
       balance sheet for a client, a read too.
+    - `ledgersync_find_clients` returns 25 clients by default (up to 50) and `total`, how many clients match in
+      all, so the AI can say how many clients the firm has without listing them; the firm's own accounts entry is
+      never counted. `next_cursor` gets the next page of the same search. With no search, the first page also has
+      `clients_with_banks`, how many of those clients have at least one bank connected in LedgerSync, working or
+      not, and `clients_needing_attention`, how many of them have a bank connection that needs attention, judged as
+      `ledgersync_list_connections_needing_attention` judges it. An employee's numbers cover the clients assigned
+      to them. `cursor` is a new input, so an AI app that kept an older copy of the tools reloads them before it can
+      page (see Tool updates below); `total` and the counts reach every app at once.
     - `ledgersync_find_clients` also returns the firm's own accounts: the banks connected on the firm owner's
       own LedgerSync login rather than for a client, as the LedgerSync app's client list shows them. They come
       back as one entry, first in the list, whose name ends in "(the firm's own accounts)", marked
