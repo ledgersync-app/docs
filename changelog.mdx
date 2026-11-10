@@ -3,6 +3,21 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-10" tags={["AI connector"]}>
+  ## The reconciliation check is clearer when a statement agrees with the books
+
+  A statement that agrees with the client's QuickBooks books no longer comes back with entries to check:
+
+  - Rows of one date and one amount that nothing tells apart, such as several insurance payments of the same amount
+    on one day, are now paired. They used to be listed as "not matched: check that they are one entry".
+  - LedgerSync also reads the statement before the previous one. An entry the books date a day after the bank posted
+    it, across a month end, is no longer named as still open two months later.
+  - Entries still open from before the statement that cancel each other out are named as such, instead of sending
+    you to the previous statement.
+  - See `ledgersync_compare_statement_to_books` in [For developers](/ai/developers). No new tool: your AI app keeps
+    the tool list it has.
+</Update>
+
 <Update label="2026-11-09" tags={["AI connector"]}>
   ## Your AI pulls a client's financial reports from QuickBooks
 

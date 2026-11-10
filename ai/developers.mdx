@@ -470,7 +470,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       statement's own `statement_incomplete` comes first; then, at each confidence, mistakes come before timing
       (`date_shift`, `opening_difference`, `not_yet_at_bank`). The summary shows up to 10 causes, fewer when the answer
       runs long, and `counts.likely_causes` counts them all. An entry the bank has not shown that QuickBooks marks
-      reconciled or cleared stays `not_yet_at_bank`, with the mark named in the evidence.
+      reconciled or cleared stays `not_yet_at_bank`, with the mark named in the evidence. When the entries still open
+      from before this statement cancel each other out, the `opening_difference` evidence says so.
     - The summary lists the first rows of `on_statement_not_in_books` (statement rows nothing in the books matched) and
       `in_books_not_on_statement` (books entries of the period that neither this statement nor the previous one
       shows), and `counts` counts every row of each list. `list` pages one list at a time
@@ -479,7 +480,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       (QuickBooks' own cleared mark, when the row has one) and `qbo_ref`. `previous_statement_id` names the account's
       statement before this one.
     - Rows are matched as LS Close matches them: the same amount within 4 days, 10 days for a card and 21 for a check
-      whose bank text starts "CHECK #", then combinations of rows.
+      whose bank text starts "CHECK #", then combinations of rows. Rows of one date and one amount that nothing tells
+      apart (two 105.00 deposits on one day, say) are paired in the statement's order, where LS Close's own screen
+      leaves them to you. The previous statement and the one before it, when LedgerSync holds them, are matched as well,
+      so an entry that cleared on either is not named as still open.
     - An account with no QuickBooks account to compare with (not linked, or linked to one that is gone, inactive or not
       a bank or card account) answers `status: needs_quickbooks_account` with the client's bank and card accounts in
       `choices`. The AI asks the user which one, then calls again with its id as `qbo_bank_account_id`, which is used
