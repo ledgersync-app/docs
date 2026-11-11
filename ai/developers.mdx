@@ -333,6 +333,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `ledgersync_list_review_transactions` or `ledgersync_list_transactions`. Each client gets one message,
       about their own transactions only. A transaction that is not one of the named clients' transactions you can
       see, or a named client who holds none of them, is refused with `invalid_request`, and nothing is sent.
+      A Finicity charge still pending at the bank is refused the same way, with a sentence saying so: the client's
+      page lists it only once it has posted, so ask about it then.
       Only bank-feed (Finicity or MX) and PDF statement transactions can be asked about: transactions on LedgerSync's
       own bank connection (`txn_FDE_...`) are refused with `invalid_request`. Like the other previews, it sends
       nothing and creates no link.
