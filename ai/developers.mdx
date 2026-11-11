@@ -1101,7 +1101,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `change_set_id` (`lcs_...`). LedgerSync marks the vendors one at a time in the background and sends QuickBooks
       only each vendor's 1099 flag: nothing else on the vendor changes, and a tax ID is never read or written. A
       vendor someone changed in QuickBooks since the preview is left as it is (`changed_since_preview`). Calling it
-      again with the same `confirmation_id` never marks twice. An apply that got no clear answer comes back as
+      again with the same `confirmation_id` never marks twice: it returns `existing: true` with the change set's
+      status now, or with the status it was first sent with when LedgerSync cannot read that status at the moment.
+      An apply that got no clear answer comes back as
       `upstream_unknown`: check `ledgersync_get_ledger_changes_status` before trying again.
     - `ledgersync_get_ledger_changes_status` takes `client_id`, `client_name` and `change_set_id`. It answers `status` (`queued`,
       `running`, `done`, `partial`, `failed`, `undoing`, `undone` or `undo_failed`), the counts, the AI app the
