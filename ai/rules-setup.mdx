@@ -649,7 +649,7 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     - The apply takes the preview's `confirmation_id` with the same `client_id` and `client_name` the preview named,
       and refuses one that names another client. It works for 30 minutes, only for the person and the AI
       app that made the preview, and saves only the items the preview accepted. Calling the apply again with the
-      same confirmation returns the first answer; it never applies twice.
+      same confirmation never applies twice: it says the setup was already sent and gives its status now.
     - The undo works the same way. The first call changes nothing: it returns what would be removed and kept, and
       an `undo_id`. Only a second call with that `undo_id`, within 15 minutes, undoes the setup. Both calls go to
       the same tool, marked as changing data, so Claude and ChatGPT ask before each one, the check included.

@@ -3,6 +3,18 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-11" tags={["AI connector"]}>
+  ## Applying the same rules setup again says where it stands
+
+  When your AI applies a rules setup it already applied, LedgerSync no longer repeats its first answer ("queued").
+  It says the setup was already sent and gives its status now, such as done or undone. As before, nothing is
+  applied twice.
+
+  - The same goes for linking a global category at every client.
+  - See `ledgersync_apply_rules_setup` in [For developers](/ai/developers). No new tool: your AI app keeps the tool
+    list it has.
+</Update>
+
 <Update label="2026-11-10" tags={["AI connector"]}>
   ## The reconciliation check is clearer when a statement agrees with the books
 

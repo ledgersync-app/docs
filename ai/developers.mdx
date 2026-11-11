@@ -883,7 +883,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       categorized, with the same rule order as for new transactions (the client's rules first, existing ones before
       new ones). When the setup made global rules, it also fills the waiting transactions at the firm's other
       clients on the same platform that one of those rules now wins. Calling it again with the same confirmation
-      returns the first answer and never applies twice.
+      never applies twice: it returns `existing: true` with the setup's status now, or with the status it was first
+      sent with when LedgerSync cannot read that status at the moment.
     - With changes, the apply first checks that each rule it changes is still as the preview showed it. If one
       changed or was deleted since, nothing is saved: the apply is refused with `invalid_request` ("These rules
       changed since the preview: ... Preview again."). The setup then writes the changes, checking each rule again
@@ -1002,6 +1003,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       client, the firm's global rules on that category then file the waiting transactions they now win, and take off
       their "map this category" badge. Transactions another rule holds, or that a person categorized, stay as they
       are. A client that fails does not stop the others. While the setup runs, the firm's other setups wait.
+      Calling it again with the same `confirmation_id` never links twice: it returns `existing: true` with the
+      setup's status now, or with the status it was first sent with when LedgerSync cannot read that status at the
+      moment.
     - `ledgersync_get_rules_setup_status` and `ledgersync_undo_rules_setup` take an `rsl_` `setup_id` without a
       `client_id`. The status counts the clients done (`clients_done` of `clients_total`), and its `firm_links` block
       counts the links made (`linked`) and the transactions filed through them (`filled_through_links`), and lists
