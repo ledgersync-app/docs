@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (59 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (60 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -64,7 +64,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">59</span>
+## Tools <span className="lsai-badge">60</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -75,6 +75,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_get_vendor_coding_history` | How a client has coded one vendor's entries over the last months: the accounts used, most used first, with how often, when last and the average amount. Takes the vendor, or the text of a bank row | No |
 | `ledgersync_compare_statement_to_books` | Why a bank or card statement does not reconcile: LedgerSync's copy of the statement against the client's QuickBooks register for its period, the difference on its last day split into parts that add up to it, and the rows on each side that nothing matched | No |
 | `ledgersync_get_financials` | One financial report of a client straight from QuickBooks Online: profit and loss, balance sheet, cash flow, trial balance, A/R aging or A/P aging, for one period (one day for the as-of reports) or compared with another, each line with its change and the big changes flagged | No |
+| `ledgersync_drill_account` | One account of a client's QuickBooks Online books broken down by the payees on its entries, for one period or compared with another: each payee's amount and entries, which payees are new and which stopped. Starts from an account line of a financial report | No |
 | `ledgersync_create_client` | Adds a client, checking for duplicates first | Yes |
 | `ledgersync_get_client` | A client's details as the app's **Edit Client** screen shows them: its name, its main email and whether the client signs in with it, its main phone number (the one LedgerSync texts), and its extra emails and phone numbers | No |
 | `ledgersync_update_client` | Changes a client's name, main email, main phone number, or extra emails and phone numbers, as the app's **Edit Client** screen does; moves the client's sign-in to a new email only when asked | Yes |
@@ -165,11 +166,13 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `account_id` or `rule_id` answers `not_found` instead of an empty list. `ledgersync_get_operation_status`
       answers only for a refresh of the connection it names.
     - Ids that only mean something inside one client's books come sealed to that client: QuickBooks categories,
-      payees, bank accounts and vendors, and the client's own categories, vendors and customers in rules setup
-      (`cat_c_...`, `ven_c_...`, `cus_c_...`). A sealed id is the id, a dot and 8 more characters. A tool takes it
-      back only for the client, and the kind of id, it was given for: one from another client's list, or one with no
-      seal (as LedgerSync gave ids before), is refused with `invalid_request`, and the `next_step` tells the AI to
-      list this client's again.
+      payees, bank accounts and vendors, the accounts on a financial report's lines, and the client's own
+      categories, vendors and customers in rules setup (`cat_c_...`, `ven_c_...`, `cus_c_...`). A sealed id is the
+      id, a dot and 8 more characters. A tool takes it back only for the client, and the kind of id, it was given
+      for: one from another client's list, or one with no seal (as LedgerSync gave ids before), is refused with
+      `invalid_request`, and the `next_step` tells the AI to list this client's again. A financial report line's
+      `account_id` is taken only by `ledgersync_drill_account`: another tool's input refuses it with words that name
+      that tool.
       The firm's ids (`cat_f_...`, `ven_f_...`), rule ids, and ids no tool takes back, such as a pushed transaction's
       QuickBooks id, stay as they are.
     - A change that runs a preview's confirmation names the same clients, with their names, as the preview did:
@@ -537,6 +540,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `total`. The trial balance gives `debit` and `credit`, and the aging reports `current`, `days_1_30`,
       `days_31_60`, `days_61_90`, `days_91_and_over` and `total`. Amounts are strings with 2 decimals, and a blank
       amount is left out.
+    - On the P&L, the balance sheet, the cash flow and the trial balance, each `account` line also has its
+      `account_id`, sealed to the client, for `ledgersync_drill_account`; the aging reports' lines have none. The
+      `next_step` says which dates to drill with on each report: the report's own over a period, and from the day
+      after `compare_as_of` to `as_of` for a balance sheet's change. A balance on one day is not activity over a
+      period, so there the AI asks the user which period.
     - Each answer stays under 15,000 characters: the first page carries the summary and the flagged lines, then the
       lines, and a long report gives `next_cursor` for the next page. Each page reads QuickBooks again, so a cursor is
       refused when the period, the basis or the client's books changed since.
@@ -544,6 +552,32 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       busy for the client, the call answers `upstream_unavailable`: try again in a few minutes. A report QuickBooks
       cuts short is refused with `invalid_request` on `from`, or on `to` for the as-of reports. A client on Zoho Books
       or Xero is refused too. It changes nothing.
+    - `ledgersync_drill_account` breaks one account of a QuickBooks Online client down by the payees on its entries
+      (vendors, customers and anyone else QuickBooks names), straight from QuickBooks. `account_id` is an account
+      line's `account_id` from `ledgersync_get_financials`, a category id from `ledgersync_list_quickbooks_categories`
+      or a review report, or a QuickBooks bank account id from `ledgersync_get_quickbooks_setup`.
+    - The period is `from` and `to` (both or neither; default: last month), and `compare_from` and `compare_to`
+      compare it with another; each period is at most 366 days. It lists a period's activity, never a balance.
+      `basis` is `accrual` or `cash`, by default the client's QuickBooks report setting: pass the report's basis so
+      the total matches its line.
+    - By default the total is the account's own entries, the figure on its own report line;
+      `include_sub_accounts: true` counts its sub-accounts' entries too, the figure on a parent's Total line. The
+      `summary` always says what sits in the sub-accounts, and an account with no entries of its own says so and
+      offers to read its sub-accounts.
+    - Each row of `payees` has its `amount` and `entries` in the period and, with a comparison, `compare_amount`,
+      `compare_entries`, `change`, `change_pct` and `status`: `new` (entries in the period and none in the compare
+      period), `stopped` (the reverse) or `continuing`, by entries, not amounts. The largest changes come first (with
+      one period, the largest amounts), each row with its `evidence`. Entries with no payee are one row, marked
+      `no_payee`, last and never counted as a payee. The first `limit` payees are listed one by one (default 15, at
+      most 50), and the rest are summed in `others`, so the rows and `others` always add up to the total.
+    - The `summary` gives the amount and entries in each period, the change, how many payees, how many are new with
+      their amount, and how many stopped with their compare amount. Amounts are strings with 2 decimals. Each answer
+      stays under 15,000 characters: when long names would pass that, the last payees are summed in `others` too,
+      and a note says so.
+    - LedgerSync reads QuickBooks while the call waits, usually a few seconds, and stores nothing. When QuickBooks is
+      busy for the client, the call answers `upstream_unavailable`: try again in a few minutes. A ledger QuickBooks
+      cuts short, or takes too long to read over more than a month, is refused with `invalid_request` on `from` or
+      `compare_from`: pick a shorter period. A client on Zoho Books or Xero is refused too. It changes nothing.
     - QuickBooks bookkeeping is for clients whose bank transactions do not come into QuickBooks through a
       QuickBooks bank feed. The AI categorizes the client's transactions waiting in LedgerSync and, after the user
       approves a preview, LedgerSync posts them into the client's QuickBooks Online. See

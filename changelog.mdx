@@ -4,6 +4,19 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-11" tags={["AI connector"]}>
+  ## Your AI explains a line of a financial report, payee by payee
+
+  Ask your AI *"Which vendors are behind the jump in Acme's equipment rental in October?"*. It breaks the account
+  down by the vendors, customers and others on its entries, straight from the client's QuickBooks Online: each
+  one's amount in each period, which are new and which stopped. It starts from a line of a financial report, with
+  the report's own dates, so the total matches the line.
+
+  - See `ledgersync_drill_account` in [For developers](/ai/developers). The account lines of
+    `ledgersync_get_financials` now carry the `account_id` it takes.
+  - Your AI app loads the new tool list first (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-11-11" tags={["AI connector"]}>
   ## Applying the same rules setup again says where it stands
 
   When your AI applies a rules setup it already applied, LedgerSync no longer repeats its first answer ("queued").
