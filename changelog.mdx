@@ -4,6 +4,20 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-11" tags={["AI connector"]}>
+  ## LedgerSync is in ChatGPT's plugin directory
+
+  In ChatGPT, open **Plugins**, search **LedgerSync** and click **Install plugin**. Then sign in with your LedgerSync
+  login and click **Allow**. No address to copy, and no Developer mode. See [Set up in ChatGPT](/ai/setup-chatgpt).
+
+  - The plugin from the directory gets new LedgerSync tools on its own, after OpenAI's daily check, so it has no
+    **Refresh tools** to click (see [After a LedgerSync update](/ai/troubleshooting#after-an-update)).
+  - Added LedgerSync by hand before? It keeps working. To switch, see *Added LedgerSync to ChatGPT by hand before?* on
+    [Set up in ChatGPT](/ai/setup-chatgpt).
+  - The sandbox address is still added by hand (see [For developers](/ai/developers)). When a tool list is out of
+    date, the connector's `next_step` now says **Refresh tools** only for a copy added by hand.
+</Update>
+
+<Update label="2026-11-11" tags={["AI connector"]}>
   ## Your AI checks a new client's books before you price the cleanup
 
   Ask your AI *"Check Acme's books before I price the cleanup."*. It reads the client's QuickBooks Online books

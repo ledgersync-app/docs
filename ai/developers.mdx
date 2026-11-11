@@ -42,7 +42,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
   - Sub-account (firm) logins and their employees cannot connect yet; they get **Connecting an AI assistant is
     not available for sub-account logins yet.** Client logins, support sessions and logins with access days and
     hours cannot connect.
-  - ChatGPT works on any plan, even the free one, in the web version on chatgpt.com. Add it from
+  - ChatGPT: since 2026-11-11 the live connector is a plugin in ChatGPT's plugin directory,
+    [LedgerSync by LedgerSync Inc.](https://chatgpt.com/plugins/plugin_asdk_app_6ae388df146c819191650a15919c8776)
+    (`plugin_asdk_app_6ae388df146c819191650a15919c8776`). Install it from **Plugins** (search **LedgerSync**, then
+    **Install plugin**) on chatgpt.com or the ChatGPT desktop app; once installed it also works in the phone app. On
+    ChatGPT Business, Enterprise or Edu, the workspace admin sets who can install it (**Admin console**, then
+    **Plugins**). See [Set up in ChatGPT](/ai/setup-chatgpt).
+  - Added by hand (the sandbox address, or a ChatGPT that can't install it from the directory), ChatGPT works on any
+    plan, even the free one, in the web version on chatgpt.com. Add it from
     **Plugins**: **Add**, then **Add custom MCP server** (older screens: **Create MCP
     App**). If neither is there, turn on **Developer mode** (**Settings**, then **Security and login**). On
     ChatGPT Business, Enterprise or Edu, only the workspace admin can add it for everyone.
@@ -143,7 +150,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       also gives `client_id`, `client_name` (the client that id really is) and `given_client_name`. A call that names
       several clients is refused whole when one of them is wrong.
     - An AI app that still holds LedgerSync's tool list from before October 30, 2026, when names began, sends client
-      ids without names: ChatGPT keeps that list until you click **Refresh tools**. The tools that read one client and
+      ids without names: a ChatGPT copy added by hand keeps that list until you click **Refresh tools**. The tools that read one client and
       existed then still answer such a call: the id must be a client the person sees, a name it does give must be
       that client, other ids must be the client's, and the answer names the client. Those are the list, get and status
       tools of connections, accounts, transactions, statements, rules, rules setup, For review transactions,
@@ -714,7 +721,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `ledgersync_get_rules_setup` answers `supported: false` with the reason in its `next_step`, and a preview is
       refused with `invalid_request`. See
       [Set up rules for a client](/ai/rules-setup). An AI app connected before these tools came out must load the
-      new tool list first: reconnect in Claude, click **Refresh** in ChatGPT or reauthenticate in Grok, then start a
+      new tool list first: reconnect in Claude, click **Refresh** in ChatGPT (a copy added by hand) or reauthenticate in Grok, then start a
       new chat (see Tool updates below).
     - The AI offers rules without being asked. For a Manual or QuickBooks Online client, the first page of
       `ledgersync_list_transactions` also answers `transactions_without_rule`: how many of the client's transactions
@@ -1494,15 +1501,21 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
   <Accordion title="Tool updates: Claude and ChatGPT keep a copy of the tool list, and Grok may too">
     - Claude and ChatGPT keep their own copy of the connector's tools: names, descriptions and settings. After
       LedgerSync adds a tool or a setting (for example `for_check_images` on 2026-10-07), reconnect in Claude
-      or click **Refresh** in ChatGPT, then start a new chat. See
+      or click **Refresh** in ChatGPT (a copy added by hand), then start a new chat. See
       [After a LedgerSync update](/ai/troubleshooting#after-an-update).
+    - The plugin from ChatGPT's plugin directory (since 2026-11-11) has no **Refresh tools** button. OpenAI scans the
+      live connector every day: a new tool reaches users once it passes OpenAI's automated checks, a changed tool keeps
+      its previous definition until the new one passes, and a removed tool goes at the next scan. So a new tool can
+      take a day or more to show up there. On ChatGPT Business, Enterprise or Edu, the workspace admin's **New tools**
+      (or **New actions**) setting decides whether tools added later are allowed.
     - In Grok, load an update by connecting again: open [grok.com/connectors](https://grok.com/connectors), click
       **LedgerSync**, then **Reauthenticate**. Then start a new chat.
     - On 2026-10-30 every tool that works on a client gained `client_name` next to `client_id` (`client_names` next
       to `client_ids`), `ledgersync_get_fix_link` gained `client_id`, and the confirmed changes gained the clients
       of their preview. An AI app that kept the older copy sends no name, so LedgerSync refuses the call with
       `invalid_request`, and its `next_step` says to reload LedgerSync's tools once (Claude: reconnect; ChatGPT:
-      **Refresh tools**; Grok: **Reauthenticate**) and start a new chat.
+      **Refresh tools** on a copy added by hand, while the plugin from ChatGPT's plugin directory gets new tools on its
+      own after OpenAI's daily check; Grok: **Reauthenticate**) and start a new chat.
     - What a tool returns always comes from the live server, so new result fields and messages work at once.
   </Accordion>
 
