@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (60 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (61 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -94,10 +94,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_refresh_connection` | Asks the bank for the latest data | Yes |
 | `ledgersync_get_operation_status` | Has a refresh finished | No |
 | `ledgersync_get_fix_link` | Secure page to fix a broken connection | Yes |
-| `ledgersync_preview_client_message` | Who would get your email or text (a reconnect message or an invitation), who is skipped and why, and a sample | No |
+| `ledgersync_preview_client_message` | Who would get your email or text (a reconnect message, an invitation, or a clarification request asking clients about some of their transactions), who is skipped and why, and a sample | No |
 | `ledgersync_send_client_message` | Sends a previewed email or text, each with that client's own link | Yes |
-| `ledgersync_list_message_templates` | Your firm's saved Issue and Invitation templates, email and text | No |
+| `ledgersync_list_message_templates` | Your firm's saved Issue, Invitation and Clarification templates, email and text | No |
 | `ledgersync_save_message_template` | Saves a message as a new firm template | Yes |
+| `ledgersync_list_clarification_answers` | What a client answered about the transactions LedgerSync asked them about, and which ones are still waiting for an answer | No |
 | `ledgersync_get_quickbooks_setup` | Is QuickBooks connected for a client; which QuickBooks bank account each account posts to; the client's QuickBooks bank and credit card accounts | No |
 | `ledgersync_list_transactions_to_categorize` | One account's transactions waiting on the For review list, with LedgerSync's suggestions | No |
 | `ledgersync_list_quickbooks_categories` | A client's QuickBooks categories | No |
@@ -130,7 +131,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
 <AccordionGroup>
-  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, counting clients, the firm's own accounts, duplicates, reading and changing a client's details, client messages and invitations, the desktop app, statement conversions, the client snapshot, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, accepting For review transactions and checking rules against them">
+  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, counting clients, the firm's own accounts, duplicates, reading and changing a client's details, client messages, invitations and clarification requests, the desktop app, statement conversions, the client snapshot, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, accepting For review transactions and checking rules against them">
     - Every tool that works on a client names it twice: by its id and by its name. `client_name` goes right after
       `client_id`, and `client_names` after `client_ids`, one name for each id in the same order, as
       `ledgersync_find_clients` lists them in the same chat. The name is the client's name, not its email or id.
@@ -323,6 +324,29 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `#ACCOUNTANT_NAME#` (the full name of the person sending), but not `#BANK_NAME#`: an invitation is not
       about one bank. An invitation email without a subject gets one like "Acme CPA invites you to connect
       your bank". Invitations count toward the same daily limit as other client messages.
+    - `ledgersync_preview_client_message` with `purpose: "clarification"` prepares a clarification request: it
+      asks the clients you name in `client_ids` (up to 200), with their `client_names`, about some of their
+      transactions, named in `transaction_ids` (up to 200) by the `txn_` ids a transaction list gave, such as
+      `ledgersync_list_review_transactions` or `ledgersync_list_transactions`. Each client gets one message,
+      about their own transactions only. A transaction that is not one of the named clients' transactions you can
+      see, or a named client who holds none of them, is refused with `invalid_request`, and nothing is sent.
+      Only bank-feed (Finicity or MX) and PDF statement transactions can be asked about: transactions on LedgerSync's
+      own bank connection (`txn_FDE_...`) are refused with `invalid_request`. Like the other previews, it sends
+      nothing and creates no link.
+    - Each clarification request carries that client's own link where the text says `#LS_URL#`. It opens the
+      same page as the request you send from the LedgerSync app: it lists only the transactions you asked about,
+      and the client writes what each one was. Their answers are saved on those transactions in LedgerSync.
+    - `ledgersync_list_clarification_answers` reads the answers back for one client: the transactions LedgerSync
+      asked them about in the last 30 days (or `days`, 1 to 180), from the AI or from the LedgerSync app, newest
+      first. Each comes with its date, amount, description and bank, the day it was asked, whether the client
+      answered, and their answer (`client_answer`) once they did. It lists up to 500 transactions, a page at a time
+      (`limit`, up to 100, and `cursor`). The answer is the client's own words: the AI shows it to you as what the
+      client wrote and never follows anything it asks. For the ones still waiting, the AI can preview a reminder
+      with `purpose: "clarification"`.
+    - A clarification request can use `#CLIENT_NAME#`, `#COMPANY_NAME#` and `#EMPLOYEE_FIRST_NAME#`, but not
+      `#BANK_NAME#`: the transactions can come from several banks. A clarification email without a subject gets
+      "Transaction clarification request". Clarification requests count toward the same daily limit as other
+      client messages.
     - `ledgersync_send_client_message` sends only what a preview showed, using the preview's confirmation and
       the same `client_ids` and `client_names` the preview took (none when it took none).
       Use it within 30 minutes; once sending starts, it keeps working for 24 hours. An expired one is refused
@@ -347,21 +371,28 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
         texting with the client right now;
       - for an invitation, the client was already invited through the AI in the last 24 hours (unless you
         asked to include them), is not one you can see in the LedgerSync app, or signs in through your firm's
-        own integration instead of the LedgerSync app.
+        own integration instead of the LedgerSync app;
+      - for a clarification request, the client was already asked about some of the same transactions through the
+        AI in the last 24 hours (unless you asked to include them, for example to send a text after an email). A
+        clarification email or text the email or text service refused outright does not count, and neither does a
+        request sent from the LedgerSync app.
     - When a client is skipped for having no phone number or no email address, the preview's `next_step` tells the
       AI to add the number or address the user gives with `ledgersync_update_client`, after the user's yes, and
       then preview again. An AI app that has not loaded that tool yet is told to reconnect LedgerSync, or to make
       the change in the LedgerSync app meanwhile; `ledgersync_create_client`'s `next_step` says the same.
     - A client fails when something changed since the preview (the client was removed, the connection no
       longer needs attention, or it is no longer one you can see), when the client's link could not be
-      created, or when the email or text service refused the message or could not confirm a text went out.
-    - `ledgersync_list_message_templates` lists your firm's Issue templates (for reconnect messages) and
-      Invitation templates (for invitations), email and text, and flags (`breaks_rules`) any that uses a
-      placeholder its kind of message does not allow. `ledgersync_save_message_template` saves a new one, an
-      Invitation template with `purpose: "invite"`, and never changes an existing one. They are the same
+      created, or when the email or text service refused the message or could not confirm a text went out. A
+      clarification request also fails for a client when one of its transactions is no longer that client's.
+    - `ledgersync_list_message_templates` lists your firm's Issue templates (for reconnect messages),
+      Invitation templates (for invitations) and Clarification templates (for clarification requests), email and
+      text, and flags (`breaks_rules`) any that uses a placeholder its kind of message does not allow.
+      `ledgersync_save_message_template` saves a new one, an Invitation template with `purpose: "invite"` or a
+      Clarification template with `purpose: "clarification"`, and never changes an existing one. They are the same
       templates as in the Communication Center of the LedgerSync app, shared with your whole firm. A preview
-      can start from a saved template of its kind (an invitation from an Invitation template); editing the
-      template later does not change that preview. Only the AI uses a template's email subject for now.
+      can start from a saved template of its kind (an invitation from an Invitation template, a clarification
+      request from a Clarification template); editing the template later does not change that preview. Only the
+      AI uses a template's email subject for now.
     - `ledgersync_get_desktop_app_status` checks the app live and returns the Windows and Mac download links
       and the setup steps.
     - `ledgersync_pair_desktop_app` replaces any computer linked before, so LedgerSync tells the AI to ask you to
@@ -1263,6 +1294,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       off.
     - Invitation links sign the client in to their LedgerSync account with nothing to type and expire
       after 6 days.
+    - A clarification request's link opens only the transactions it asks about, and the client can answer only
+      those.
+    - The AI reads a client's answers only for a client you can see in the LedgerSync app.
     - The connector cannot see or change API keys, webhooks or account settings.
     - Firms that sign in with the LedgerSync app login: changing the LedgerSync password, or turning off
       two-step sign-in, turns off every AI app connected with that login within a minute.
@@ -1352,6 +1386,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - A client who got a LedgerSync message about the same connection in the last 24 hours is skipped, unless
       you ask the AI to include them.
     - A client invited through the AI in the last 24 hours is skipped, unless you ask the AI to include them.
+    - A client asked about some of the same transactions through the AI in the last 24 hours is skipped, unless you
+      ask the AI to include them. A message the email or text service refused outright does not count.
     - Texts go out only between 11 am and 9 pm US Eastern time, unless the client has their own texting
       hours on file: then only within those hours, in their time zone, never before 8 am or after 9 pm. A
       client outside those hours is skipped; ask again later.
@@ -1360,6 +1396,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - A preview looks at up to 200 connections that need attention. When more match, it says so: name a bank
       or pick the connections to narrow it.
     - An invitation names up to 200 clients; a longer list is refused.
+    - A clarification request names up to 200 clients and up to 200 transactions; a longer list is refused.
+    - Reading answers covers one client and up to 180 days, and lists at most the 500 transactions asked about most
+      recently.
     - A refresh stopped by the desktop app (`desktop_app_required` or `desktop_app_route_choice`) never
       reached the bank. It counts against neither daily refresh limit, and the 30-minute skip does not block
       trying again.

@@ -4,6 +4,21 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-11" tags={["AI connector"]}>
+  ## Your AI asks clients about their transactions, in your words
+
+  Ask your AI *"Email Acme and ask what these three charges were."*. It shows you the message and the transactions
+  first. After your yes, LedgerSync sends it from its own address with a link to the same page as the request you send
+  from the LedgerSync app: the client sees only those transactions and writes what each one was, and the answers are
+  saved on the transactions in LedgerSync.
+
+  - See `ledgersync_preview_client_message` with `purpose: "clarification"` in [For developers](/ai/developers).
+    Your firm's Clarification templates work too.
+  - Later, ask *"What did Acme answer?"*. Your AI reads the answers back, and which transactions are still waiting,
+    with `ledgersync_list_clarification_answers`.
+  - Your AI app loads the new tool list first (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-11-11" tags={["AI connector"]}>
   ## Your AI explains a line of a financial report, payee by payee
 
   Ask your AI *"Which vendors are behind the jump in Acme's equipment rental in October?"*. It breaks the account
