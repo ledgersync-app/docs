@@ -4,6 +4,20 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-11" tags={["AI connector"]}>
+  ## Your AI checks a new client's books before you price the cleanup
+
+  Ask your AI *"Check Acme's books before I price the cleanup."*. It reads the client's QuickBooks Online books
+  over the last 12 full months and gives the figures a cleanup is priced from: entries per month, each bank and card
+  account with how long since an entry was reconciled, the entries waiting in Uncategorized and Ask My Accountant,
+  suspense balances, unused accounts, and receivables and bills over 90 days. It gives figures, never hours: for an
+  estimate, your AI asks for your firm's own rates.
+
+  - See `ledgersync_run_diagnostic` in [For developers](/ai/developers). Each account it lists carries the
+    `account_id` that `ledgersync_drill_account` takes.
+  - Your AI app loads the new tool list first (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-11-11" tags={["AI connector"]}>
   ## Your AI asks clients about their transactions, in your words
 
   Ask your AI *"Email Acme and ask what these three charges were."*. It shows you the message and the transactions
