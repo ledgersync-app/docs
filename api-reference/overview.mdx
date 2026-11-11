@@ -1,0 +1,56 @@
+---
+title: "API reference"
+sidebarTitle: "Overview"
+description: "Every v3 endpoint, grouped by what it works on. Pick one in the sidebar to see its parameters and responses."
+---
+
+Send your secret key as a Bearer token:
+
+```bash
+curl https://api-sandbox.ledgersyncappv2.com/v3/clients \
+  -H "Authorization: Bearer sk_test_..."
+```
+
+## Base URLs
+
+| Environment | Base URL | Keys start with |
+| --- | --- | --- |
+| Sandbox | `https://api-sandbox.ledgersyncappv2.com/v3` | `sk_test_` |
+| Live | `https://api.ledgersyncappv2.com/v3` | `sk_live_` |
+
+## Endpoint groups
+
+| Group | What it covers |
+| --- | --- |
+| Clients | The end users whose bank accounts you manage, their hosted connect links, and short-lived end-user tokens. |
+| Connections | A Client's link to one bank: open it, read it, refresh it, reauthorize it, or disconnect it. |
+| Accounts | The accounts a connection brings in: list them or read one. |
+| Transactions | Posted transactions and pending charges for an account. |
+| Statements | The period statements the bank publishes (usually monthly PDFs), and turning an uploaded statement PDF into transactions. |
+| Checks | Images of paper checks read from FDE statements. FDE connections only. |
+| Operations | Check on the few calls that run in the background, or wait for their webhook. |
+| Webhooks | Where LedgerSync sends event notifications: subscriptions, test events, and signing-secret rotation. |
+| ApiKeys | Create, list, and revoke API keys, and change a key's scopes. Each key works in one environment. |
+| Institutions | The bank catalog: search it, then pass a bank's `id` when you open a connection. |
+| Settings | Your allowlist of redirect URLs, one per environment. |
+| Sandbox | Sandbox only: the list of test banks you can connect to. |
+| Metrics | Read-only stats behind the developer portal's Metrics page. |
+| Health | A liveness check. No key needed. |
+| PortalGating | Calls the LedgerSync developer portal makes for sandbox and live access requests. Not part of your integration. |
+
+## Related guides
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Keys, the two environments, and the trace id header.
+  </Card>
+  <Card title="Errors" icon="triangle-exclamation" href="/guides/errors">
+    One error envelope. Branch on `code`.
+  </Card>
+  <Card title="Pagination" icon="list" href="/guides/pagination">
+    Follow `next_cursor` until `has_more` is false.
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/guides/webhooks">
+    Subscribe, verify signatures, handle retries.
+  </Card>
+</CardGroup>

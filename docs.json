@@ -82,7 +82,13 @@
       },
       {
         "tab": "API Reference",
-        "openapi": "openapi.yaml"
+        "openapi": "openapi.yaml",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": ["api-reference/overview"]
+          }
+        ]
       },
       {
         "tab": "v2 API (legacy)",
