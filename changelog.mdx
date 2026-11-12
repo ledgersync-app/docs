@@ -4,6 +4,20 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-12" tags={["AI connector"]}>
+  ## Get check images from Claude or ChatGPT
+
+  Ask your AI *"Get Acme's October check images, named by payee and date."*. It lists each check (its date, number,
+  amount, payee and memo as read from the check, and the bank transaction LedgerSync matched it to, when there is one)
+  and gives you a link that downloads the images: one check as its image, more as a ZIP with a CSV of their details.
+
+  - Two new tools: `ledgersync_list_check_images` and `ledgersync_get_check_images_download_link`. The images never
+    enter the chat. The links work once and expire after 10 minutes, like statement links.
+  - Name the files your way: say how, for example payee, then the date, then the check number. Up to 200 checks a
+    link, and up to 10 links at a time.
+  - Your AI app loads the new tools with the tool list (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-11-12" tags={["AI connector"]}>
   ## Your AI explains what changed this month, and scopes a new client's cleanup
 
   Ask your AI *"Why did Acme's expenses jump in October?"*. It compares two periods of the client's QuickBooks Online

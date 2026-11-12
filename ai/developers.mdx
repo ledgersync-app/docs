@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (62 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (64 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -71,7 +71,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">62</span>
+## Tools <span className="lsai-badge">64</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -96,6 +96,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_list_transactions` | An account's transactions (last 30 days by default), leaving out the ones on LedgerSync's Excluded list unless the user asks for them (`include_excluded`, which marks each one `excluded`); for a Manual or QuickBooks Online client, how many of its transactions have no rule yet, leaving out accounts hidden in LedgerSync | No |
 | `ledgersync_list_statements` | An account's statements | No |
 | `ledgersync_get_statement_download_link` | One-time link to a statement PDF | No |
+| `ledgersync_list_check_images` | A client's check images, newest first: each check's date, number, amount, payee and memo as read from the check, its bank and account, and the bank transaction LedgerSync matched it to. Never the images themselves | No |
+| `ledgersync_get_check_images_download_link` | One-time links to a client's check images as files: one check as its image, more as a ZIP (up to 200 a link) with each image named the way you ask and a CSV of their details | No |
 | `ledgersync_create_statement_upload_link` | Secure page where you upload a bank statement PDF to turn it into transactions | Yes |
 | `ledgersync_get_statement_conversion` | Has a statement conversion finished; its transactions, a page at a time | No |
 | `ledgersync_get_conversion_download_link` | One-time link to a converted statement as a CSV, Excel, QuickBooks or OFX file | No |
@@ -297,7 +299,24 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       ticked. Check images come only through LedgerSync's own connection, so for many banks they need one
       sign-in for it and another for transactions or statements. That connection is created as soon as the
       account holder confirms it on the page; if they stop before signing in, use `ledgersync_get_fix_link` on
-      that connection instead of a new link. The images show in the LedgerSync app; no tool returns them.
+      that connection instead of a new link. The images show in the LedgerSync app, and
+      `ledgersync_list_check_images` lists them once they arrive with the statements.
+    - `ledgersync_list_check_images` lists a client's check images, newest first, 50 a page (`limit` up to 100,
+      `cursor` for more): each check's `check_id`, `date` (the day it cleared), `check_number`, `amount`
+      (negative for a check the client wrote, positive for one they deposited), `payee` and `memo` as read from
+      the check, `check_date` (written on the check), `bank`, `account_id`, `account` and, when LedgerSync matched
+      the check to a bank transaction, its `transaction_id`. Narrow it with `account_id`, `from` and `to`. Check
+      images come only from a bank's Statements & Images connection: for another account, or a client without
+      one, the `next_step` says so.
+    - `ledgersync_get_check_images_download_link` gives links to the image files, never the images in the chat.
+      It takes the same `account_id`, `from` and `to`, or up to 200 `check_ids` from the list, and a
+      `file_name_pattern` built from your naming convention with `{date}`, `{year}`, `{month}`, `{day}`,
+      `{check_number}`, `{payee}`, `{amount}`, `{memo}`, `{account}`, `{bank}` and `{check_date}` (the default
+      is `{date}_{check_number}_{payee}_{amount}`; the answer shows an `example_file_name`). One check downloads
+      as its image; more as a ZIP of up to 200 images with `check-images.csv` (each check's details and its
+      file) and, when some could not be included, `checks-not-included.txt`. More than 200 checks come as
+      several links, newest first, up to 10 (2,000 checks); more is refused with a step to ask for a shorter
+      period. Both tools need `read:checks`, which every connection holds, read-only ones too.
     - `ledgersync_search_institutions` also says whether a bank gives transactions, statements and check
       images. When a bank in the answer gives check images, the result adds a `check_images_note` on how to
       connect them. `ledgersync_list_connections` also gives each connection's status.
@@ -1337,7 +1356,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       descriptions and `next_step`s carry them.
   </Accordion>
 
-  <Accordion title="Security: a tool acts only on the client the user named, bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview, rules saved only after a preview, 24-hour export links that export only on Download, vendors marked for 1099 only after a preview, tax IDs never shown, For review transactions accepted only after a preview">
+  <Accordion title="Security: a tool acts only on the client the user named, bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement and check image links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview, rules saved only after a preview, 24-hour export links that export only on Download, vendors marked for 1099 only after a preview, tax IDs never shown, For review transactions accepted only after a preview">
     - A tool acts only on the client the user named. Each client id comes with the client's name, and LedgerSync
       checks they are the same client, and one the person sees, before it reads or changes anything. An id that is
       another client than the name, such as one the AI remembered from an earlier chat, is refused, and so is a
@@ -1346,6 +1365,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       in there, or on the bank-data partner's secure page it opens for some banks. Connect links expire after
       72 hours.
     - Statement download links expire after 10 minutes and work once; if a download fails, ask for a new link.
+    - Check image download links expire after 10 minutes and work once too. The images never enter the chat,
+      and the address where LedgerSync stores them never leaves LedgerSync: the link's page reads the client's
+      checks again as the person who asked for it and serves only the checks it names.
     - Statement upload links work for 24 hours and take one PDF. Converted-file links expire after 10 minutes
       and work once. Both stop working when the connection does: when it is disconnected or made read-only
       (uploads only), when the person's LedgerSync login can no longer connect, or when the connector is turned
