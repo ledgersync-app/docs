@@ -23,7 +23,7 @@ In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
 
 </AiStep>
 
-<AiStep id="ask" n={2} total={5} title="Ask the AI">
+<AiStep id="ask" n={2} total={5} title="Ask the AI" img="/images/ai-what-changed/wc-1-ask.png" caption="Your request">
 
 Type *"Why did Acme's expenses jump in October?"*, with your client's name and the month, and press **Enter**. No
 month? It compares last month with the month before. Want another comparison? Add it, for example *"against October
@@ -31,7 +31,7 @@ last year"*.
 
 </AiStep>
 
-<AiStep id="changes" n={3} total={5} title="Read the big changes">
+<AiStep id="changes" n={3} total={5} title="Read the big changes" img="/images/ai-what-changed/wc-2-changes.png" caption="The big changes">
 
 The AI shows the totals for both periods, such as income, expenses and net income, and how much each changed. Then it
 shows the lines that changed the most, each with its evidence, for example *up 5,400.00 (263.41%), from 2,050.00 to
@@ -39,17 +39,19 @@ shows the lines that changed the most, each with its evidence, for example *up 5
 
 </AiStep>
 
-<AiStep id="payees" n={4} total={5} title="See who is behind each change">
+<AiStep id="payees" n={4} total={5} title="See who is behind each change" img="/images/ai-what-changed/wc-3-payees.png" caption="The vendors behind each change">
 
 For the biggest changes, the AI breaks the account down by vendor or customer: which changed the most, which are new
 this period and which stopped, with their amounts.
 
 </AiStep>
 
-<AiStep id="summary" n={5} total={5} title="Send the summary">
+<AiStep id="summary" n={5} total={5} title="Send the summary" img="/images/ai-what-changed/wc-4-summary.png" caption="The summary to send">
 
-The AI ends with a short summary in plain words: what changed, why, and any questions to ask your client. Copy it into
-an email to your client or a partner.
+Ask for it, for example *"Write a short summary I can send the client."* The AI writes a short summary in plain
+words: what changed, why, and any questions to ask your client. Copy it into an email to your client or a partner.
+In Claude, the ready-made guide writes it without being asked: the **+** button, **Connectors**, **Add from
+LedgerSync**, then **Explain what changed between two periods**.
 
 </AiStep>
 
