@@ -303,7 +303,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `ledgersync_list_check_images` lists them once they arrive with the statements.
     - `ledgersync_list_check_images` lists a client's check images, newest first, 50 a page (`limit` up to 100,
       `cursor` for more): each check's `check_id`, `date` (the day it cleared), `check_number`, `amount`
-      (negative for a check the client wrote, positive for one they deposited), `payee` and `memo` as read from
+      (negative for a check the client wrote; positive for one they deposited or, at some banks, one they
+      wrote), `payee` and `memo` as read from
       the check, `check_date` (written on the check), `bank`, `account_id`, `account` and, when LedgerSync matched
       the check to a bank transaction, its `transaction_id`. Narrow it with `account_id`, `from` and `to`. Check
       images come only from a bank's Statements & Images connection: for another account, or a client without
