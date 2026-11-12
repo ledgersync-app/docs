@@ -68,6 +68,8 @@
               "ai/1099-vendors",
               "ai/review-my-client",
               "ai/explain-my-reconciliation",
+              "ai/what-changed",
+              "ai/new-client-check",
               "ai/troubleshooting",
               "ai/desktop-app"
             ]

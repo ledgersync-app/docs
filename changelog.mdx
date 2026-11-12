@@ -3,6 +3,23 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-12" tags={["AI connector"]}>
+  ## Your AI explains what changed this month, and scopes a new client's cleanup
+
+  Ask your AI *"Why did Acme's expenses jump in October?"*. It compares two periods of the client's QuickBooks Online
+  profit and loss or balance sheet, names the vendors and customers behind the biggest changes, and writes a short
+  summary you can send. See [What changed this month](/ai/what-changed).
+
+  Ask *"Check Acme's books before I price the cleanup."*. After the figures, your AI asks for your firm's rates and
+  turns them into a scope with hours. See [Check a new client's books](/ai/new-client-check).
+
+  - The steps are also MCP prompts, `flux_and_summary` and `prospect_diagnostic`. The client snapshot now recommends
+    `flux_and_summary` while QuickBooks works, and the descriptions of `ledgersync_get_financials`,
+    `ledgersync_drill_account` and `ledgersync_run_diagnostic` name their playbook.
+  - No new tools. Your AI app loads the new prompts and descriptions with the tool list (see Tool updates on
+    [For developers](/ai/developers)).
+</Update>
+
 <Update label="2026-11-11" tags={["AI connector"]}>
   ## LedgerSync is in ChatGPT's plugin directory
 

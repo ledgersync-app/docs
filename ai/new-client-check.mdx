@@ -1,0 +1,218 @@
+---
+title: "Check a new client's books"
+description: "Before you price a cleanup, your AI reads a new client's QuickBooks Online books over the last 12 months and gives you the figures to price from. With your firm's own rates, it turns them into a scope with hours. Nothing changes in QuickBooks."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiCopy, AiNote, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="Check a new client's books" subtitle="Ask your AI to size up a new client's cleanup. It reads the client's QuickBooks Online books and gives you the figures, then a scope with your own rates.">
+
+<AiNote tone="green">
+
+**For QuickBooks Online clients**, new or prospective, once they are in LedgerSync with QuickBooks Online connected.
+Not set up yet? Go to [Start here](/ai/start-here). Added it a while ago? Do
+[After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+
+</AiNote>
+
+## Start
+
+<AiStep id="new-chat" n={1} total={5} title="Start a new chat">
+
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
+
+</AiStep>
+
+<AiStep id="ask" n={2} total={5} title="Ask the AI">
+
+Type *"Check Acme's books before I price the cleanup."*, with your client's name, and press **Enter**. It usually
+takes about 15 seconds, and up to about half a minute on a big company: LedgerSync reads the books while you wait.
+
+</AiStep>
+
+<AiStep id="figures" n={3} total={5} title="Read the figures">
+
+The AI shows the figures a cleanup is priced from: entries per month and the busiest month, each bank and card account
+and how long since it was last reconciled, the entries waiting in Uncategorized and Ask My Accountant, suspense
+balances, unused accounts, invoices and bills over 90 days, Undeposited Funds and Opening Balance Equity.
+
+</AiStep>
+
+<AiStep id="rates" n={4} total={5} title="Give your rates">
+
+The AI asks for your firm's rates, for example minutes to categorize one entry, hours to reconcile one account for one
+month, and your hourly price. It uses only your rates and asks for any that are missing. It never makes one up.
+
+</AiStep>
+
+<AiStep id="scope" n={5} total={5} title="Get the scope">
+
+The AI lists each piece of work with its count, your rate and the hours, then the total hours. Give your hourly price
+and it adds the price.
+
+</AiStep>
+
+<AiNote tone="green">
+
+**It only reads.** Nothing changes in QuickBooks.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**Your rates stay in the chat.** LedgerSync does not keep them, so give them again in a new chat.
+
+</AiNote>
+
+## More details
+
+<AccordionGroup>
+
+<Accordion title="What happens after you ask">
+
+1. The AI finds the client and checks that its QuickBooks connection works.
+2. LedgerSync reads the client's QuickBooks books over the last 12 full months, and the balances as of today, while
+   the AI waits.
+3. The AI shows the figures, the summary first.
+4. It asks for your firm's rates, and never makes one up.
+5. With your rates, it writes the scope: each piece of work, its count, your rate and the hours, then the total.
+6. At the end, it says what the check leaves out, and offers a dashboard of the check and a next step: for example the
+   entries waiting for a category one by one, or why an account does not reconcile.
+
+</Accordion>
+
+<Accordion title="What the check counts">
+
+- **Entries per month:** the entries that post in each of the 12 months. Delayed charges, billable expense charges and
+  time charges post nothing and are left out.
+- **Bank and card accounts:** each active account with its balance and its newest entry QuickBooks marks reconciled,
+  searched back 3 years. An idle account, with no entries in the 12 months and a zero balance, is listed but not
+  counted as not reconciled.
+- **Entries waiting for a category:** in Uncategorized and Ask My Accountant accounts, counted the same way as the
+  uncategorized check of [Review a client's books](/ai/review-my-client).
+- **Suspense balances:** accounts with Suspense in their name.
+- **Unused accounts:** active accounts with no entries in the 12 months and no balance. QuickBooks' own accounts, such
+  as Retained Earnings, are never unused.
+- **Invoices and bills over 90 days**, Undeposited Funds and Opening Balance Equity, as of today.
+
+</Accordion>
+
+<Accordion title="What it leaves out">
+
+- Entries older than 12 months: those waiting for a category are not in its counts.
+- Payroll, sales tax, inventory and fixed assets.
+- Hours or a price of its own: only your rates turn the figures into hours.
+- Changes in QuickBooks: it only reads.
+- Clients that use another accounting app, such as QuickBooks Desktop, Zoho Books or Xero.
+
+</Accordion>
+
+<Accordion title="Before you start">
+
+- **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
+  a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the
+  new-client check.
+- **The client is in LedgerSync and connected to QuickBooks there**, the same connection you use to sync transactions
+  from the LedgerSync app.
+- **The client uses QuickBooks Online.**
+
+</Accordion>
+
+<Accordion title="Your client's data">
+
+<AiNote tone="yellow">
+
+**Your client's figures go through your AI account.** The AI app reads the check's figures and the names of the
+client's accounts, and keeps the chat under your AI account's settings. Check that account's data settings before you
+start.
+
+</AiNote>
+
+</Accordion>
+
+<Accordion title="Optional: the full instructions to paste">
+
+You don't need these: LedgerSync already tells your AI the main steps. If your AI does not follow them, give it these
+instructions.
+
+<div className="lsai-prompt">
+  <AiCopy label="Instructions for your AI" text={`Check a new or prospective LedgerSync client's QuickBooks Online books before pricing the cleanup, and scope the work.
+1. Find the client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. The check works for QuickBooks Online clients.
+2. Call ledgersync_get_client_snapshot. If QuickBooks is not connected or not working, tell the user how to fix it, as the snapshot's next_step says, and stop.
+3. Call ledgersync_run_diagnostic. It reads the last 12 full months of the client's books. If it answers that LedgerSync is busy, do what its next_step says.
+4. Show the user the summary first, then the details, in plain words: the entries per month and the busiest month; each bank and card account and how long since QuickBooks shows an entry reconciled in it; the entries waiting in Uncategorized and Ask My Accountant accounts; the suspense balances; the unused accounts; the invoices and bills over 90 days; Undeposited Funds and Opening Balance Equity. Tell the user what notes say.
+5. LedgerSync gives figures only. Before any hours or price, ask the user for their firm's rates for the work the check found, for example minutes to categorize one waiting entry, hours to reconcile one account for one month, and their hourly price. Use only the rates the user gives, ask for any that are missing, and never fill one in yourself, not even a typical one.
+6. With the rates, write the cleanup scope as a short table: each piece of work, its count from the check, the rate and the hours, then the total hours, and the price when the user gave an hourly price. The pieces of work: categorizing the waiting entries; reconciling each bank and card account that is not idle for the months since its newest reconciled entry (when it has none, ask the user how far back to go); clearing the suspense balances, Opening Balance Equity and Undeposited Funds; reviewing the invoices and bills over 90 days; and tidying the unused accounts. Leave out any piece the check found nothing for, and name any piece it could not count, as its notes say. If the user also prices the monthly work after the cleanup, base it on the entries per month.
+7. Before you finish, tell the user what the check leaves out: it counts entries from the last 12 months only, so older entries waiting for a category are not in its counts; it does not check payroll, sales tax, inventory or fixed assets; and it changes nothing in QuickBooks.
+8. End with the check's two offers, as its next_step words them: a dashboard of this check, and the next step it names.`} />
+</div>
+
+1. Click **Copy** above.
+2. In Claude, ChatGPT or Grok, start a new chat.
+3. Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
+4. At the end, type the client's name. For example: *Acme*. Then press **Enter**.
+
+<AiNote tone="gray">
+
+**Using Claude Code?** The instructions are also a LedgerSync command there. Type **/**, pick **prospect_diagnostic**
+(it says **(MCP)** next to it) and press **Enter**. Then tell it the client.
+
+</AiNote>
+
+</Accordion>
+
+</AccordionGroup>
+
+## If something goes wrong
+
+<AccordionGroup>
+
+<Accordion title="Most common messages">
+
+| The AI says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| **QuickBooks is not connected for this client in LedgerSync.** | In the LedgerSync app, click **Rules Engine**, then **QuickBooks**. In the menu on the left, click **Manage Connections**. Find the client and click **Authorize**, then sign in to the client's QuickBooks. Then ask the AI again. |
+| **The client's QuickBooks connection in LedgerSync stopped working.** | Open **Manage Connections** the same way. At the top, next to the client's name, click **Reconnect** and sign in to QuickBooks again. Then ask the AI again. |
+| **This client's books are not in QuickBooks Online.** | LedgerSync reads QuickBooks Online books only for now. |
+| LedgerSync is busy, or could not answer just now | Wait a minute, then ask the AI again. |
+| **QuickBooks took too long to list the entries, so the volume is left out.** | The other figures stand. Ask again later for the entries per month. |
+| **QuickBooks took too long to read the ledger, so the unused accounts are left out, and every bank and card account counts as not reconciled.** | Ask again later for the full check. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+
+</Accordion>
+
+</AccordionGroup>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the tools">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_get_client_snapshot` | One call to start work on a client: whether QuickBooks is connected, its first accounts, and the playbooks that fit | No |
+    | `ledgersync_run_diagnostic` | A client's QuickBooks Online books checked before a cleanup is priced, over the last 12 full months: a `summary` for a dashboard, then the volume, the bank and card accounts, the waiting and suspense accounts, the chart, receivables, payables, Undeposited Funds and Opening Balance Equity | No |
+    | `ledgersync_drill_account` | Any account the check lists, broken down by the payees on its entries, with the check's `from` and `to` and basis `accrual` | No |
+
+    - The instructions above are also an MCP prompt, `prospect_diagnostic` ("Check a new client's books before pricing
+      a cleanup"), with an optional `client` argument. Claude Code lists it as a command.
+    - The client snapshot does not recommend it: it cannot tell a new client from one the firm has kept for years. The
+      check's description names it, and its `next_step` says to give no hours or price until the user has given the
+      firm's rates.
+    - Both tools need `read:accounting` and change nothing.
+    - See [For developers](/ai/developers) for every field.
+  </Accordion>
+
+  <Accordion title="For developers: limits">
+    - The last 12 full calendar months; balances, aging and the reconciled search as of today.
+    - Usually about 15 seconds while the call waits, within LedgerSync's 25-second budget for its QuickBooks reads,
+      and nothing stored. A part QuickBooks is too slow for is left out with a note; when LedgerSync is busy with
+      other checks, the AI tries again in a minute.
+    - Each answer stays under 15,000 characters.
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>

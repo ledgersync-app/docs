@@ -1,0 +1,209 @@
+---
+title: "What changed this month"
+description: "Your AI compares two periods of a client's QuickBooks Online profit and loss or balance sheet, flags the big changes with their evidence, names the vendors and customers behind each one, and sums it up in plain words, ready to send. Nothing changes in QuickBooks."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiCopy, AiNote, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="What changed this month" subtitle="Ask your AI why a number moved. It compares two periods of your client's books, flags the big changes and names the vendors behind them.">
+
+<AiNote tone="green">
+
+**For QuickBooks Online clients.** Not set up yet? Go to [Start here](/ai/start-here). Added it a while ago? Do
+[After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+
+</AiNote>
+
+## Start
+
+<AiStep id="new-chat" n={1} total={5} title="Start a new chat">
+
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
+
+</AiStep>
+
+<AiStep id="ask" n={2} total={5} title="Ask the AI">
+
+Type *"Why did Acme's expenses jump in October?"*, with your client's name and the month, and press **Enter**. No
+month? It compares last month with the month before. Want another comparison? Add it, for example *"against October
+last year"*.
+
+</AiStep>
+
+<AiStep id="changes" n={3} total={5} title="Read the big changes">
+
+The AI shows the totals for both periods, such as income, expenses and net income, and how much each changed. Then it
+shows the lines that changed the most, each with its evidence, for example *up 5,400.00 (263.41%), from 2,050.00 to
+7,450.00*.
+
+</AiStep>
+
+<AiStep id="payees" n={4} total={5} title="See who is behind each change">
+
+For the biggest changes, the AI breaks the account down by vendor or customer: which changed the most, which are new
+this period and which stopped, with their amounts.
+
+</AiStep>
+
+<AiStep id="summary" n={5} total={5} title="Send the summary">
+
+The AI ends with a short summary in plain words: what changed, why, and any questions to ask your client. Copy it into
+an email to your client or a partner.
+
+</AiStep>
+
+<AiNote tone="green">
+
+**It only reads.** Nothing changes in QuickBooks.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**Balances instead?** Ask about cash, receivables or a loan, and the AI compares the balance sheet on two days. Want
+smaller changes flagged? Tell the AI, for example *"flag changes over 500"*.
+
+</AiNote>
+
+## More details
+
+<AccordionGroup>
+
+<Accordion title="What happens after you ask">
+
+1. The AI finds the client and checks that its QuickBooks connection works.
+2. LedgerSync reads the profit and loss for both periods straight from QuickBooks, or the balance sheet for a question
+   about balances, on the client's own cash or accrual setting, and compares them line by line.
+3. It flags the account lines that changed by at least 1,000.00 and at least 10%, the largest change first, each with
+   its evidence. A line with nothing in the period it is compared with is flagged on the amount alone.
+4. For up to five of the biggest changes, and any line you asked about, LedgerSync reads the account's entries and
+   groups them by vendor or customer.
+5. The AI explains each change in plain words, and says whether it looks like a one-off, a timing difference or an
+   entry to check.
+6. It writes a short summary you can send.
+7. At the end, it says what this does not do, and offers a dashboard of the changes and a review of the period's
+   entries for ones to fix.
+
+</Accordion>
+
+<Accordion title="What it does not do">
+
+- Change anything in QuickBooks.
+- Show each entry: it shows the vendors and customers behind a change, with their totals.
+- Tell a mistake from a real change: an entry in the wrong account or month shows up as a change there. The AI points
+  out the ones to check, and [Review a client's books](/ai/review-my-client) finds entries to fix.
+- Clients that use another accounting app, such as QuickBooks Desktop, Zoho Books or Xero.
+
+</Accordion>
+
+<Accordion title="Before you start">
+
+- **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
+  a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the reports
+  and the breakdown by vendor.
+- **The client is connected to QuickBooks in LedgerSync**, the same connection you use to sync transactions from the
+  LedgerSync app.
+- **The client uses QuickBooks Online.**
+
+</Accordion>
+
+<Accordion title="Your client's data">
+
+<AiNote tone="yellow">
+
+**Your client's figures go through your AI account.** The AI app reads the report's lines and the vendors and
+customers behind them, and keeps the chat under your AI account's settings. Check that account's data settings before
+you start.
+
+</AiNote>
+
+</Accordion>
+
+<Accordion title="Optional: the full instructions to paste">
+
+You don't need these: LedgerSync already tells your AI the main steps. If your AI does not follow them, give it these
+instructions.
+
+<div className="lsai-prompt">
+  <AiCopy label="Instructions for your AI" text={`Explain what changed in a LedgerSync client's books between two periods, and sum it up in plain words.
+1. Find the client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. The reports work for QuickBooks Online clients.
+2. Call ledgersync_get_client_snapshot. If QuickBooks is not connected or not working, tell the user how to fix it, as the snapshot's next_step says, and stop.
+3. Call ledgersync_get_financials with report profit_and_loss for the period, last month unless the user names another, and compare_from and compare_to for the period just before it (the month before, for a month), unless the user names another, such as the same month last year. When the question is about balances, such as cash, receivables or loans, use report balance_sheet with to and compare_to instead. Keep the default flag_amount and flag_percent unless the user gives others. The first answer holds the summary and the flagged lines; if a line the user asked about is not in it, call again with the same arguments and next_cursor.
+4. Take the flagged lines with the largest changes, up to five, and any line the user asked about, flagged or not. For each, call ledgersync_drill_account with the line's account_id and the dates and basis the report's next_step gives, to see the payees behind the change: which changed the most and, when it compares two periods, which are new and which stopped.
+5. Tell the user the overall result first: each total in both periods and its change, such as income, expenses and net income, and whether the report is on a cash or accrual basis. Then each big change, largest first, or the one the user asked about first: its amounts in both periods, its evidence, and the payees behind it with their amounts. Say whether each looks like a one-off, a timing difference, or an entry to check, such as a cost in the wrong account or month. Name the other flagged lines in a sentence each. Use only the amounts LedgerSync returned.
+6. Then write a short summary the user can paste into an email to the client or a partner: the overall result and the changes that matter most, in a few sentences, with any questions to ask the client.
+7. Before you finish, tell the user what this does not do: it reads the books as they are, so an entry in the wrong account or month shows up as a change; it shows the payees behind a change, not each entry; and it changes nothing in QuickBooks.
+8. End with two offers: a dashboard of these changes, and a review of the period's entries for ones to fix (the month_end_review playbook).`} />
+</div>
+
+1. Click **Copy** above.
+2. In Claude, ChatGPT or Grok, start a new chat.
+3. Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
+4. At the end, type the client's name and the period. For example: *Acme, October 2026*. Then press **Enter**.
+
+<AiNote tone="gray">
+
+**Using Claude Code?** The instructions are also a LedgerSync command there. Type **/**, pick **flux_and_summary** (it
+says **(MCP)** next to it) and press **Enter**. Then tell it the client and the period.
+
+</AiNote>
+
+</Accordion>
+
+</AccordionGroup>
+
+## If something goes wrong
+
+<AccordionGroup>
+
+<Accordion title="Most common messages">
+
+| The AI says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| **QuickBooks is not connected for this client in LedgerSync.** | In the LedgerSync app, click **Rules Engine**, then **QuickBooks**. In the menu on the left, click **Manage Connections**. Find the client and click **Authorize**, then sign in to the client's QuickBooks. Then ask the AI again. |
+| **The client's QuickBooks connection in LedgerSync stopped working.** | Open **Manage Connections** the same way. At the top, next to the client's name, click **Reconnect** and sign in to QuickBooks again. Then ask the AI again. |
+| **This client's books are not in QuickBooks Online.** | LedgerSync reads QuickBooks Online books only for now. |
+| QuickBooks has nothing for this report on these dates | Check the period, or ask about another one. |
+| **QuickBooks cut this report short: it is too large to read.** | Ask about a shorter period. For a balance sheet on one day, run the report in QuickBooks itself. |
+| QuickBooks cut an account's ledger short, or took too long to read it | Ask about a shorter period. |
+| LedgerSync could not answer just now, or QuickBooks is busy | Wait a few minutes, then ask the AI again. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+
+</Accordion>
+
+</AccordionGroup>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the tools">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_get_client_snapshot` | One call to start work on a client: whether QuickBooks is connected, its first accounts, and the playbooks that fit | No |
+    | `ledgersync_get_financials` | One financial report straight from QuickBooks Online, for one period or two: with two, each line's `change` and `change_pct`, and the `flagged` lines with their evidence | No |
+    | `ledgersync_drill_account` | One account broken down by the payees on its entries, for one period or two: each payee's amount and entries and, with two, which are `new` and which `stopped` | No |
+
+    - The instructions above are also an MCP prompt, `flux_and_summary` ("Explain what changed between two periods"),
+      with optional `client`, `period` and `compare_with` arguments. Claude Code lists it as a command.
+    - The client snapshot recommends `flux_and_summary` whenever the client's QuickBooks connection works.
+    - The descriptions of `ledgersync_get_financials` and `ledgersync_drill_account` name it, for AI apps that do not
+      show prompts. Each account line of a report carries the `account_id` the drill-down takes, and the report's
+      `next_step` gives the dates to drill with.
+    - Both tools need `read:accounting` and change nothing.
+    - See [For developers](/ai/developers) for every field.
+  </Accordion>
+
+  <Accordion title="For developers: limits">
+    - `flagged` lists up to 10 account lines, the largest change first, and `flagged_count` counts them all. The
+      thresholds are `flag_amount` (default 1,000.00) and `flag_percent` (default 10).
+    - The drill-down reads at most 366 days per period, lists 15 payees by default (up to 50) and sums the rest in
+      `others`.
+    - LedgerSync reads QuickBooks while the call waits and stores nothing. Each answer stays under 15,000 characters.
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>
