@@ -4,6 +4,17 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-12" tags={["AI connector"]}>
+  ## Clearer counts, and a summary to send after a comparison
+
+  In `ledgersync_run_diagnostic`'s answer, `over_90_count` is now `over_90_customer_count` on `receivables` and
+  `over_90_vendor_count` on `payables`, so the count of who is owed over 90 days says what it counts.
+
+  - When `ledgersync_get_financials` compares two periods, its `next_step` now asks the AI to end with a short summary
+    the user can send the client, with or without the `flux_and_summary` prompt.
+  - No new tools, and nothing to reload: the answers carry the change.
+</Update>
+
+<Update label="2026-11-12" tags={["AI connector"]}>
   ## The new-client check says who is behind old bills and invoices
 
   `ledgersync_run_diagnostic`'s `receivables` and `payables` now carry `evidence` in words, for example *"7,440.14

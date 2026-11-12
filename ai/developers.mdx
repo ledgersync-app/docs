@@ -668,10 +668,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       accounts (Retained Earnings, Opening Balance Equity, Undeposited Funds and the Unapplied Cash accounts) are
       never unused.
     - `receivables` and `payables`: the open total, the amount over 90 days (QuickBooks' own, net of old credits),
-      how many customers or vendors are over 90 days, and the old credits, then `evidence` in words, for example
-      "7,440.14 over 90 days: 7,925.94 owed to 2 vendors, less 4 old credits of 485.80" or "nothing over 90 days"
-      (`over_90_count` counts customers or vendors, not invoices or bills); then `undeposited_funds` and
-      `opening_balance_equity`.
+      how many customers or vendors are over 90 days (`over_90_customer_count` on `receivables`,
+      `over_90_vendor_count` on `payables`: customers and vendors, not invoices or bills), and the old credits, then
+      `evidence` in words, for example "7,440.14 over 90 days: 7,925.94 owed to 2 vendors, less 4 old credits of
+      485.80" or "nothing over 90 days"; then `undeposited_funds` and `opening_balance_equity`.
     - Each account row carries its `account_id`, sealed to the client, for `ledgersync_drill_account` with the
       check's `from`, `to` and basis `accrual`, and its `evidence`. Amounts are strings with 2 decimals. Each answer
       stays under 15,000 characters, its whole text included (the sentence before the JSON and the client's name):
