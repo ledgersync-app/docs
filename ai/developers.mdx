@@ -1054,7 +1054,13 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       category, the transactions it matches get the "map this category" badge. When QuickBooks does not answer or
       the connection is broken, the setup stays running and tries again every few minutes, 5 runs in all. Then
       what still needs QuickBooks fails, with `quickbooks_broken` when the connection is broken or refused, or
-      `write_failed` when QuickBooks did not answer, and the setup ends done with some failed items.
+      `write_failed` when QuickBooks did not answer, and the setup ends done with some failed items. When QuickBooks
+      answers and refuses a new category or vendor itself (a validation error, or `6190` while the client's
+      QuickBooks subscription has ended or has a billing problem), that item fails at once with `quickbooks_refused`:
+      its message says why QuickBooks refused it or, for `6190`, to renew the subscription or fix the billing in
+      QuickBooks and run the setup again. A name QuickBooks says is taken, without LedgerSync finding what holds it,
+      fails with `name_taken`. What uses a failed item, such as a rule or a link, fails with `depends_on_refused`, the
+      rest of the setup is saved, and the `next_step` says it was QuickBooks, not LedgerSync, that refused them.
     - `ledgersync_get_rules_setup_status` takes the `client_id`, `client_name` and the `setup_id` and says where the setup is
       (queued, running, done, done with some failed items, failed, being undone, undone, or undo failed), with its
       phase and progress. A finished setup also gives what it created by type, how many transactions it filled for
