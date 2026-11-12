@@ -4,6 +4,18 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-12" tags={["AI connector"]}>
+  ## The new-client check says who is behind old bills and invoices
+
+  `ledgersync_run_diagnostic`'s `receivables` and `payables` now carry `evidence` in words, for example *"7,440.14
+  over 90 days: 7,925.94 owed to 2 vendors, less 4 old credits of 485.80"*: `over_90_count` counts the vendors or
+  customers behind the amount, not bills or invoices.
+
+  - `ledgersync_get_financials`, `ledgersync_drill_account` and `ledgersync_run_diagnostic` keep each answer's whole
+    text under 15,000 characters, the sentence before the JSON and the client's name included.
+  - No new tools, and nothing to reload: the answers carry the change.
+</Update>
+
+<Update label="2026-11-12" tags={["AI connector"]}>
   ## Get check images from Claude or ChatGPT
 
   Ask your AI *"Get Acme's October check images, named by payee and date."*. It lists each check (its date, number,

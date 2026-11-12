@@ -609,7 +609,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `next_step` says which dates to drill with on each report: the report's own over a period, and from the day
       after `compare_as_of` to `as_of` for a balance sheet's change. A balance on one day is not activity over a
       period, so there the AI asks the user which period.
-    - Each answer stays under 15,000 characters: the first page carries the summary and the flagged lines, then the
+    - Each answer stays under 15,000 characters, its whole text included (the sentence before the JSON and the
+      client's name): the first page carries the summary and the flagged lines, then the
       lines, and a long report gives `next_cursor` for the next page. Each page reads QuickBooks again, so a cursor is
       refused when the period, the basis or the client's books changed since.
     - LedgerSync reads QuickBooks while the call waits, usually a few seconds, and stores nothing. When QuickBooks is
@@ -636,8 +637,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       most 50), and the rest are summed in `others`, so the rows and `others` always add up to the total.
     - The `summary` gives the amount and entries in each period, the change, how many payees, how many are new with
       their amount, and how many stopped with their compare amount. Amounts are strings with 2 decimals. Each answer
-      stays under 15,000 characters: when long names would pass that, the last payees are summed in `others` too,
-      and a note says so.
+      stays under 15,000 characters, its whole text included (the sentence before the JSON and the client's name):
+      when long names would pass that, the last payees are summed in `others` too, and a note says so.
     - LedgerSync reads QuickBooks while the call waits, usually a few seconds, and stores nothing. When QuickBooks is
       busy for the client, the call answers `upstream_unavailable`: try again in a few minutes. A ledger QuickBooks
       cuts short, or takes too long to read over more than a month, is refused with `invalid_request` on `from` or
@@ -667,11 +668,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       accounts (Retained Earnings, Opening Balance Equity, Undeposited Funds and the Unapplied Cash accounts) are
       never unused.
     - `receivables` and `payables`: the open total, the amount over 90 days (QuickBooks' own, net of old credits),
-      how many customers or vendors are over 90 days, and the old credits; then `undeposited_funds` and
+      how many customers or vendors are over 90 days, and the old credits, then `evidence` in words, for example
+      "7,440.14 over 90 days: 7,925.94 owed to 2 vendors, less 4 old credits of 485.80" or "nothing over 90 days"
+      (`over_90_count` counts customers or vendors, not invoices or bills); then `undeposited_funds` and
       `opening_balance_equity`.
     - Each account row carries its `account_id`, sealed to the client, for `ledgersync_drill_account` with the
       check's `from`, `to` and basis `accrual`, and its `evidence`. Amounts are strings with 2 decimals. Each answer
-      stays under 15,000 characters: past that, the unused names drop first, then the waiting accounts with the
+      stays under 15,000 characters, its whole text included (the sentence before the JSON and the client's name):
+      past that, the unused names drop first, then the waiting accounts with the
       fewest entries are summed in `waiting_others`, then the bank, card and suspense rows that do not fit are
       counted, each step with a note.
     - LedgerSync gives figures only, never hours or a price: the AI asks the user for their firm's rates and uses
