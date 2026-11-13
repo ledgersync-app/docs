@@ -77,7 +77,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | --- | --- | --- |
 | `ledgersync_get_account_status` | Which firm and login it is connected as; is the connection ready; sandbox or live; refreshes left | No |
 | `ledgersync_find_clients` | Finds clients by name or email, and the firm's own accounts, each with the id and the name the other client tools take together; says how many clients match in all and, with no search, how many have banks connected and how many need attention | No |
-| `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, and the playbooks that fit | No |
+| `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, and the playbooks that fit; on sandbox for now, also its open W-9 requests | No |
 | `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear | No |
 | `ledgersync_get_vendor_coding_history` | How a client has coded one vendor's entries over the last months: the accounts used, most used first, with how often, when last and the average amount. Takes the vendor, or the text of a bank row | No |
 | `ledgersync_compare_statement_to_books` | Why a bank or card statement does not reconcile: LedgerSync's copy of the statement against the client's QuickBooks register for its period, the difference on its last day split into parts that add up to it, and the rows on each side that nothing matched | No |
@@ -128,7 +128,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created (in QuickBooks too), changed and filled, never counting an account hidden in LedgerSync; what failed and why | No |
 | `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove, put back and keep, never counting an account hidden in LedgerSync (what it created in QuickBooks stays); after a yes, undoes it | Yes |
 | `ledgersync_get_categorized_export_link` | How many of the Manual clients' categorized transactions are not exported yet, and a 24-hour link to them as the LedgerSync app's Default or ACS export file | No (pressing **Download** on the link's page marks them Synced) |
-| `ledgersync_get_1099_summary` | The vendors a QuickBooks client paid at or over the 1099 threshold in a tax year, with each one's QuickBooks 1099 flag, whether a tax ID and an email are on file (never the tax ID itself), a suggested next step and advice from the expense accounts its payments were booked to; card and payment app payments left out by default; can count only the accounts the accountant chooses | No |
+| `ledgersync_get_1099_summary` | The vendors a QuickBooks client paid at or over the 1099 threshold in a tax year, with each one's QuickBooks 1099 flag, whether a tax ID and an email are on file (never the tax ID itself), a suggested next step and advice from the expense accounts its payments were booked to; card and payment app payments left out by default; can count only the accounts the accountant chooses; on sandbox for now, each vendor's W-9 request too | No |
 | `ledgersync_preview_ledger_changes` | Checks marking up to 100 of a QuickBooks client's vendors for 1099, or unmarking them: each vendor's 1099 flag before and after, and the vendors it would leave as they are, with the reason | No |
 | `ledgersync_apply_ledger_changes` | Marks the previewed vendors for 1099 in the client's QuickBooks, in the background, changing nothing else on them | Yes |
 | `ledgersync_get_ledger_changes_status` | How marking vendors went: which were changed, which were left as they were and why, and how an undo went | No |
@@ -465,7 +465,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       accounts it returns has a `last_statement` and is not a loan, `flux_and_summary` while QuickBooks works,
       `form_1099_season` from November 1 to February 15 while QuickBooks works, and `quickbooks_bookkeeping` when an
       account can post to QuickBooks. It never names `prospect_diagnostic`, since it cannot tell a new client from one
-      the firm has kept for years. `data_as_of` says when it was read.
+      the firm has kept for years. `data_as_of` says when it was read. On the sandbox connector for now, it also
+      returns `open_w9_requests`, how many of the client's W-9 requests are still open (sent or opened): the
+      requests `ledgersync_list_w9_requests` lists with `status: open`.
     - Its `next_step` ends with one or two offers, the first two of: the month-end review (until a review of last
       month finished today), the 1099 check in its season, bookkeeping, connecting a bank when the client has no
       accounts yet, and a dashboard of the client's status.
@@ -1210,7 +1212,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `exclude_card_payments: false` keeps them in.
     - Each vendor comes with `total_paid`, `card_and_app_paid` and `reportable` (money as text with two decimals),
       `qbo_1099_flag`, `has_tin` and `has_email` (true or false only: a tax ID never reaches the AI),
-      `w9_status` ("not tracked yet"), a `suggested_action` (`mark_for_1099`, `get_tax_id`, `review` or `ok`) and
+      `w9_status` ("not tracked yet" on live; on the sandbox connector, the vendor's W-9 request, below), a
+      `suggested_action` (`mark_for_1099`, `get_tax_id`, `review` or `ok`) and
       its `evidence`, plus `advice` and `advice_reason` (below). The answer also has the counts,
       `total_reportable`, `excluded_card_and_app_total` and `data_as_of`, when the payments were read; the vendors
       come a page at a time (`limit`, 15 by default and at most 100, and `cursor`). Every answer stays under 15,000
@@ -1312,6 +1315,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `ledgersync_list_w9_requests` lists each vendor's latest request, or every request with `include_history`, with
       its `status` (`sent`, `opened`, `completed`, `expired`, `cancelled`, `superseded` or `failed`; `open` means sent
       or opened), its dates, `reminder_count` and `tax_id_received`, never the tax ID itself.
+    - On the sandbox connector, `ledgersync_get_1099_summary` shows each vendor's W-9 request: `w9_status` is the
+      status `ledgersync_list_w9_requests` shows for that vendor by default (`sent`, `opened`, `completed`,
+      `expired`, `cancelled` or `failed`), or `not requested` for a vendor never asked, with `w9_completed_at` once
+      it is completed. `counts.w9_requests` has `completed`, `open` (sent or opened) and `needed` (no tax ID on file
+      and no request open or completed). Its `next_step` offers W-9 requests to the `needed` vendors (pointing to the
+      preview, for a firm W-9 requests are open to), points to the open ones and offers the completed W-9s. Step 6 of
+      `form_1099_season` there offers the W-9 requests too, and `ledgersync_get_client_snapshot` returns
+      `open_w9_requests`. On live, `w9_status` stays "not tracked yet" until W-9 requests open there.
     - `ledgersync_get_w9_download_link` takes a `request_id` (`w9r_...`) whose status is `completed` or `superseded`
       and gives a link that works once, within 10 minutes. It opens a page with a **Download** button. The PDF is the
       official IRS Form W-9 with the vendor's entries and typed signature, and it never passes through the chat.
