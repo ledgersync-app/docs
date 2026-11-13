@@ -133,9 +133,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_apply_ledger_changes` | Marks the previewed vendors for 1099 in the client's QuickBooks, in the background, changing nothing else on them | Yes |
 | `ledgersync_get_ledger_changes_status` | How marking vendors went: which were changed, which were left as they were and why, and how an undo went | No |
 | `ledgersync_undo_ledger_changes` | Shows which vendors' 1099 flags would go back and which would stay; after a yes, puts them back | Yes |
-| `ledgersync_preview_w9_requests` | Checks sending W-9 requests to up to 50 of a QuickBooks client's vendors, picked from the 1099 list: the address each email would go to, the vendors it would leave out and why, and the email as the vendor would read it; also reminders, a corrected address, asking a vendor again and cancelling (sandbox only for now) | No |
+| `ledgersync_preview_w9_requests` | Checks sending W-9 requests to up to 50 of a QuickBooks client's vendors, picked from the 1099 list: the address each email would go to, the vendors it would leave out and why, and the email as the vendor would read it; also reminders, a corrected address, asking a vendor again and cancelling; can also save each W-9 to QuickBooks once the vendor signs (sandbox only for now) | No |
 | `ledgersync_send_w9_requests` | Emails the previewed W-9 requests from LedgerSync's address in the firm's name, each with the vendor's own secure link to fill in and sign the form (sandbox only for now) | Yes |
-| `ledgersync_list_w9_requests` | A client's W-9 requests: whether each vendor's was sent, opened, completed, expired, cancelled, replaced by a newer one or bounced, with its dates and whether a tax ID came in, never the tax ID itself (sandbox only for now) | No |
+| `ledgersync_list_w9_requests` | A client's W-9 requests: whether each vendor's was sent, opened, completed, expired, cancelled, replaced by a newer one or bounced, with its dates and whether a tax ID came in, never the tax ID itself, and how each W-9's save to QuickBooks went when it was chosen (sandbox only for now) | No |
 | `ledgersync_get_w9_download_link` | One-time link, good for 10 minutes, to a vendor's completed W-9 as the official IRS form in PDF (sandbox only for now) | No |
 | `ledgersync_list_review_transactions` | One Manual or QuickBooks Online client's transactions in the Rules Engine's For review or Categorized tab, as the LedgerSync app shows them, each with its category and GL code, payee and the rule that filed it | No |
 | `ledgersync_preview_accept_transactions` | Checks accepting the For review transactions of 1 to 10 clients, by default the ones an inclusion rule filed, leaving out the categories you name: what would move to Categorized (an exclusion rule's to Excluded), what LedgerSync would refuse and why, and what would stay and why | No |
@@ -1294,7 +1294,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `access_not_active` from the preview and the send. `ledgersync_preview_w9_requests` takes `client_id`,
       `client_name`, `vendors` (1 to 50, each a `vendor_id` from `ledgersync_get_1099_summary` or
       `ledgersync_list_w9_requests`, with an optional `action`: `send`, `remind`, `correct_address`, `request_again`
-      or `cancel`; an optional `email`; and, to ask again, a `reason` the vendor reads) and an optional `note`. It
+      or `cancel`; an optional `email`; and, to ask again, a `reason` the vendor reads), an optional `note` and an
+      optional `save_to_quickbooks` (below), which the answer repeats when a vendor will be emailed. It
       reads each vendor from QuickBooks and answers each vendor's `status` (`will_email`, `will_cancel` or `skipped`
       with its `skip_reason`), the address each email goes to, the emails as the vendor reads them (the link shown as
       `[secure link]`), `to_email`, `to_cancel`, `skipped`, `data_as_of` and a `confirmation_id` that works for 30
@@ -1315,6 +1316,16 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `ledgersync_list_w9_requests` lists each vendor's latest request, or every request with `include_history`, with
       its `status` (`sent`, `opened`, `completed`, `expired`, `cancelled`, `superseded` or `failed`; `open` means sent
       or opened), its dates, `reminder_count` and `tax_id_received`, never the tax ID itself.
+    - With `save_to_quickbooks` on the preview, LedgerSync also saves each W-9 to QuickBooks shortly after the vendor
+      signs: it marks the vendor for 1099 and saves their tax ID, unless QuickBooks has a different tax ID for them,
+      which it leaves as it is (a W-9 asked again replaces the tax ID of the W-9 it replaced). It is off when left
+      out, and open only to firms that may mark vendors for 1099 from an AI app; any other firm gets
+      `access_not_active` and can preview without it. A reminder keeps the choice its request was first sent with.
+      `ledgersync_list_w9_requests` then shows `save_to_quickbooks` and `quickbooks_save`: its `status` (`waiting`
+      for the vendor, `saving`, `saved`, `marked_only` when QuickBooks kept a different tax ID, `not_saved` with the
+      reason in `message`, or `undone`) and its `change_set_id`, which `ledgersync_get_ledger_changes_status` and
+      `ledgersync_undo_ledger_changes` take. The undo puts back the 1099 mark only; QuickBooks keeps the tax ID. The
+      tax ID goes from the encrypted W-9 to QuickBooks and never through the AI.
     - On the sandbox connector, `ledgersync_get_1099_summary` shows each vendor's W-9 request: `w9_status` is the
       status `ledgersync_list_w9_requests` shows for that vendor by default (`sent`, `opened`, `completed`,
       `expired`, `cancelled` or `failed`), or `not requested` for a vendor never asked, with `w9_completed_at` once
