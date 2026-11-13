@@ -3,6 +3,21 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-13" tags={["Connections", "AI connector"]}>
+  ## A failed statement pull no longer reads `disconnected`
+
+  `GET /v3/connections` and `GET /v3/connections/{id}` used to report a Finicity connection as `disconnected`, with
+  no `last_error`, whenever its last statement pull had failed, even while its transactions and balances refreshed
+  every day. Some banks never serve statements through Finicity (CIBC U.S. Business is one), so their connections
+  stayed `disconnected`, and reauthorizing could not help: Finicity answers "No action required".
+
+  - The status now follows the bank login, so those connections read `active`.
+  - The failed pull still shows on `realized_capabilities.statements`, as `failed`.
+  - Nothing to change on your side. If you skip `disconnected` connections, expect some of them to come back as
+    `active`.
+  - The AI connector no longer suggests a fix link for them.
+</Update>
+
 <Update label="2026-11-12" tags={["AI connector"]}>
   ## Clearer counts, and a summary to send after a comparison
 
