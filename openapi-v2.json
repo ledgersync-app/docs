@@ -1788,11 +1788,11 @@
           {
             "name": "from",
             "in": "query",
-            "description": "First day to include, yyyy-MM-dd (MM/dd/yyyy is also accepted). FINICITY filters on the posted date, MX on the transaction date; FDE ignores the date range.",
+            "description": "First day to include, yyyy-MM-dd (MM/dd/yyyy is also accepted). FINICITY filters on the posted date, MX and PDF on the transaction date; FDE ignores the date range.",
             "required": false,
             "schema": {
               "type": "string",
-              "description": "First day to include, yyyy-MM-dd (MM/dd/yyyy is also accepted). FINICITY filters on the posted date, MX on the transaction date; FDE ignores the date range.",
+              "description": "First day to include, yyyy-MM-dd (MM/dd/yyyy is also accepted). FINICITY filters on the posted date, MX and PDF on the transaction date; FDE ignores the date range.",
               "example": "2026-07-01"
             },
             "example": "2026-07-01"
@@ -1836,13 +1836,13 @@
           {
             "name": "rowsPerPage",
             "in": "query",
-            "description": "10, 20 or 50. FINICITY and MX return 50 rows per page for any other value; FDE needs one of the three.",
+            "description": "10, 20 or 50. FINICITY, MX and PDF return 50 rows per page for any other value; FDE needs one of the three.",
             "required": false,
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 50,
-              "description": "10, 20 or 50. FINICITY and MX return 50 rows per page for any other value; FDE needs one of the three.",
+              "description": "10, 20 or 50. FINICITY, MX and PDF return 50 rows per page for any other value; FDE needs one of the three.",
               "enum": [
                 10,
                 20,
@@ -1866,16 +1866,17 @@
           {
             "name": "source",
             "in": "query",
-            "description": "Bank-data provider of the account: the bank's source from the account list, in uppercase. Defaults to FINICITY, so an MX account returns no transactions unless source=MX is sent. Takes precedence over addOn.",
+            "description": "Bank-data provider of the account: the bank's source from the account list, in uppercase. PDF reads the lines of bank statements uploaded to LedgerSync. Defaults to FINICITY, so an MX or PDF account returns no transactions unless its source is sent. Takes precedence over addOn.",
             "required": false,
             "schema": {
               "type": "string",
               "default": "FINICITY",
-              "description": "Bank-data provider of the account: the bank's source from the account list, in uppercase. Defaults to FINICITY, so an MX account returns no transactions unless source=MX is sent. Takes precedence over addOn.",
+              "description": "Bank-data provider of the account: the bank's source from the account list, in uppercase. PDF reads the lines of bank statements uploaded to LedgerSync. Defaults to FINICITY, so an MX or PDF account returns no transactions unless its source is sent. Takes precedence over addOn.",
               "enum": [
                 "FINICITY",
                 "MX",
-                "FDE"
+                "FDE",
+                "PDF"
               ]
             }
           },
@@ -3731,16 +3732,21 @@
           },
           "transactionId": {
             "type": "string",
-            "description": "The source and the id together, for example FINICITY_119874 or MX_628988. Unique across sources.",
+            "description": "The source and the id together, for example FINICITY_119874, MX_628988 or PDF_77146. Unique across sources.",
             "example": "FINICITY_119874"
+          },
+          "source": {
+            "type": "string",
+            "description": "The provider the transaction comes from: FINICITY, MX, FDE, or PDF for a line read from a bank statement uploaded to LedgerSync.",
+            "example": "FINICITY"
           },
           "transactionHash": {
             "type": "string",
-            "description": "FINICITY only; null for MX. A 32-character hash of the transaction's details that stays the same when a connection is disconnected and reconnected. Use it to match transactions across a reconnect; two identical purchases on the same day share it."
+            "description": "FINICITY: a 32-character hash of the transaction's details that stays the same when a connection is disconnected and reconnected. Use it to match transactions across a reconnect; two identical purchases on the same day share it. PDF: a hash of the line's details that can differ when the same statement is uploaded again and can be null, so match PDF lines by transactionId. Null for MX."
           },
           "postedDate": {
             "type": "string",
-            "description": "The day the bank posted the transaction. The format depends on the source: FINICITY and FDE send yyyy-MM-ddTHH:mm:ss in UTC with no offset (read the first 10 characters as the date), MX sends MM/dd/yyyy. Null on FINICITY pending transactions. On MX pending transactions it holds the transaction date.",
+            "description": "The day the bank posted the transaction. The format depends on the source: FINICITY and FDE send yyyy-MM-ddTHH:mm:ss in UTC with no offset (read the first 10 characters as the date), MX and PDF send MM/dd/yyyy. Null on FINICITY pending transactions. On MX pending transactions it holds the transaction date.",
             "example": "2023-04-01T12:00:00"
           },
           "bankName": {
@@ -3751,7 +3757,7 @@
           },
           "bankAccountId": {
             "type": "string",
-            "description": "FINICITY: the provider's account id. MX: the LedgerSync connection id (banks[].id in the account list). FDE: the account code."
+            "description": "FINICITY: the provider's account id. MX and PDF: the LedgerSync connection id (banks[].id in the account list). FDE: the account code."
           },
           "accountNumber": {
             "type": "string"
@@ -3763,7 +3769,7 @@
           },
           "status": {
             "type": "string",
-            "description": "FINICITY: active, pending or shadow. MX: POSTED or PENDING. FDE: as FDE reports it."
+            "description": "FINICITY: active, pending or shadow. MX: POSTED or PENDING. FDE: as FDE reports it. PDF: active."
           },
           "transactionDate": {
             "type": "string",
@@ -3775,7 +3781,7 @@
           },
           "type": {
             "type": "string",
-            "description": "As the institution reports it. MX sends DEBIT or CREDIT."
+            "description": "As the institution reports it. MX and PDF send DEBIT or CREDIT."
           },
           "amount": {
             "type": "number",
@@ -4244,7 +4250,7 @@
           },
           "source": {
             "type": "string",
-            "description": "The data provider of this connection: FINICITY, MX, FDE or PDF. Send it as source to the transaction list for this connection's accounts. PDF connections are not served by the transaction list.",
+            "description": "The data provider of this connection: FINICITY, MX, FDE or PDF (bank statements uploaded to LedgerSync). Send it as source to the transaction list for this connection's accounts.",
             "example": "FINICITY"
           },
           "statementErrorMessage": {
