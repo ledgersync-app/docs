@@ -66,6 +66,7 @@
               "ai/accept-transactions",
               "ai/categorized-export",
               "ai/1099-vendors",
+              "ai/w9-requests",
               "ai/review-my-client",
               "ai/explain-my-reconciliation",
               "ai/what-changed",

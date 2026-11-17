@@ -3,6 +3,24 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-17" tags={["AI connector"]}>
+  ## Ask vendors for their W-9 from Claude or ChatGPT
+
+  Ask your AI *"Send W-9 requests to Acme's vendors with no tax ID on file."*. After your yes, LedgerSync emails
+  each vendor, from its own address under your firm's name, a secure link to fill in and sign the official Form W-9.
+  Ask later who has finished, and get each finished W-9 as a PDF through a link that works once.
+
+  - Four tools, now on live as well as sandbox: `ledgersync_preview_w9_requests`, `ledgersync_send_w9_requests`,
+    `ledgersync_list_w9_requests` and `ledgersync_get_w9_download_link`. Sending opens to a few test firms first.
+  - On live, the 1099 list's `w9_status` now shows each vendor's W-9 request, and `ledgersync_get_client_snapshot`
+    returns `open_w9_requests`. The 1099 season prompt offers the W-9 requests too.
+  - Optionally, LedgerSync saves each W-9 to QuickBooks once the vendor signs: the 1099 mark, and the tax ID unless
+    QuickBooks has a different one.
+  - Tax IDs never reach the chat: the vendor enters theirs on LedgerSync's secure page.
+  - Your AI app loads the new tools with the tool list (see Tool updates on [For developers](/ai/developers)). See
+    [Ask vendors for their W-9](/ai/w9-requests).
+</Update>
+
 <Update label="2026-11-13" tags={["Connections", "AI connector"]}>
   ## A failed statement pull no longer reads `disconnected`
 

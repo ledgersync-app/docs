@@ -1,0 +1,234 @@
+---
+title: "Ask vendors for their W-9"
+description: "Your AI sends W-9 requests to a QuickBooks Online client's vendors. Each vendor fills in and signs the official form on a secure LedgerSync page, and you download the finished W-9 when you need it."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="Ask vendors for their W-9" subtitle="Ask your AI. After your yes, LedgerSync emails each vendor a secure link to fill in and sign their W-9, and you download the finished form.">
+
+<AiNote tone="green">
+
+**For QuickBooks Online clients.** Not set up yet? Go to [Start here](/ai/start-here). Added it a while ago? Do
+[After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+
+</AiNote>
+
+## Start
+
+<AiStep id="new-chat" n={1} total={5} title="Start a new chat">
+
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
+
+</AiStep>
+
+<AiStep id="ask" n={2} total={5} title="Ask the AI">
+
+Type *"Send W-9 requests to Acme's vendors with no tax ID on file"*, with your client's name, and press **Enter**.
+
+</AiStep>
+
+<AiStep id="check" n={3} total={5} title="Check the preview">
+
+The AI shows who gets a request and at which email address, the email as each vendor will read it, and the vendors
+it leaves out, with the reason. Nothing is sent yet.
+
+</AiStep>
+
+<AiStep id="yes" n={4} total={5} title="Say yes">
+
+Say yes, and allow it each time Claude or ChatGPT asks. LedgerSync emails each vendor from its own address, under
+your firm's name. When a vendor replies, the reply comes to you.
+
+</AiStep>
+
+<AiStep id="follow" n={5} total={5} title="Get the finished W-9s">
+
+A few days later, ask *"Who has sent their W-9 for Acme?"*. The AI says where each request stands. For a vendor who
+finished theirs, ask for the W-9: the AI gives you a link that downloads it as a PDF.
+
+</AiStep>
+
+<AiNote tone="green">
+
+**The vendor fills in the form online.** They answer one question at a time, in the official form's words, and sign
+by typing their name. Their link works for 30 days.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**Tax IDs are never shown in the chat.** The vendor types theirs only on LedgerSync's secure page, and LedgerSync
+keeps it encrypted. Don't type a tax ID in the chat.
+
+</AiNote>
+
+<AiNote tone="yellow">
+
+**Keep your own copy.** LedgerSync deletes a client's W-9s when the client is deleted. Download the ones you keep.
+
+</AiNote>
+
+<AiNote tone="yellow">
+
+**Using Grok?** Tell it to wait for your yes before it sends anything.
+
+</AiNote>
+
+## More details
+
+<AccordionGroup>
+
+<Accordion title="What happens after you ask">
+
+1. The AI finds the client and reads the client's 1099 list from QuickBooks: the vendors with no tax ID on file,
+   and whether LedgerSync already asked each one for a W-9.
+2. It shows you a preview: each vendor who gets a request and the email address it goes to, the one in QuickBooks or
+   one you give it. It also shows the email as the vendor will read it, and the vendors it leaves out, with the
+   reason: for example no email address, a request already waiting, or a W-9 already completed. Nothing has been
+   sent.
+3. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right. LedgerSync emails
+   each vendor from its own address as "(your firm) via LedgerSync". The email says your client needs their Form W-9
+   for their 1099 filing, and that your firm collects it on LedgerSync's secure page. Replies reach the person who
+   sent the requests.
+4. The vendor clicks **Fill in my W-9**, fills in the form one step at a time, and signs by typing their name. Their
+   link works for 30 days.
+5. Ask the AI where the requests stand. For each vendor it says sent, opened, completed, expired, cancelled, replaced
+   by a newer request, or bounced. The 1099 list shows the same for each vendor, and the client summary says how many
+   requests are still waiting on vendors.
+6. Ask for a vendor's finished W-9. The AI gives you a link that works once, within 10 minutes. It opens a page with
+   a **Download W-9** button. The PDF is the official IRS Form W-9 with the vendor's answers and typed signature. It
+   never passes through the chat.
+7. No answer after a week? Ask the AI to remind them. A reminder goes to a vendor last emailed more than 7 days ago,
+   with a new link.
+8. Wrong email address? Give the AI the right one: it cancels the waiting request and sends a new one there. Need a
+   new W-9 from a vendor, for example because the IRS said the tax ID was wrong? Ask the AI to ask them again, and say
+   why: the vendor reads your reason in the email. You can also ask the AI to cancel a request.
+
+<AiNote tone="gray">
+
+**Optional: save each W-9 to QuickBooks.** When you send the requests, you can ask the AI to also save each W-9 to
+QuickBooks once the vendor signs. LedgerSync then marks the vendor for 1099 and saves their tax ID, unless QuickBooks
+already has a different one, which it leaves for you to compare with the W-9. The AI's list of W-9 requests shows how
+each save went. You can undo the 1099 mark; QuickBooks keeps the tax ID.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**What the vendor's email says.** The subject is "W-9 request from" and your client's name. The email also says
+LedgerSync never asks for a tax ID by email or phone, and that the vendor should enter theirs only on the secure page
+the link opens.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**How many a day.** Your firm can send up to 300 W-9 emails a day, everyone at the firm and every AI app together.
+First requests, reminders, corrected addresses and requests sent again all count. A cancel sends no email and does
+not count.
+
+</AiNote>
+
+</Accordion>
+
+<Accordion title="What it does not cover">
+
+- Filing. File the 1099s through your usual 1099 service.
+- Checking a vendor's tax ID with the IRS.
+- Forms for vendors outside the U.S., such as the W-8. The W-9 is for U.S. persons.
+- Reminders on their own. The AI sends a reminder when you ask for one.
+- Clients that use another accounting app, such as QuickBooks Desktop or Zoho Books.
+
+</Accordion>
+
+<Accordion title="Before you start">
+
+- **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
+  a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the W-9
+  tools.
+- **The client is connected to QuickBooks in LedgerSync**, the same connection you use to sync transactions from
+  the LedgerSync app.
+- **The client uses QuickBooks Online.**
+- **Each vendor has an email address in QuickBooks.** No address there? Give the AI the one to use.
+
+</Accordion>
+
+<Accordion title="Your client's data">
+
+<AiNote tone="yellow">
+
+**Your client's vendors go through your AI account.** The AI app reads the client's vendors, their email addresses
+and where each W-9 request stands, and keeps the chat under your AI account's settings. Check that account's data
+settings before you start. Tax IDs never reach the chat: it only says whether one came in.
+
+</AiNote>
+
+</Accordion>
+
+<Accordion title="Optional: the full instructions to paste">
+
+You don't need these: LedgerSync already gives your AI the same steps. The W-9 steps are part of the 1099
+instructions: see [Find who needs a 1099](/ai/1099-vendors), under **Optional: the full instructions to paste**.
+
+</Accordion>
+
+</AccordionGroup>
+
+## If something goes wrong
+
+<AccordionGroup>
+
+<Accordion title="Most common messages">
+
+| The AI says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| **Sending W-9 requests from an AI app is open to a few test firms first.** | Ask those vendors for their W-9 directly for now. The 1099 list still shows who needs one. |
+| **QuickBooks holds no email address for this vendor.** | Give the AI the vendor's email address, and ask it to preview again. |
+| **The vendor already has an open W-9 request.** | Ask the AI to remind them, to send it to a corrected address, or to cancel it. |
+| **The vendor was emailed a W-9 request in the last 7 days.** | Wait: a reminder can go once 7 days have passed. |
+| **The vendor already completed a W-9.** | Ask the AI for the finished W-9. To ask for a new one, tell the AI why: the vendor reads your reason. |
+| **The vendor is inactive in QuickBooks.** | Make the vendor active in QuickBooks, then ask the AI to preview again. |
+| **Your firm reached today's limit of W-9 emails. Send the rest tomorrow.** | Ask the AI to send the rest tomorrow. |
+| **QuickBooks did not answer LedgerSync just now.** | Nothing was sent for those vendors. Ask again in a few minutes. |
+
+</Accordion>
+
+<Accordion title="More messages: preview expired, send already running, read-only, download link used">
+
+| The AI says | Do this |
+| --- | --- |
+| **This confirmation is unknown or expired. Preview the W-9 requests again.** | A preview works for 30 minutes. Ask the AI to preview again. |
+| **Another send is running; try again in a minute.** | Wait a minute, then ask the AI to send again. |
+| **This connection is read-only or lacks permission for this action.** | This connection can read but not send. Ask your vendors for their W-9 directly, or email <AiEmail />. |
+| The download page says **This link was already used** or **This link has expired** | Each link works once, for 10 minutes. Ask the AI for a new link. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+
+</Accordion>
+
+</AccordionGroup>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the 4 tools and what they change">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_preview_w9_requests` | Checks W-9 requests to up to 50 of a QuickBooks client's vendors, picked from the 1099 list: the address each email would go to, the vendors it would leave out and why, and the email as the vendor would read it; also reminders, a corrected address, asking a vendor again and cancelling | No |
+    | `ledgersync_send_w9_requests` | Emails the previewed W-9 requests from LedgerSync's address in the firm's name, each with the vendor's own secure link | Yes |
+    | `ledgersync_list_w9_requests` | Where each of a client's W-9 requests stands, and how each W-9's save to QuickBooks went when it was chosen; never a tax ID | No |
+    | `ledgersync_get_w9_download_link` | One-time link, good for 10 minutes, to a vendor's completed W-9 as the official IRS form in PDF | No |
+
+    - The preview needs `write:accounting`, and only firms W-9 requests are open to may preview and send (test firms
+      first); any other firm gets `access_not_active`. The list and the download link need `read:accounting`.
+    - The 1099 list (`ledgersync_get_1099_summary`) shows each vendor's `w9_status`, and the client snapshot
+      (`ledgersync_get_client_snapshot`) returns `open_w9_requests`.
+    - See [For developers](/ai/developers) for every field.
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>
