@@ -185,7 +185,7 @@ instructions: see [Find who needs a 1099](/ai/1099-vendors), under **Optional: t
 | The AI says | Do this |
 | --- | --- |
 | It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
-| **Sending W-9 requests from an AI app is open to a few test firms first.** | Ask those vendors for their W-9 directly for now. The 1099 list still shows who needs one. |
+| **Sending W-9 requests from an AI app is open to a few test firms first.** | Every firm can send W-9 requests on the live LedgerSync connector; only the sandbox (test) connector still says this. Ask those vendors for their W-9 directly for now. The 1099 list still shows who needs one. |
 | **QuickBooks holds no email address for this vendor.** | Give the AI the vendor's email address, and ask it to preview again. |
 | **The vendor already has an open W-9 request.** | Ask the AI to remind them, to send it to a corrected address, or to cancel it. |
 | **The vendor was emailed a W-9 request in the last 7 days.** | Wait: a reminder can go once 7 days have passed. |
@@ -221,8 +221,9 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     | `ledgersync_list_w9_requests` | Where each of a client's W-9 requests stands, and how each W-9's save to QuickBooks went when it was chosen; never a tax ID | No |
     | `ledgersync_get_w9_download_link` | One-time link, good for 10 minutes, to a vendor's completed W-9 as the official IRS form in PDF | No |
 
-    - The preview needs `write:accounting`, and only firms W-9 requests are open to may preview and send (test firms
-      first); any other firm gets `access_not_active`. The list and the download link need `read:accounting`.
+    - The preview needs `write:accounting`, and only firms W-9 requests are open to may preview and send: every firm on
+      live; on the sandbox connector still test firms only, and any other firm there gets `access_not_active`. The
+      list and the download link need `read:accounting`.
     - The 1099 list (`ledgersync_get_1099_summary`) shows each vendor's `w9_status`, and the client snapshot
       (`ledgersync_get_client_snapshot`) returns `open_w9_requests`.
     - See [For developers](/ai/developers) for every field.

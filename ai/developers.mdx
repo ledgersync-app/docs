@@ -1290,8 +1290,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       ("Find who needs a 1099"), with optional `client` and `tax_year` arguments. Claude Code lists it as a
       command. The connector's instructions also tell the AI to preview 1099 marks first and apply them only after
       the user's yes.
-    - W-9 requests are open to test firms first, on live and on the sandbox connector: every other firm gets
-      `access_not_active` from the preview and the send. `ledgersync_preview_w9_requests` takes `client_id`,
+    - W-9 requests are open to every firm. On the sandbox connector they are still limited to test firms: every other
+      firm there gets `access_not_active` from the preview and the send. `ledgersync_preview_w9_requests` takes `client_id`,
       `client_name`, `vendors` (1 to 50, each a `vendor_id` from `ledgersync_get_1099_summary` or
       `ledgersync_list_w9_requests`, with an optional `action`: `send`, `remind`, `correct_address`, `request_again`
       or `cancel`; an optional `email`; and, to ask again, a `reason` the vendor reads), an optional `note` and an
