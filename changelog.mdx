@@ -3,6 +3,16 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-17" tags={["Clients"]}>
+  ## Updating a client keeps it in its group
+
+  `PATCH /v3/clients/{client_id}` used to take the client out of the client group it was filed under in the
+  LedgerSync app, on every update, even one that only set `external_id`. The client now stays in its group, as
+  every field you leave out stays as it is.
+
+  - Nothing to change on your side: the request and the answer are the same as before.
+</Update>
+
 <Update label="2026-11-17" tags={["AI connector"]}>
   ## Ask vendors for their W-9 from Claude or ChatGPT
 
