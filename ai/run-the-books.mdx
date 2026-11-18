@@ -23,7 +23,7 @@ In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
 
 </AiStep>
 
-<AiStep id="ask" n={2} total={5} title="Give it the instructions">
+<AiStep id="ask" n={2} total={5} title="Give it the instructions" imgs={[{ src: "/images/ai-run-books/run-1-menu.png", caption: "Claude's + menu" }, { src: "/images/ai-run-books/run-2-inputs.png", caption: "The client and the month" }]}>
 
 **In Claude:** click **+**, then **Connectors**, then **Add from LedgerSync**. Pick **Run the books for a client**,
 type your client's name and the month, click **Add prompt**, then press **Enter**.
@@ -50,7 +50,7 @@ stop to ask along the way.
 
 </AiStep>
 
-<AiStep id="approve" n={5} total={5} title="Say yes to the list">
+<AiStep id="approve" n={5} total={5} title="Say yes to the list" imgs={[{ src: "/images/ai-run-books/run-3-list-top.png", caption: "The start of the list" }, { src: "/images/ai-run-books/run-4-list-end.png", caption: "The end: one yes" }]}>
 
 You get one list with every change: what it will post to QuickBooks, the new rules, the email to your client, any
 bank fix links, the vendors to mark for 1099 and the W-9 requests. Under it: the fixes for you to make in QuickBooks,
@@ -62,6 +62,14 @@ everything in order and tells you what was done.
 <AiNote tone="green">
 
 **Nothing changes until you say yes.** Nothing is posted to QuickBooks and nothing is sent to anyone before that.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**Using Claude?** It asks before each step that reads your client's data. To let it read without asking every time:
+click **Customize** in Claude's menu on the left, then **Connectors**, then **LedgerSync**. Under **Tool
+permissions**, set **Read-only tools** to **Always allow**. Posting, saving and sending still wait for your yes.
 
 </AiNote>
 
