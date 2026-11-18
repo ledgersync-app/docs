@@ -756,6 +756,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - The instructions on [Bookkeeping into QuickBooks](/ai/quickbooks-bookkeeping) are also an MCP prompt,
       `quickbooks_bookkeeping` ("Bookkeeping into QuickBooks"), with optional `client` and `period` arguments.
       Claude Code lists it as a command.
+    - The instructions on [Run the books for a client](/ai/run-the-books) are an MCP prompt, `run_the_books` ("Run
+      the books for a client"), with optional `client` and `period` arguments. It adds no tool: it chains these tools
+      for one client end to end, from the bank feeds to the 1099 step, and asks for one yes on a list of previews,
+      each `confirmation_id` still good for 30 minutes. Claude Code lists it as a command.
     - Rules setup lets the AI create a client's categorization rules in LedgerSync, with the new categories,
       category links and vendors they need, and change the rules that exist, after the user approves a preview. It
       works for Manual and QuickBooks Online clients. For a client on another accounting app, such as Zoho Books,
