@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (68 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (69 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -71,13 +71,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">68</span>
+## Tools <span className="lsai-badge">69</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
 | `ledgersync_get_account_status` | Which firm and login it is connected as; is the connection ready; sandbox or live; refreshes left | No |
 | `ledgersync_find_clients` | Finds clients by name or email, and the firm's own accounts, each with the id and the name the other client tools take together; says how many clients match in all and, with no search, how many have banks connected and how many need attention | No |
 | `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, and the playbooks that fit, and its open W-9 requests | No |
+| `ledgersync_get_playbook` | The step-by-step instructions of one of LedgerSync's playbooks, such as `run_the_books`, word for word what its prompt returns, for requests typed in plain words and AI apps that show no prompts | No |
 | `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear | No |
 | `ledgersync_get_vendor_coding_history` | How a client has coded one vendor's entries over the last months: the accounts used, most used first, with how often, when last and the average amount. Takes the vendor, or the text of a bank row | No |
 | `ledgersync_compare_statement_to_books` | Why a bank or card statement does not reconcile: LedgerSync's copy of the statement against the client's QuickBooks register for its period, the difference on its last day split into parts that add up to it, and the rows on each side that nothing matched | No |
@@ -757,9 +758,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `quickbooks_bookkeeping` ("Bookkeeping into QuickBooks"), with optional `client` and `period` arguments.
       Claude Code lists it as a command.
     - The instructions on [Run the books for a client](/ai/run-the-books) are an MCP prompt, `run_the_books` ("Run
-      the books for a client"), with optional `client` and `period` arguments. It adds no tool: it chains these tools
-      for one client end to end, from the bank feeds to the 1099 step, and asks for one yes on a list of previews,
-      each `confirmation_id` still good for 30 minutes. Claude Code lists it as a command.
+      the books for a client"), with optional `client` and `period` arguments. It chains these tools for one client end
+      to end, from the bank feeds and the statements to the 1099 step, and asks for one yes on a list of everything
+      to fix, each `confirmation_id` still good for 30 minutes. Claude Code lists it as a command. A request typed in
+      plain words, and AI apps that show no prompts, get the same steps from `ledgersync_get_playbook`, which returns
+      any playbook's steps by name.
     - Rules setup lets the AI create a client's categorization rules in LedgerSync, with the new categories,
       category links and vendors they need, and change the rules that exist, after the user approves a preview. It
       works for Manual and QuickBooks Online clients. For a client on another accounting app, such as Zoho Books,

@@ -4,6 +4,19 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-18" tags={["AI connector"]}>
+  ## Just ask your AI to run the books
+
+  Type *"Run the books for Acme for October"* in Claude, ChatGPT or Grok, and your AI follows LedgerSync's steps for
+  it, with no menu needed. The run now asks for the client and the month first, checks for missing statements (a bank
+  that never sends statements is flagged as that, not as missing), checks every categorization, then the rules, the
+  reconciliation and the rest, and ends with one list of everything to fix, each with its solution.
+
+  - New tool `ledgersync_get_playbook`: any LedgerSync playbook's steps by name, the same as its prompt.
+  - Your AI app loads the new tool with the tool list (see Tool updates on [For developers](/ai/developers)). See
+    [Run the books for a client](/ai/run-the-books).
+</Update>
+
+<Update label="2026-11-18" tags={["AI connector"]}>
   ## Run a client's books with one request
 
   A new prompt, *Run the books for a client*, has your AI do one client's bookkeeping end to end: the bank feeds,
