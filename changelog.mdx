@@ -3,6 +3,46 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-19" tags={["Transactions"]}>
+  ## `merchant_name` names the other party, plus counterparties and payment details
+
+  `merchant_name` now names the other party of a transaction: the merchant on a purchase, or the company or person
+  paid or paying on an ACH or wire. It is no longer a transaction-type label such as `Outgoing Wire` or
+  `Orig Co Name`, and three new fields describe that party and the payment.
+
+  - **Finicity names are read from the ACH and wire text.** They keep the bank's spelling and cuts: CIBC, for
+    example, cuts an ACH company name to 16 characters and a wire beneficiary to 18.
+  - **MX transactions carry the name MX cleaned.** Their `merchant_name` was always `null` before.
+  - **`null` when the bank text names no outside party:** checks with no payee, deposits, transfers between the
+    holder's own accounts, loan moves, fees, interest and sweeps.
+  - **New `merchant_entity_id`:** MX's merchant ID (`MCH-...`), the same across banks and accounts. It is `null` on
+    Finicity, portal (FDE) and uploaded-statement (PDF) transactions, and when MX's ID is a catch-all the bank uses
+    for many unrelated parties.
+  - **New `counterparties`:** always an array. Today it holds at most one entry, the party `merchant_name` names, and
+    it is empty when `merchant_name` is `null`. Each entry has `name`, `type`, `entity_id` and `confidence_level`,
+    which is `HIGH` for an MX name backed by its merchant ID and `LOW` for a name cleaned or parsed from the bank text.
+  - **New `payment_meta`:** always an object with `payment_method` (`ACH` or `WIRE` today), `payer` (money in),
+    `payee` (money out) and `reference_number` (the bank's reference as printed). All four are `null` unless the row
+    is an ACH or wire LedgerSync can read.
+
+  An outgoing wire read from Finicity at CIBC, with the beneficiary cut to 18 characters:
+
+  ```json
+  {
+    "merchant_name": "PAYCOM CLIENT TRUS",
+    "merchant_entity_id": null,
+    "counterparties": [
+      { "name": "PAYCOM CLIENT TRUS", "type": null, "entity_id": null, "confidence_level": "LOW" }
+    ],
+    "payment_meta": { "payment_method": "WIRE", "payer": null, "payee": "PAYCOM CLIENT TRUS", "reference_number": null }
+  }
+  ```
+
+  The new fields are additive, and a transaction you already pulled shows the new values when you read it again. If
+  you match on `merchant_name`, expect labels such as `Outgoing Wire` to give way to a name or `null`. Every field and
+  value is in [The transaction object](/guides/quickstart#the-transaction-object).
+</Update>
+
 <Update label="2026-11-19" tags={["AI connector"]}>
   ## Run the books tells you when it is waiting for you
 

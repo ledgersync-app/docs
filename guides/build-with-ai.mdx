@@ -172,8 +172,18 @@ the connect session. If no return address is needed, omit that field.
 
 Transaction fields, and this is the complete list: `id`, `account_id`,
 `external_id`, `amount`, `iso_currency_code`, `date`, `description`,
-`merchant_name`, `category`, `pending`. `amount` is negative for money
-out and positive for money in.
+`merchant_name`, `merchant_entity_id`, `counterparties`, `payment_meta`,
+`category`, `pending`. `amount` is negative for money out and positive
+for money in.
+
+`merchant_name` is the other party: the merchant, or the company or
+person paid or paying on an ACH or wire. It is null when the bank text
+names no outside party. `merchant_entity_id` is MX's merchant ID, or
+null. `counterparties` is always an array, empty when `merchant_name`
+is null; each entry has `name`, `type`, `entity_id` and
+`confidence_level`. `payment_meta` is always an object with
+`payment_method`, `payer`, `payee` and `reference_number`, all null
+unless the row is an ACH or wire LedgerSync can read.
 
 Account `type` is checking, savings, credit_card, loan, investment or
 other. `current_balance` is from the account holder's point of view, so a

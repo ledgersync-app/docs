@@ -373,11 +373,55 @@ Every row in a `/transactions` response has the same shape, whatever aggregator 
 | `iso_currency_code` | string | ISO-4217, e.g. `USD`. Defaults to `USD` when the source omits it. |
 | `date` | string (`YYYY-MM-DD`) | Posted date — when the transaction cleared. |
 | `description` | string | Raw bank description, e.g. `STARBUCKS #1234 SEATTLE WA`. |
-| `merchant_name` | string \| null | Cleaned merchant, when the source provides one. |
+| `merchant_name` | string \| null | The other party's name: the merchant on a purchase, or the company or person paid or paying on an ACH or wire. Never a transaction-type label. `null` when the bank text names no outside party. Details in [Who the transaction was with](#who-the-transaction-was-with). |
+| `merchant_entity_id` | string \| null | MX's merchant ID (`MCH-...`), the same across banks and accounts. |
+| `counterparties` | array | Always present. The parties other than the account holder, possibly none (`[]`). |
+| `payment_meta` | object | Always present. The ACH or wire details: all four fields are `null` unless the row is an ACH or wire LedgerSync can read. |
 | `category` | string \| null | LedgerSync's normalized category (best-effort across sources). |
 | `pending` | boolean | `true` while the charge is still pending, `false` once posted. |
 
-That's the complete set. There is no `subcategory`, `type`, or `location` field.
+That's the complete set. `counterparties` and `payment_meta` are always present, even when they hold nothing. There is no top-level `subcategory`, `type`, or `location` field: the `type` inside a `counterparties` entry is the kind of party, not of transaction.
+
+### Who the transaction was with
+
+`merchant_name` is never a transaction-type label such as `Outgoing Wire` or `Orig Co Name`. It is `null` when the bank text names no outside party: checks with no payee, deposits, transfers between the holder's own accounts, loan moves, fees, interest and sweeps. Where the name comes from:
+
+- **Finicity:** read from the bank's text, keeping the bank's spelling and cuts. CIBC, for example, cuts an ACH company name to 16 characters and a wire beneficiary to 18.
+- **MX:** the name MX cleaned.
+- **Portal (FDE) and uploaded statements (PDF):** none, so `merchant_name` is `null`.
+
+`merchant_entity_id` comes from MX only, so it is `null` on Finicity, portal (FDE) and uploaded-statement (PDF) transactions. On MX it is also `null` when `merchant_name` is `null`, and when MX's ID is a catch-all the bank uses for many unrelated parties.
+
+`counterparties` lists the parties other than the account holder. Today it holds at most one entry, the party `merchant_name` names, and it is empty when `merchant_name` is `null`. Each entry:
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `name` | string | Same as `merchant_name`. |
+| `type` | string \| null | One of `merchant`, `financial_institution`, `payment_app`, `marketplace`, `payment_terminal`, `income_source`. `null` when it cannot be told. |
+| `entity_id` | string \| null | Same as `merchant_entity_id`. |
+| `confidence_level` | string \| null | One of `VERY_HIGH`, `HIGH`, `MEDIUM`, `LOW`, `UNKNOWN`. `HIGH`: an MX name backed by MX's merchant ID. `LOW`: a name cleaned or parsed from the bank text, which is also what `LOW` means at Plaid. |
+
+`payment_meta` holds:
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `payment_method` | string \| null | `ACH` or `WIRE` today. More values may be added, so read it as a plain string. |
+| `payer` | string \| null | For money in: who paid, as the bank text names them. `null` for money out. |
+| `payee` | string \| null | For money out: who was paid, as the bank text names them. `null` for money in. |
+| `reference_number` | string \| null | The bank's reference as printed: the ACH `TRACE#` at Chase, the ACH `Trace` some credit unions print, the wire `TRN` at Bank of America, the wire IMAD at Chase (else its `TRN`), the wire `REF` at Encore. Some banks mask part of it. |
+
+`payer` and `payee` keep the bank's text, so they can differ from `merchant_name`. An outgoing wire read from Finicity at CIBC, with the beneficiary cut to 18 characters:
+
+```json
+{
+  "merchant_name": "PAYCOM CLIENT TRUS",
+  "merchant_entity_id": null,
+  "counterparties": [
+    { "name": "PAYCOM CLIENT TRUS", "type": null, "entity_id": null, "confidence_level": "LOW" }
+  ],
+  "payment_meta": { "payment_method": "WIRE", "payer": null, "payee": "PAYCOM CLIENT TRUS", "reference_number": null }
+}
+```
 
 ### Amount sign
 
@@ -389,8 +433,30 @@ That's the complete set. There is no `subcategory`, `type`, or `location` field.
 ```json
 {
   "data": [
-    { "id": "txn_FINICITY_1", "amount": -28.34, "description": "STARBUCKS #1234 SEATTLE WA", "category": "Food and Drink", "pending": false },
-    { "id": "txn_FINICITY_2", "amount": 1500.00, "description": "PAYROLL DEPOSIT", "category": "Income", "pending": false }
+    {
+      "id": "txn_FINICITY_1",
+      "amount": -28.34,
+      "description": "STARBUCKS #1234 SEATTLE WA",
+      "merchant_name": "Starbucks",
+      "merchant_entity_id": null,
+      "counterparties": [
+        { "name": "Starbucks", "type": "merchant", "entity_id": null, "confidence_level": "LOW" }
+      ],
+      "payment_meta": { "payment_method": null, "payer": null, "payee": null, "reference_number": null },
+      "category": "Food and Drink",
+      "pending": false
+    },
+    {
+      "id": "txn_FINICITY_2",
+      "amount": 1500.00,
+      "description": "PAYROLL DEPOSIT",
+      "merchant_name": null,
+      "merchant_entity_id": null,
+      "counterparties": [],
+      "payment_meta": { "payment_method": null, "payer": null, "payee": null, "reference_number": null },
+      "category": "Income",
+      "pending": false
+    }
   ]
 }
 ```
