@@ -15,6 +15,23 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 </Update>
 
 <Update label="2026-11-20" tags={["AI connector"]}>
+  ## Five tools are now part of others
+
+  The live connector has 66 tools instead of 71 (sandbox 64 instead of 69): five tools were folded into the tools
+  they always followed, so AI apps with a cap on how many tools they load keep every LedgerSync tool.
+
+  - `ledgersync_get_operation_status` now reports any background work by the id its tool returned: a refresh
+    (`operation_id` with `connection_id`, as before), a QuickBooks push (`push_id`), changes made in QuickBooks
+    (`change_set_id`) or a rules setup (`setup_id`). It replaces `ledgersync_get_quickbooks_push_status`,
+    `ledgersync_get_ledger_changes_status` and `ledgersync_get_rules_setup_status`, with the same answers.
+  - `ledgersync_list_rules` with a `rule_id` shows one rule in full. It replaces `ledgersync_get_rule`.
+  - `ledgersync_get_statement_conversion` with a `format` adds a one-time link to the converted file once the
+    conversion is completed. It replaces `ledgersync_get_conversion_download_link`.
+  - An AI app still holding its old tool list gets "unknown tool" from the five old names: reload the tool list (see
+    Tool updates on [For developers](/ai/developers)).
+</Update>
+
+<Update label="2026-11-20" tags={["AI connector"]}>
   ## Your AI remembers each client
 
   Tell your AI something about a client, like *"Acme uses Stripe for card payments and its year ends in June"*, and

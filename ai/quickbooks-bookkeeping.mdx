@@ -187,7 +187,7 @@ Use this for a client whose bank transactions do not come into QuickBooks throug
 5. A transaction with pending_global_rule matched one of the firm's global rules, but this client has no QuickBooks category mapped to the rule's global category. Ask the user which category to use instead of guessing, and suggest mapping it in LedgerSync's Categories Mapping, so the rule files these by itself next time.
 6. Leave out transfers between the client's own accounts, payments of an open bill or invoice, and anything LedgerSync flags as a possible duplicate. List them for the user instead.
 7. Call ledgersync_preview_quickbooks_push. Show the user the summary, the refused rows and the warnings. Nothing has changed yet.
-8. Only after the user says yes, call ledgersync_push_to_quickbooks with the preview's confirmation_id and the same client_id and client_name. Then check ledgersync_get_quickbooks_push_status and tell the user what was posted, what failed and why.`} />
+8. Only after the user says yes, call ledgersync_push_to_quickbooks with the preview's confirmation_id and the same client_id and client_name. Then check ledgersync_get_operation_status with its push_id and tell the user what was posted, what failed and why.`} />
 </div>
 
 1. Click **Copy** above.
@@ -260,7 +260,7 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     | `ledgersync_search_quickbooks_payees` | Finds the client's QuickBooks vendors, customers and employees | No |
     | `ledgersync_preview_quickbooks_push` | Checks up to 100 transactions with the categories and payees the AI picked, and shows what would be posted | No |
     | `ledgersync_push_to_quickbooks` | Posts a previewed set of transactions into the client's QuickBooks | Yes |
-    | `ledgersync_get_quickbooks_push_status` | What a push posted, skipped or failed, and why | No |
+    | `ledgersync_get_operation_status` | With the `push_id` the push returned: what it posted, skipped or failed, and why | No |
 
     - The QuickBooks category, payee and bank account ids the tools give are sealed to their client: the id, a dot
       and 8 more characters. The preview takes each one back only for that client: an id from another client's list,

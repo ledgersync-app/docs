@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (71 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (66 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -71,7 +71,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">71</span>
+## Tools <span className="lsai-badge">66</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -101,10 +101,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_list_check_images` | A client's check images, newest first: each check's date, number, amount, payee and memo as read from the check, its bank and account, and the bank transaction LedgerSync matched it to. Never the images themselves | No |
 | `ledgersync_get_check_images_download_link` | One-time links to a client's check images as files: one check as its image, more as a ZIP (up to 200 a link) with each image named the way you ask and a CSV of their details | No |
 | `ledgersync_create_statement_upload_link` | Secure page where you upload a bank statement PDF to turn it into transactions | Yes |
-| `ledgersync_get_statement_conversion` | Has a statement conversion finished; its transactions, a page at a time | No |
-| `ledgersync_get_conversion_download_link` | One-time link to a converted statement as a CSV, Excel, QuickBooks or OFX file | No |
+| `ledgersync_get_statement_conversion` | Has a statement conversion finished; its transactions, a page at a time; with a `format`, a one-time link to the converted statement as a CSV, Excel, QuickBooks or OFX file | No |
 | `ledgersync_refresh_connection` | Asks the bank for the latest data | Yes |
-| `ledgersync_get_operation_status` | Has a refresh finished | No |
+| `ledgersync_get_operation_status` | Where background work stands, by the id its tool returned: has a refresh finished (`operation_id`); what a QuickBooks push posted, skipped or failed, and why (`push_id`); how a rules setup is going, what it created (in QuickBooks too), changed and filled, never counting an account hidden in LedgerSync, and what failed and why (`setup_id`); how marking vendors went, which were changed, which were left as they were and why, and how an undo went (`change_set_id`) | No |
 | `ledgersync_get_fix_link` | Secure page to fix a broken connection | Yes |
 | `ledgersync_preview_client_message` | Who would get your email or text (a reconnect message, an invitation, or a clarification request asking clients about some of their transactions), who is skipped and why, and a sample | No |
 | `ledgersync_send_client_message` | Sends a previewed email or text, each with that client's own link | Yes |
@@ -117,23 +116,19 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_search_quickbooks_payees` | Finds a client's QuickBooks vendors, customers and employees | No |
 | `ledgersync_preview_quickbooks_push` | Checks up to 100 transactions with the categories and payees the AI picked, and shows what would be posted to QuickBooks | No |
 | `ledgersync_push_to_quickbooks` | Posts a previewed set of transactions into the client's QuickBooks | Yes |
-| `ledgersync_get_quickbooks_push_status` | What a QuickBooks push posted, skipped or failed, and why | No |
 | `ledgersync_get_rules_setup` | Can a client's rules be set up (Manual and QuickBooks Online clients); counts of its categories, vendors, rules and waiting transactions (accounts hidden in LedgerSync left out); for a QuickBooks client, its QuickBooks connection and the transactions waiting for a link; can you make global rules; the limits; the client's last setups | No |
 | `ledgersync_list_setup_categories` | A client's categories or the firm's global categories, with GL codes (Manual), links, a suggested link for each global category the client does not link, and the LS-AI mark | No |
 | `ledgersync_list_setup_vendors` | A client's vendors (and, for a QuickBooks client, its customers) or the firm's global vendors, with the LS-AI mark | No |
-| `ledgersync_list_rules` | A client's rules or the firm's global rules, with conditions, category, payee and the LS-AI mark | No |
-| `ledgersync_get_rule` | One of a client's rules or the firm's global rules in full: every condition, every category line of a client rule, its payee, whether it is on, and the rules just before and after it | No |
+| `ledgersync_list_rules` | A client's rules or the firm's global rules, with conditions, category, payee and the LS-AI mark; with a `rule_id`, one of them in full: every condition, every category line of a client rule, its payee, whether it is on, and the rules just before and after it | No |
 | `ledgersync_list_uncategorized_transactions` | A client's waiting transactions that no rule fills, grouped by bank text, largest groups first, and, at a QuickBooks client, the groups a global rule would file once a category is linked. Accounts hidden in LedgerSync are left out | No |
 | `ledgersync_preview_rules_setup` | Checks up to 100 rules with their new categories, links and vendors, and up to 50 changes to existing rules (edit, turn off, turn on, move, delete), and counts what each rule would fill and what each change would put back, keep or fill, for the client and at the firm's other clients (never counting an account hidden in LedgerSync); at a QuickBooks client, also what waits for a link and which other clients need one | No |
 | `ledgersync_preview_category_links` | For one global category, proposes the category to link at every client that has none linked to it yet (only the clients you can see), with the totals, a summary by category and, at QuickBooks clients, how many waiting transactions the firm's global rules would file once it is linked; a page at a time | No |
 | `ledgersync_apply_rules_setup` | Saves a previewed rules setup, makes its changes to existing rules and fills the waiting transactions, in the background; for a QuickBooks client, it first creates the new categories and vendors in the client's QuickBooks; it also saves the links `ledgersync_preview_category_links` previewed, client by client | Yes |
-| `ledgersync_get_rules_setup_status` | How a rules setup is going; what it created (in QuickBooks too), changed and filled, never counting an account hidden in LedgerSync; what failed and why | No |
 | `ledgersync_undo_rules_setup` | Shows what undoing a rules setup would remove, put back and keep, never counting an account hidden in LedgerSync (what it created in QuickBooks stays); after a yes, undoes it | Yes |
 | `ledgersync_get_categorized_export_link` | How many of the Manual clients' categorized transactions are not exported yet, and a 24-hour link to them as the LedgerSync app's Default or ACS export file | No (pressing **Download** on the link's page marks them Synced) |
 | `ledgersync_get_1099_summary` | The vendors a QuickBooks client paid at or over the 1099 threshold in a tax year, with each one's QuickBooks 1099 flag, whether a tax ID and an email are on file (never the tax ID itself), a suggested next step and advice from the expense accounts its payments were booked to; card and payment app payments left out by default; can count only the accounts the accountant chooses; also each vendor's W-9 request | No |
 | `ledgersync_preview_ledger_changes` | Checks marking up to 100 of a QuickBooks client's vendors for 1099, or unmarking them: each vendor's 1099 flag before and after, and the vendors it would leave as they are, with the reason | No |
 | `ledgersync_apply_ledger_changes` | Marks the previewed vendors for 1099 in the client's QuickBooks, in the background, changing nothing else on them | Yes |
-| `ledgersync_get_ledger_changes_status` | How marking vendors went: which were changed, which were left as they were and why, and how an undo went | No |
 | `ledgersync_undo_ledger_changes` | Shows which vendors' 1099 flags would go back and which would stay; after a yes, puts them back | Yes |
 | `ledgersync_preview_w9_requests` | Checks sending W-9 requests to up to 50 of a QuickBooks client's vendors, picked from the 1099 list: the address each email would go to, the vendors it would leave out and why, and the email as the vendor would read it; also reminders, a corrected address, asking a vendor again and cancelling; can also save each W-9 to QuickBooks once the vendor signs | No |
 | `ledgersync_send_w9_requests` | Emails the previewed W-9 requests from LedgerSync's address in the firm's name, each with the vendor's own secure link to fill in and sign the form | Yes |
@@ -181,8 +176,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - Every other id a tool takes must belong to the named client. Another client's connection, account, statement,
       refresh operation, rule, rules setup, QuickBooks push or 1099 change set answers `not_found`; in a preview, it
       is refused like any id that is not the client's. A list filtered by another client's `connection_id`,
-      `account_id` or `rule_id` answers `not_found` instead of an empty list. `ledgersync_get_operation_status`
-      answers only for a refresh of the connection it names.
+      `account_id` or `rule_id` answers `not_found` instead of an empty list. For a refresh,
+      `ledgersync_get_operation_status` answers only for a refresh of the connection it names.
     - Ids that only mean something inside one client's books come sealed to that client: QuickBooks categories,
       payees, bank accounts and vendors, the accounts on a financial report's lines and in the new-client check, and
       the client's own
@@ -451,8 +446,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       (`validated`; `validation_status`: `balanced`, `balance_mismatch`, `totals_mismatch` or `balance_missing`;
       `validation_message`, in words the AI can repeat; a conversion with no transactions has none of these) and
       the transactions, 50 at a time by default (up to 200): pass `next_cursor` for more.
-    - `ledgersync_get_conversion_download_link` makes a link to the file the LedgerSync app's PDF Converter
-      makes: `csv`, `xlsx` (Excel), `qbo` (a QuickBooks bank file) or `ofx`.
+    - `ledgersync_get_statement_conversion` with a `format` makes a link to the file the LedgerSync app's PDF
+      Converter makes: `csv`, `xlsx` (Excel), `qbo` (a QuickBooks bank file) or `ofx`. Only a completed conversion
+      with transactions gets one, as `file` (`format`, `download_url` and `expires_at`) in place of its transactions;
+      any other answer has no link, so checking on a conversion never uses one up. This was the tool
+      `ledgersync_get_conversion_download_link` until November 20, 2026.
     - A conversion belongs to the person who made the upload link: the owner, an administrator or an employee.
       It also shows on that person's **PDF Converter** page in the LedgerSync app, where it can be exported
       again.
@@ -785,7 +783,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       returns a `push_id` (`qbp_...`), a status (`queued`, `nothing_to_push` or `already_queued`), the number
       queued, the refused transactions and the payees it created. Calling it again with the same confirmation
       returns the same answer and never posts twice.
-    - `ledgersync_get_quickbooks_push_status` takes the `client_id`, `client_name` and the `push_id` and says `in_progress`,
+    - `ledgersync_get_operation_status` with the `client_id`, `client_name` and the `push_id` says `in_progress`,
       `finished` or `failed`, with counts and, for each transaction, `synced` (with its QuickBooks id), `failed`
       (with the reason), `skipped_possible_duplicate`, `skipped_not_posted`, `pending` or `not_pushed`, a page at
       a time.
@@ -905,8 +903,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       (`more_lines`).
     - Each category, vendor and rule that a rules setup created or linked carries `ai` (`setup_id`, `reviewed`):
       the LS-AI mark.
-    - `ledgersync_get_rule` takes the `client_id`, `client_name` and a `rule_id` (`rul_c_...` or `rul_g_...`) and shows one rule in
-      full: the `rule` as `ledgersync_list_rules` lists it, its `transaction_type`, a client rule's categorization
+    - `ledgersync_list_rules` with the `client_id`, `client_name` and a `rule_id` (`rul_c_...` or `rul_g_...`) shows
+      that one rule in full instead of a list (`scope`, `query`, `limit` and `cursor` are then not used): the `rule` as `ledgersync_list_rules` lists it, its `transaction_type`, a client rule's categorization
       `lines` (each with its `category`: `id`, `name`, `gl_code` and `full_name` when it differs from the name; its
       `class`, `customer`, `amount` and `allocation_type`: `percentage` or `amount`), and the rules just before and
       after it in its list (`neighbours`: `before` and `after`, each with `id` and `name`). Its `next_step` says how
@@ -1011,7 +1009,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       broken connection, and otherwise to preview again in a few minutes.
     - `changes` change rules that exist, one change per rule, next to new items or on their own. Each has a `ref`
       (as for new items), an `action` (`edit`, `turn_off`, `turn_on`, `move` or `delete`) and the rule's `rule_id`
-      (`rul_c_...` or `rul_g_...`, from `ledgersync_list_rules` or `ledgersync_get_rule`). An `edit` gives the parts
+      (`rul_c_...` or `rul_g_...`, from `ledgersync_list_rules`). An `edit` gives the parts
       it changes, any of `name`, `direction`, `match`, `conditions`, `category` and `payee`: a part left out stays as
       it is, `conditions` replace all of the rule's, and `category` and `payee` take the same ids and refs as a new
       rule of the same scope. A `move` gives a `position`: a `place`, `before` or `after` another rule of the same
@@ -1113,7 +1111,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       QuickBooks and run the setup again. A name QuickBooks says is taken, without LedgerSync finding what holds it,
       fails with `name_taken`. What uses a failed item, such as a rule or a link, fails with `depends_on_refused`, the
       rest of the setup is saved, and the `next_step` says it was QuickBooks, not LedgerSync, that refused them.
-    - `ledgersync_get_rules_setup_status` takes the `client_id`, `client_name` and the `setup_id` and says where the setup is
+    - `ledgersync_get_operation_status` with the `client_id`, `client_name` and the `setup_id` says where the setup is
       (queued, running, done, done with some failed items, failed, being undone, undone, or undo failed), with its
       phase and progress. A finished setup also gives what it created by type, how many transactions it filled for
       the client, how many the existing rules filled, how many it filled at other clients and at how many clients,
@@ -1207,7 +1205,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       Calling it again with the same `confirmation_id` never links twice: it returns `existing: true` with the
       setup's status now, or with the status it was first sent with when LedgerSync cannot read that status at the
       moment.
-    - `ledgersync_get_rules_setup_status` and `ledgersync_undo_rules_setup` take an `rsl_` `setup_id` without a
+    - `ledgersync_get_operation_status` and `ledgersync_undo_rules_setup` take an `rsl_` `setup_id` without a
       `client_id`. The status counts the clients done (`clients_done` of `clients_total`), and its `firm_links` block
       counts the links made (`linked`) and the transactions filed through them (`filled_through_links`), and lists
       the clients whose link failed, with the reason (`failed_clients`, each with its `client_id` and
@@ -1216,7 +1214,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       the badge where no other rule takes them. A link a person changed since stays. Links need no
       **Manage Global Rules**.
     - A rules setup apply or undo that got no clear answer from LedgerSync comes back as `upstream_unknown`,
-      naming the setup: check `ledgersync_get_rules_setup_status` before trying again.
+      naming the setup: check `ledgersync_get_operation_status` with the `setup_id` before trying again.
     - The instructions on [Set up rules for a client](/ai/rules-setup) are also an MCP prompt, `rules_setup`
       ("Set up rules for a client"), with optional `client` and `focus` arguments. Claude Code lists it as a
       command.
@@ -1306,8 +1304,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       again with the same `confirmation_id` never marks twice: it returns `existing: true` with the change set's
       status now, or with the status it was first sent with when LedgerSync cannot read that status at the moment.
       An apply that got no clear answer comes back as
-      `upstream_unknown`: check `ledgersync_get_ledger_changes_status` before trying again.
-    - `ledgersync_get_ledger_changes_status` takes `client_id`, `client_name` and `change_set_id`. It answers `status` (`queued`,
+      `upstream_unknown`: check `ledgersync_get_operation_status` with the `change_set_id` before trying again.
+    - `ledgersync_get_operation_status` with `client_id`, `client_name` and `change_set_id` answers `status` (`queued`,
       `running`, `done`, `partial`, `failed`, `undoing`, `undone` or `undo_failed`), the counts, the AI app the
       changes were approved from (`app`) and, a page at a time, each vendor's flag before and after with its
       `result` and `reason`, and after an undo its `undo` and `undo_reason`.
@@ -1365,7 +1363,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `access_not_active` and can preview without it. A reminder keeps the choice its request was first sent with.
       `ledgersync_list_w9_requests` then shows `save_to_quickbooks` and `quickbooks_save`: its `status` (`waiting`
       for the vendor, `saving`, `saved`, `marked_only` when QuickBooks kept a different tax ID, `not_saved` with the
-      reason in `message`, or `undone`) and its `change_set_id`, which `ledgersync_get_ledger_changes_status` and
+      reason in `message`, or `undone`) and its `change_set_id`, which `ledgersync_get_operation_status` and
       `ledgersync_undo_ledger_changes` take. The undo puts back the 1099 mark only; QuickBooks keeps the tax ID. The
       tax ID goes from the encrypted W-9 to QuickBooks and never through the AI.
     - `ledgersync_get_1099_summary` shows each vendor's W-9 request: `w9_status` is the
@@ -1399,9 +1397,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       The answer also has the client's `platform` (`manual` or `quickbooks`), `total`, `has_more` and
       `next_cursor`. A page that does not fit in 20,000 characters is cut, and its `next_step` says to call again
       with a smaller `limit` and the same `cursor`. It changes nothing and needs `read:accounting`. A `rule_id`
-      the client does not have, read as `ledgersync_get_rule` reads it, answers `not_found` instead of an empty list.
+      the client does not have, read as `ledgersync_list_rules` reads it for a `rule_id`, answers `not_found` instead
+      of an empty list.
     - Its `next_step` also tells the AI how to check rules against the transactions they filed: read each rule with
-      `ledgersync_get_rule`, compare its conditions on the bank text and the amount, its category and its payee with
+      `ledgersync_list_rules` and its `rule_id`, compare its conditions on the bank text and the amount, its category and its payee with
       each transaction, tell the user about every mismatch, and propose a fix with `ledgersync_preview_rules_setup`
       only after the user agrees.
     - `ledgersync_preview_accept_transactions` takes `client_ids` (1 to 10, from `ledgersync_find_clients`) with
@@ -1675,10 +1674,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     `invalid_request`, `internal_error`, `idempotency_conflict` or `upstream_unavailable` (LedgerSync could not
     be reached or could not check the firm just now; try again in a minute. After saving a template, list the
     templates first: it may already be saved). A QuickBooks push that got no clear answer from LedgerSync comes
-    back as `upstream_unknown`, with its `push_id`: check `ledgersync_get_quickbooks_push_status` before pushing
-    again. A rules setup apply or undo that got no clear answer comes back as `upstream_unknown` too, naming the
-    setup: check `ledgersync_get_rules_setup_status` before trying again. So does a 1099 marking apply or undo:
-    check `ledgersync_get_ledger_changes_status` before trying again. An accept of For review transactions that
+    back as `upstream_unknown`, with its `push_id`: check `ledgersync_get_operation_status` with the `push_id`
+    before pushing again. A rules setup apply or undo that got no clear answer comes back as `upstream_unknown` too,
+    naming the setup: check `ledgersync_get_operation_status` with the `setup_id` before trying again. So does a
+    1099 marking apply or undo: check `ledgersync_get_operation_status` with the `change_set_id` before trying
+    again. An accept of For review transactions that
     LedgerSync did not confirm comes back as `upstream_unknown` too: call `ledgersync_accept_transactions` again with
     the same `confirmation_id`, which never accepts twice. For its undo, call `ledgersync_undo_accept_transactions`
     without `undo_id` to see what has not gone back yet. A change to a client's details that LedgerSync did not

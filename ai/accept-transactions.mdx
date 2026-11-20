@@ -228,7 +228,7 @@ instructions.
 4. Only after the user says yes, call ledgersync_accept_transactions with the preview's confirmation_id and the same client_ids and client_names. If a client is not done yet (upstream_unknown, not_reached or not_started), call it again with the same confirmation_id, client_ids and client_names: it never accepts twice.
 5. Report to the user, client by client: what moved, what LedgerSync refused and why, what changed since the preview, and what stayed in For review. Accepting posts nothing to QuickBooks: a QuickBooks client's Categorized transactions are synced in the LedgerSync app, and a Manual client's go in its next export.
 6. If the user wants them back in For review, call ledgersync_undo_accept_transactions with the accept_id and, in client_ids and client_names, every client whose status is done. The first call only shows what would go back and what would stay. Only after the user says yes, call it again with the undo_id and the same client_ids and client_names.
-7. To check rules against the transactions they filed, list them with ledgersync_list_review_transactions, read each rule with ledgersync_get_rule, compare its conditions, category and payee with each transaction, and tell the user about every mismatch. Propose a fix with ledgersync_preview_rules_setup only after the user agrees.`} />
+7. To check rules against the transactions they filed, list them with ledgersync_list_review_transactions, read each rule in full with ledgersync_list_rules and its rule_id, compare its conditions, category and payee with each transaction, and tell the user about every mismatch. Propose a fix with ledgersync_preview_rules_setup only after the user agrees.`} />
 </div>
 
 1. Click **Copy** above.
