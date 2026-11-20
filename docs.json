@@ -61,7 +61,7 @@
               "ai/setup-grok",
               "ai/setup-grok-bot",
               "ai/convert-statement",
-              "ai/run-the-books",
+              "ai/checklist",
               "ai/quickbooks-bookkeeping",
               "ai/rules-setup",
               "ai/accept-transactions",
@@ -143,6 +143,7 @@
     ]
   },
   "redirects": [
+    { "source": "/ai/run-the-books", "destination": "/ai/checklist", "permanent": true },
     { "source": "/ai", "destination": "/guides/build-with-ai", "permanent": true },
     { "source": "/build-with-ai", "destination": "/guides/build-with-ai", "permanent": true },
     { "source": "/quickstart", "destination": "/guides/quickstart", "permanent": true },

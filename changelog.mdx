@@ -3,6 +3,22 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-20" tags={["AI connector"]}>
+  ## The CheckList: a client's month-end checklist in one request
+
+  Type *"Run Checklist for Acme, Month 10-26"* in Claude, ChatGPT or Grok, and your AI runs that client's month as
+  eight steps: bank statements, categorizing, rules, questions to your client, the QuickBooks entries to fix, the
+  reconciliation, 1099s and W-9s, and the final checks before posting. It shows how much of the month AI did and how
+  much is left, sorts each transaction into done by AI, matches past bookkeeping, AI's best guess or only the client
+  knows, and ends with one list of changes for your yes. It replaces *Run the books for a client*. In Claude's
+  **+** menu it is *Run the CheckList for a client*: if you still see the old name, reconnect LedgerSync once. See
+  [The CheckList](/ai/checklist).
+
+  - A long list cut to fit one answer now comes with a `next_cursor` that starts at the first row it left off, so
+    your AI reads every row once: the 1099 list, the review reports, the statement comparison's lists and the history
+    of AI changes. The W-9 request list still gives a smaller `limit` to call again with, and that call now fits.
+</Update>
+
 <Update label="2026-11-20" tags={["Checks"]}>
   ## The checks list comes newest first, and pages faster
 
