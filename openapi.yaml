@@ -1678,13 +1678,16 @@ paths:
 
         Checks are nested under their account because the account is the access
         boundary. Follow `download_url` to fetch the image bytes.
+
+        Checks come newest first: the check LedgerSync captured most recently
+        is first.
       parameters:
         - $ref: '#/components/parameters/ClientId'
         - $ref: '#/components/parameters/Cursor'
         - $ref: '#/components/parameters/Limit'
       responses:
         '200':
-          description: A page of checks. Empty for non-FDE accounts.
+          description: A page of checks, newest first. Empty for non-FDE accounts.
           content:
             application/json:
               schema:
