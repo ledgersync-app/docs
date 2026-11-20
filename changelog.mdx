@@ -3,6 +3,17 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-20" tags={["Checks"]}>
+  ## The checks list comes newest first, and pages faster
+
+  `GET /v3/accounts/{account_id}/checks` now lists checks newest first: the check LedgerSync captured most recently is
+  first. Before, check ids were compared as text, so on an account whose check ids differ in length an older check could
+  come before newer ones. Cursors you already hold stay valid.
+
+  - Each page now reads only its own checks, so a large account pages much faster: a page of 100 checks on a
+    548-check account took about 45 seconds, and about 1 second after this change.
+</Update>
+
 <Update label="2026-11-20" tags={["AI connector"]}>
   ## Your AI remembers each client
 

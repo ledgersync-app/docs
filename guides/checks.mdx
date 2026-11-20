@@ -96,7 +96,8 @@ curl "https://api-sandbox.ledgersyncappv2.com/v3/accounts/acc_FDE_77/checks?clie
 }
 ```
 
-Check ids are `chk_FDE_<id>`, source-tagged like every other v3 id. The list
+Check ids are `chk_FDE_<id>`, source-tagged like every other v3 id. Checks come
+newest first: the check LedgerSync captured most recently is first. The list
 paginates with `limit` and `cursor` exactly like the rest of the API — see
 [Pagination](/guides/pagination).
 
