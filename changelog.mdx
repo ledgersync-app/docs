@@ -3,6 +3,21 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-20" tags={["AI connector"]}>
+  ## Your AI remembers each client
+
+  Tell your AI something about a client, like *"Acme uses Stripe for card payments and its year ends in June"*, and
+  after you confirm the words, LedgerSync keeps it. Every chat, everyone at your firm who works on the client, and
+  every AI app you use starts from it, so the AI stops asking what it already knows.
+
+  - New tool `ledgersync_save_client_fact`: saves, changes or removes one fact about a client. A client keeps at most
+    20 facts, each up to 500 characters and 6,000 in all; numbers of 8 or more digits (tax IDs, account and card
+    numbers) and sign-in details are refused.
+  - `ledgersync_get_client_snapshot` now returns the client's `facts` by category, with `facts_total`, and for a client
+    with none can offer to set them up.
+  - Your AI app loads the new tool with the tool list (see Tool updates on [For developers](/ai/developers)).
+</Update>
+
 <Update label="2026-11-19" tags={["Transactions"]}>
   ## `merchant_name` names the other party, plus counterparties and payment details
 
@@ -41,6 +56,19 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
   The new fields are additive, and a transaction you already pulled shows the new values when you read it again. If
   you match on `merchant_name`, expect labels such as `Outgoing Wire` to give way to a name or `null`. Every field and
   value is in [The transaction object](/guides/quickstart#the-transaction-object).
+</Update>
+
+<Update label="2026-11-19" tags={["AI connector"]}>
+  ## Ask your AI what it changed
+
+  LedgerSync keeps a history of every change the AI makes through it, with who approved it and from which AI app.
+  Ask *"What did the AI change this month?"* or *"Who approved the rules for Acme?"*: your AI answers from the
+  history and, if you ask, undoes a change that can still be undone.
+
+  - New tool `ledgersync_list_audit_log`: the history, newest first, by client, dates, tool or person. Your firm's
+    owner and admins see the whole firm; anyone else sees their own clients and the changes they approved.
+  - The firm's owner and admins also see it on the **AI changes** page in the LedgerSync app.
+  - Your AI app loads the new tool with the tool list (see Tool updates on [For developers](/ai/developers)).
 </Update>
 
 <Update label="2026-11-19" tags={["AI connector"]}>

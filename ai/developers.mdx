@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (69 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (71 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -71,13 +71,14 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">69</span>
+## Tools <span className="lsai-badge">71</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
 | `ledgersync_get_account_status` | Which firm and login it is connected as; is the connection ready; sandbox or live; refreshes left | No |
 | `ledgersync_find_clients` | Finds clients by name or email, and the firm's own accounts, each with the id and the name the other client tools take together; says how many clients match in all and, with no search, how many have banks connected and how many need attention | No |
-| `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, and the playbooks that fit, and its open W-9 requests | No |
+| `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, the facts your firm saved about the client, and the playbooks that fit, and its open W-9 requests | No |
+| `ledgersync_save_client_fact` | Saves, changes or removes one fact about a client that LedgerSync keeps for every chat, every staff member and every AI app, such as "uses Stripe for card payments" or "year ends in June", after you confirm the exact words | Yes |
 | `ledgersync_get_playbook` | The step-by-step instructions of one of LedgerSync's playbooks, such as `run_the_books`, word for word what its prompt returns, for requests typed in plain words and AI apps that show no prompts | No |
 | `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear | No |
 | `ledgersync_get_vendor_coding_history` | How a client has coded one vendor's entries over the last months: the accounts used, most used first, with how often, when last and the average amount. Takes the vendor, or the text of a bank row | No |
@@ -142,11 +143,12 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_preview_accept_transactions` | Checks accepting the For review transactions of 1 to 10 clients, by default the ones an inclusion rule filed, leaving out the categories you name: what would move to Categorized (an exclusion rule's to Excluded), what LedgerSync would refuse and why, and what would stay and why | No |
 | `ledgersync_accept_transactions` | Accepts the previewed transactions, client by client, as the LedgerSync app's Accept does; posts nothing to QuickBooks | Yes |
 | `ledgersync_undo_accept_transactions` | Shows which accepted transactions would go back to For review and which would stay (synced, exported or changed since); after a yes, moves them back | Yes |
+| `ledgersync_list_audit_log` | The history of every change the AI made through LedgerSync, newest first: when, the client, who approved it, from which AI app, what was done and, for work that runs in the background, how it went; narrowed by client, dates, tool or person | No |
 | `ledgersync_get_desktop_app_status` | Is the desktop app linked and connected (live only) | No |
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
 <AccordionGroup>
-  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, counting clients, the firm's own accounts, duplicates, reading and changing a client's details, client messages, invitations and clarification requests, the desktop app, statement conversions, the client snapshot, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, W-9 requests, accepting For review transactions and checking rules against them">
+  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, counting clients, the firm's own accounts, duplicates, reading and changing a client's details, client messages, invitations and clarification requests, the desktop app, statement conversions, the client snapshot, client facts, the history of AI changes, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, W-9 requests, accepting For review transactions and checking rules against them">
     - Every tool that works on a client names it twice: by its id and by its name. `client_name` goes right after
       `client_id`, and `client_names` after `client_ids`, one name for each id in the same order, as
       `ledgersync_find_clients` lists them in the same chat. The name is the client's name, not its email or id.
@@ -469,10 +471,15 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       the firm has kept for years. `data_as_of` says when it was read. It also
       returns `open_w9_requests`, how many of the client's W-9 requests are still open (sent or opened): the
       requests `ledgersync_list_w9_requests` lists with `status: open`.
+    - It also returns the facts your firm saved about the client with `ledgersync_save_client_fact`: `facts`, by
+      category (`business`, `systems`, `contacts`, `close`, `tax`), newest first in each, each with its `fact_id`,
+      `text`, `source` (`user` or `ai`) and `updated_on`, and `facts_total`. A client with no facts has no `facts`
+      and `facts_total: 0`. The AI is told to use the facts instead of asking you again.
     - Its `next_step` ends with one or two offers, the first two of: the month-end review (until a review of last
       month finished today), the 1099 check in its season, bookkeeping, connecting a bank when the client has no
-      accounts yet, and a dashboard of the client's status.
-    - The answer stays under 3,000 characters: when the client has more accounts than fit, it shows fewer, never counts
+      accounts yet, setting up the client's facts when it has none, and a dashboard of the client's status.
+    - The answer stays under 3,000 characters plus the client's facts, which are never cut (about 11,000 characters
+      at most, with a client's 20 facts): when the client has more accounts than fit, it shows fewer, never counts
       fewer, and its `next_step` points to `ledgersync_list_accounts`. It reads the client's QuickBooks once, for the
       closing date, and changes nothing.
     - When a review check already read the client's books for last month today and the client's QuickBooks connection
@@ -480,6 +487,34 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       the `period`, its `data_as_of`, and `counts`, how many rows each review report flagged (`uncategorized`,
       `no_payee`, `parent_account`, `expense_inconsistency`, `over_amount` at 1,000.00). It never reads QuickBooks
       for them, and leaves `reviews` out when there was no such read today.
+    - Client facts are what the AI should know about a client in every chat: what it does, the apps and banks it
+      uses, its people, how its books are closed, its taxes. `ledgersync_save_client_fact` takes `action` (`add`,
+      `update` or `delete`), `fact_id` (from the snapshot, to update or delete), `category`, `text` and `source`.
+      The AI is told to show you the exact words first and save them only after you confirm. It is marked as
+      changing data, so Claude and ChatGPT ask before it runs. In Grok, ask it to wait for your yes. It needs
+      `write:clients`: a read-only connection gets `insufficient_scope`. Any staff member who manages the client can
+      save its facts, and everyone who works on the client reads them, in any AI app.
+    - A client keeps at most 20 facts, each at most 500 characters, 6,000 characters in all. LedgerSync refuses a
+      fact that holds a number of 8 or more digits (a tax ID, account or card number) or sign-in details (a
+      password, PIN, username or security answer), and says why. Phone numbers written as 555-123-4567, dates
+      written with dashes, dots or slashes, and ZIP+4 codes pass. Saving the same words in the same category again
+      changes nothing, and so does removing a fact already removed. A removed fact is gone for good.
+    - Each saved, changed or removed fact is in the history of AI changes (`ledgersync_list_audit_log`), by its
+      category, never its words. Facts are deleted with the client. A client moved to another firm does not take
+      its facts along: its new firm starts with none.
+    - `ledgersync_list_audit_log` lists the history of every change the AI made through LedgerSync, newest first:
+      1099 marks, rules set up, transactions accepted from For review, QuickBooks pushes, categorized exports,
+      clients added or edited, message templates saved, messages sent to clients, W-9 requests sent, reminded or
+      cancelled, W-9s saved to QuickBooks, client facts saved, changed or removed, and every undo. Each entry says
+      when, the client, who approved it, from which AI app (`claude`, `chatgpt`, `grok`, `cursor`, `other`, or
+      `ledgersync` for work LedgerSync did on its own after an AI request), what was done and, for work that runs in
+      the background, its status now: `in_progress`, `done`, `partly_done`, `failed` or `undone`.
+    - Your firm's owner and admins see the whole firm; anyone else sees their own clients' entries and the changes
+      they approved. Narrow it with `client_id` (with `client_name`), `from` and `to` (`YYYY-MM-DD`, UTC), `tool` (a
+      `ledgersync_` tool name) or `person` (a name as the history shows it); `limit` is 20 by default, up to 100,
+      and `next_cursor` gives the next page. An entry whose change can still be undone names its undo tool, and the
+      AI offers the undo only when you ask for it. The firm's owner and admins also see this history on the **AI
+      changes** page in the LedgerSync app.
     - `ledgersync_run_review_report` runs one review check on a QuickBooks Online client's books for a period (`from`
       and `to`, `YYYY-MM-DD`, at most 366 days; the last full calendar month by default). `report` is `uncategorized`
       (entries waiting in an Uncategorized or Ask My Accountant account), `no_payee` (expenses, checks and card
@@ -1526,7 +1561,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       daily budget of 500 on live (100 on sandbox), shared with API keys, which is the number the AI shows as
       refreshes left.
     - Per connected AI app: 50 new clients a day, 100 changes to client details a day, 30 connect links an hour,
-      60 message previews an hour, 30 saved templates a day, and 120 tool calls a minute on sandbox (60 on live).
+      60 message previews an hour, 30 saved templates a day, 300 fact saves a day, and 120 tool calls a minute on
+      sandbox (60 on live).
     - Statement conversions: 3 at a time and 500 a day per firm on live (2 and 50 on sandbox), shared with
       the firm's API keys, in UTC days. Each AI app can make 30 upload links an hour. The upload page takes 5
       tries a minute per link, and a link stops after 3 failed uploads. Every conversion is a real OCR read, on
