@@ -4019,7 +4019,41 @@ components:
             those this falls back to the date the bank recorded the charge, and
             it can change when the charge settles.
         description: { type: string, example: "STARBUCKS #1234 SEATTLE WA" }
-        merchant_name: { type: [string, 'null'] }
+        merchant_name:
+          type: [string, 'null']
+          description: >-
+            The other party's name: the merchant on a purchase; the company or
+            person paid or paying on an ACH or wire. Null when the bank text
+            names no outside party (checks with no payee, deposits, transfers
+            between the holder's own accounts, loan moves, fees, interest,
+            sweeps). Never a transaction-type label such as "Outgoing Wire" or
+            "Orig Co Name". Finicity names are read from the bank's text and
+            keep the bank's spelling and cuts (CIBC, for example, cuts an ACH
+            company name at 16 characters and a wire beneficiary at 18).
+            Always null on `FDE` and `PDF` transactions.
+          example: Starbucks
+        merchant_entity_id:
+          type: [string, 'null']
+          description: >-
+            MX's merchant ID (`MCH-...`), the same across banks and accounts.
+            Only MX transactions carry one: it is null on `FINICITY`, `FDE`
+            and `PDF` transactions. Also null when MX's ID is a catch-all the
+            bank uses for many unrelated parties.
+        counterparties:
+          type: array
+          description: >-
+            Parties to the transaction other than the account holder. Always
+            present. Today it holds at most one entry, the party
+            `merchant_name` names, and it is empty when `merchant_name` is
+            null.
+          items: { $ref: '#/components/schemas/TransactionCounterparty' }
+        payment_meta:
+          allOf:
+            - $ref: '#/components/schemas/TransactionPaymentMeta'
+          description: >-
+            ACH and wire details read from the bank text. Always present. All
+            four fields are null unless the transaction is an ACH or wire
+            LedgerSync can read.
         category:
           type: [string, 'null']
           description: LedgerSync's normalized category (best-effort across sources).
@@ -4049,6 +4083,75 @@ components:
 
             Whether pending charges are reported at all depends on the
             institution, so an account that never returns one is normal.
+
+    TransactionCounterparty:
+      type: object
+      description: >-
+        A party to the transaction other than the account holder.
+      required: [name]
+      properties:
+        name:
+          type: string
+          description: The party's name, the same value as the transaction's `merchant_name`.
+          example: Starbucks
+        type:
+          type: [string, 'null']
+          enum: [merchant, financial_institution, payment_app, marketplace, payment_terminal, income_source]
+          description: >-
+            What kind of party this is: a merchant, a financial institution
+            (a bank, card issuer, lender, brokerage or card processor), a
+            payment app, a marketplace, a payment terminal, or an income
+            source (who pays the account holder, such as an employer's payroll
+            or a federal payment). Null when it cannot be told.
+          example: merchant
+        entity_id:
+          type: [string, 'null']
+          description: >-
+            The same value as the transaction's `merchant_entity_id`: MX's
+            merchant ID (`MCH-...`), or null.
+        confidence_level:
+          type: [string, 'null']
+          enum: [VERY_HIGH, HIGH, MEDIUM, LOW, UNKNOWN]
+          description: >-
+            How sure LedgerSync is of this party. `HIGH`: an MX name backed by
+            its merchant ID. `LOW`: a name cleaned or parsed from the bank
+            text. Today every entry is `HIGH` or `LOW`; the other values are
+            declared now so that using them later is not a breaking change.
+          example: LOW
+
+    TransactionPaymentMeta:
+      type: object
+      description: >-
+        ACH and wire details read from the transaction's bank text. Every
+        field is null unless the transaction is an ACH or wire LedgerSync can
+        read. Only the side that is not the account holder is filled: `payee`
+        on money out, `payer` on money in. When the text names no outside
+        party, both are null while `payment_method` is still set, and so is
+        `reference_number` when the bank prints one.
+      properties:
+        payment_method:
+          type: [string, 'null']
+          description: >-
+            `ACH` or `WIRE` today. More values may be added, which is why this
+            is a plain string and not an enum.
+          example: WIRE
+        payer:
+          type: [string, 'null']
+          description: >-
+            For money in: who paid, as the bank text prints it. Null for money
+            out.
+        payee:
+          type: [string, 'null']
+          description: >-
+            For money out: who was paid, as the bank text prints it. Null for
+            money in.
+          example: PAYCOM CLIENT TRUS
+        reference_number:
+          type: [string, 'null']
+          description: >-
+            The bank's reference as printed: Chase ACH TRACE#, credit-union
+            ACH Trace, BofA wire TRN, Chase wire IMAD (else TRN), Encore wire
+            REF. Some banks mask part of it.
 
     # ---------- Statement ----------
     Statement:
