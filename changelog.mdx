@@ -3,6 +3,24 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-23" tags={["AI connector"]}>
+  ## Your AI remembers what you decided in a review
+
+  After a review of a QuickBooks Online client's books, tell your AI which flagged entries are right as they are, not
+  worth a look, or already fixed in QuickBooks. After your yes, LedgerSync keeps those decisions, so the entries stop
+  coming back in that client's reviews, for everyone at your firm and in every AI app, until their amount, account or
+  payee changes. An entry you marked fixed comes back if QuickBooks still shows it. Ask *"Show the entries I already
+  decided on"* to see them, or ask the AI to reopen one. See [Review a client's books](/ai/review-my-client).
+
+  - New tool `ledgersync_record_review_decisions`: 67 tools on live, 65 on sandbox. Each row takes its
+    `decision_key` and `fingerprint` as `ledgersync_run_review_report` gave them, and a row that changed since the
+    report is refused as `changed_since`.
+  - `ledgersync_run_review_report` leaves decided rows out and counts them in `summary.decided`; `include_decided`
+    shows them with their `decision`. A `next_cursor` taken before a decision was recorded on the client is refused.
+  - The review and the CheckList ask for your decisions at the end. To get the new tool, do
+    [After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+</Update>
+
 <Update label="2026-11-20" tags={["AI connector"]}>
   ## The CheckList: a client's month-end checklist in one request
 

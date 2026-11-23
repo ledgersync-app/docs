@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (66 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (67 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -71,16 +71,17 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">66</span>
+## Tools <span className="lsai-badge">67</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
 | `ledgersync_get_account_status` | Which firm and login it is connected as; is the connection ready; sandbox or live; refreshes left | No |
 | `ledgersync_find_clients` | Finds clients by name or email, and the firm's own accounts, each with the id and the name the other client tools take together; says how many clients match in all and, with no search, how many have banks connected and how many need attention | No |
-| `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, the facts your firm saved about the client, and the playbooks that fit, and its open W-9 requests | No |
+| `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, less the ones you decided on, the facts your firm saved about the client, and the playbooks that fit, and its open W-9 requests | No |
 | `ledgersync_save_client_fact` | Saves, changes or removes one fact about a client that LedgerSync keeps for every chat, every staff member and every AI app, such as "uses Stripe for card payments" or "year ends in June", after you confirm the exact words | Yes |
 | `ledgersync_get_playbook` | The step-by-step instructions of one of LedgerSync's playbooks, such as `run_checklist`, word for word what its prompt returns, for requests typed in plain words and AI apps that show no prompts | No |
-| `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear | No |
+| `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear; entries you already decided on are left out | No |
+| `ledgersync_record_review_decisions` | Records what you decided on entries a review check flagged, after you confirm each one: accepted (right as it is), ignored (not worth a look), fixed (fixed in QuickBooks), or reopen to take a decision back. They stop coming back in your firm's reviews of that client until the entry's amount, account or payee changes; an entry marked fixed comes back if QuickBooks still shows it | Yes |
 | `ledgersync_get_vendor_coding_history` | How a client has coded one vendor's entries over the last months: the accounts used, most used first, with how often, when last and the average amount. Takes the vendor, or the text of a bank row | No |
 | `ledgersync_compare_statement_to_books` | Why a bank or card statement does not reconcile: LedgerSync's copy of the statement against the client's QuickBooks register for its period, the difference on its last day split into parts that add up to it, and the rows on each side that nothing matched | No |
 | `ledgersync_get_financials` | One financial report of a client straight from QuickBooks Online: profit and loss, balance sheet, cash flow, trial balance, A/R aging or A/P aging, for one period (one day for the as-of reports) or compared with another, each line with its change and the big changes flagged | No |
@@ -483,8 +484,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - When a review check already read the client's books for last month today and the client's QuickBooks connection
       works, the snapshot also returns `reviews`:
       the `period`, its `data_as_of`, and `counts`, how many rows each review report flagged (`uncategorized`,
-      `no_payee`, `parent_account`, `expense_inconsistency`, `over_amount` at 1,000.00). It never reads QuickBooks
-      for them, and leaves `reviews` out when there was no such read today.
+      `no_payee`, `parent_account`, `expense_inconsistency`, `over_amount` at 1,000.00), less the rows with a
+      decision in force, as the reports leave them out. It never reads QuickBooks for them, and leaves `reviews` out
+      when there was no such read today.
     - Client facts are what the AI should know about a client in every chat: what it does, the apps and banks it
       uses, its people, how its books are closed, its taxes. `ledgersync_save_client_fact` takes `action` (`add`,
       `update` or `delete`), `fact_id` (from the snapshot, to update or delete), `category`, `text` and `source`.
@@ -503,7 +505,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - `ledgersync_list_audit_log` lists the history of every change the AI made through LedgerSync, newest first:
       1099 marks, rules set up, transactions accepted from For review, QuickBooks pushes, categorized exports,
       clients added or edited, message templates saved, messages sent to clients, W-9 requests sent, reminded or
-      cancelled, W-9s saved to QuickBooks, client facts saved, changed or removed, and every undo. Each entry says
+      cancelled, W-9s saved to QuickBooks, client facts saved, changed or removed, review decisions recorded or reopened, and every undo. Each entry says
       when, the client, who approved it, from which AI app (`claude`, `chatgpt`, `grok`, `cursor`, `other`, or
       `ledgersync` for work LedgerSync did on its own after an AI request), what was done and, for work that runs in
       the background, its status now: `in_progress`, `done`, `partly_done`, `failed` or `undone`.
@@ -536,8 +538,15 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - Each row gives the entry (`qbo_ref`, and `line_id` for a line), its `date`, its `amount` with its sign, its
       `payee` and `account`, a `reason` saying why it is flagged, and a `suggested_fix` (a category or a payee) where
       the client's history or the entry's text makes one clear. A parent account row without a fix lists the
-      `choices` to pick from. Every row also has a `decision_key` and a `fingerprint`. `summary` counts and totals
-      every row, not only the page.
+      `choices` to pick from. Every row also has a `decision_key` and a `fingerprint`, which
+      `ledgersync_record_review_decisions` takes. `summary` counts and totals every row shown, not only the page: rows
+      with a decision in force are left out and counted in `summary.decided`, unless `include_decided` is true, which
+      shows them with their decision.
+    - A row with a decision carries `decision`: `decision` (`accepted`, `ignored` or `fixed`), `state`, `note`,
+      `decided_on` and `decided_by`. `state` is `in_force` (shown only with `include_decided`), `changed` (accepted or
+      ignored before its amount, account or payee changed, so it shows again) or `still_flagged` (marked fixed, but
+      QuickBooks still shows it). A `next_cursor` taken before a decision was recorded on the client is refused: call
+      again without it.
     - LedgerSync reads the period from QuickBooks once and keeps it for the day, so every report and threshold on
       that period reuses it. A large client's first call can answer `status: running`: the same call about 30
       seconds later answers the report. `refresh` reads again, unless the last read is under 5 minutes old
@@ -545,6 +554,20 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - It pages with `next_cursor` (25 rows by default, up to 100), and each answer stays under 15,000 characters. It
       changes nothing: the user makes the fixes in QuickBooks. A client on Zoho Books or Xero is refused with
       `invalid_request`, and so is a period with more entries than one read keeps (on `from`: choose a shorter one).
+    - `ledgersync_record_review_decisions` records decisions on up to 100 review rows a call, for the period the
+      report ran on (`from` and `to`, or neither for last month). Each row takes its `decision_key` and `fingerprint`
+      exactly as `ledgersync_run_review_report` gave them, a `decision` (`accepted`, `ignored`, `fixed` or `reopen`)
+      and an optional `note`, at most 500 characters and never a tax ID, an account or card number, or sign-in
+      details; `reopen` needs no fingerprint. LedgerSync finds each row again in the period's newest reading of
+      QuickBooks, kept for a week: a row it no longer flags is refused as `not_flagged`, and a row whose amount,
+      account or payee changed since the report the user saw as `changed_since` (run the report again and decide on
+      the row as it is now). A decision recorded again the same way changes nothing, so the same call sent twice is
+      safe. With no reading of the period kept, the whole call is refused: run the report first.
+    - The answer gives `recorded` (by decision), `reopened`, `unchanged`, and each refused row with its
+      `decision_key`, `reason` and `message`. It needs `write:accounting`, works for every firm and takes 300 calls a
+      day per AI app. Each call that changed something is in the history of AI changes, with the counts, never a
+      payee, an amount or a note. Decisions on single entries do not quiet next month's new entries from the same
+      vendor.
     - `ledgersync_get_vendor_coding_history` shows how a QuickBooks Online client has coded one payee's expenses,
       checks, card charges, bills and vendor credits over the last full months (`months`, 1 to 12, 12 by default,
       counted back from last month; `window` gives the dates). Give `payee_id` with `payee_type` (from a review report
