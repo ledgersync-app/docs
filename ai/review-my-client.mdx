@@ -58,6 +58,9 @@ Tell the AI which flagged entries are right as they are, not worth a look, or al
 them back, and after your yes, LedgerSync remembers: those entries stop coming back in this client's reviews, for
 everyone at your firm and in every AI app, until their amount, account or payee changes.
 
+A charge you expect every month, like rent? Tell the AI it is fine **for this vendor**. Next month's entry from that
+vendor stays quiet too.
+
 </AiStep>
 
 <AiNote tone="green">
@@ -97,7 +100,9 @@ about 30 seconds later. After that, the other checks answer right away.
 5. It asks you about the unusual accounts and the large amounts you don't recognize. You decide.
 6. It lists the fixes you agreed with, for you to make in QuickBooks.
 7. It asks what you decided on the entries you checked: right as it is, not worth a look, or fixed in QuickBooks. It
-   shows each one back, and after your yes, LedgerSync keeps your decisions, so those entries stop coming back.
+   shows each one back, and after your yes, LedgerSync keeps your decisions, so those entries stop coming back. For a
+   charge you expect every month, like rent, it asks whether that is fine for the vendor, so next month's stays quiet
+   too.
 8. At the end, it tells you what the review does not check, and offers a dashboard of the five checks or the same
    review for your other clients.
 
@@ -127,11 +132,18 @@ about 30 seconds later. After that, the other checks answer right away.
   LedgerSync reads the client's books, it comes back, and the AI says it was marked fixed.
 - **See them again:** ask *"Show the entries I already decided on"*. The AI shows each one with your decision, who
   made it and when.
-- **Change your mind:** ask the AI to reopen an entry. It comes back in the next review.
+- **For the vendor:** for a charge you expect, like monthly rent, tell the AI it is fine for this vendor. That
+  vendor's next entries on the same account stay out of the large amount, parent account and coded differently checks
+  too. For large amounts, it covers up to an amount: that entry's, or more if you say. A larger entry still comes
+  back, and the AI asks whether to raise the amount.
+- **Not for every check:** entries waiting for a category or with no payee need a category or a payee, which a rule
+  gives them for good. The AI offers to set one up instead.
+- **Change your mind:** ask the AI to reopen an entry. It comes back in the next review. To stop a decision for a
+  vendor, ask the AI to reopen it from one of that vendor's entries.
 - **Shared with your firm:** everyone at your firm sees your decisions, in every AI app. The history of AI changes
   shows each time decisions were recorded and how many, never the entries themselves.
 - **Next month:** your decisions cover the entries you saw. A new entry next month is checked again, even from the
-  same vendor.
+  same vendor, unless you said it is fine for that vendor.
 
 </Accordion>
 
@@ -143,7 +155,7 @@ about 30 seconds later. After that, the other checks answer right away.
 - Voided entries.
 - Balances left in suspense accounts.
 - Next month's new entries against your decisions: an entry you decided on stays out, but a new one next month is
-  checked again, even from the same vendor.
+  checked again, even from the same vendor, unless you said it is fine for that vendor.
 - Clients that use another accounting app, such as QuickBooks Desktop, Zoho Books or Xero.
 
 </Accordion>
@@ -184,7 +196,7 @@ these instructions.
 4. For each report, tell the user how many entries it flagged and their total, then show each row: its date, amount, payee, account and reason, and its suggested_fix with the fix's evidence when it has one. If a report has more rows than it showed, say how many and offer the rest (call again with next_cursor). Rows the user decided on in an earlier review are left out and counted as decided; a row that comes back with its decision says why: tell the user.
 5. When a fix is unclear, or before suggesting that a vendor's entry move to another account, call ledgersync_get_vendor_coding_history for that payee to see how its entries are usually coded. An unusual account is not always a mistake, and a large amount is not wrong in itself: ask the user about the ones they do not recognize.
 6. LedgerSync cannot change these entries yet. List the fixes the user agrees with, entry by entry, for them to make in QuickBooks.
-7. Ask the user what they decided on the entries they checked: accepted (right as it is), ignored (not worth a look) or fixed (fixed in QuickBooks), with a short note if they give a reason. Show each entry with its decision, and after the user says yes, record them with ledgersync_record_review_decisions, with each row's decision_key and fingerprint and the same period, so they stop coming back in this client's reviews.
+7. Ask the user what they decided on the entries they checked: accepted (right as it is), ignored (not worth a look) or fixed (fixed in QuickBooks), with a short note if they give a reason. For a vendor's charge the user expects every month, like rent, ask whether to accept it for the vendor, so the vendor's next entries on the same account stay quiet too (for_this_vendor true; on large amounts up to an amount, by default the entry's). Show each entry with its decision, and after the user says yes, record them with ledgersync_record_review_decisions, with each row's decision_key and fingerprint and the same period, so they stop coming back in this client's reviews.
 8. Before you finish, tell the user what the review does not check: bill payments, customer payments, invoices, sales receipts, refund receipts, credit memos, estimates, time entries, voided entries, and balances left in suspense accounts.
 9. End by offering a dashboard of the five checks' counts, and the same review for the firm's other clients.`} />
 </div>
@@ -237,7 +249,7 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     | `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected, the date its books are closed through, its first accounts with their latest statements, the playbooks that fit and, when a check read last month today, how many entries each check flagged, less the ones you decided on | No |
     | `ledgersync_run_review_report` | One of the five checks on a client's QuickBooks books for a period: `uncategorized`, `no_payee`, `parent_account`, `expense_inconsistency` or `over_amount`, each row with its `reason` and, where history or text supports one, a `suggested_fix` | No |
     | `ledgersync_get_vendor_coding_history` | How the client has coded one payee's entries over the last 12 months, the accounts most used first, from a payee or from the text of a bank row | No |
-    | `ledgersync_record_review_decisions` | Records your decisions on flagged entries (`accepted`, `ignored`, `fixed`, or `reopen`), each by its `decision_key` and `fingerprint`, so they stop coming back until the entry changes | Yes |
+    | `ledgersync_record_review_decisions` | Records your decisions on flagged entries (`accepted`, `ignored`, `fixed`, or `reopen`), each by its `decision_key` and `fingerprint`, so they stop coming back until the entry changes; with `for_this_vendor`, for the vendor's entries on the same account too (`up_to` on `over_amount`) | Yes |
 
     - The instructions above are also an MCP prompt, `month_end_review` ("Review a client's books for the month"),
       with optional `client` and `month` arguments. Claude Code lists it as a command.
@@ -250,6 +262,9 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
     - A check leaves out the rows with a decision in force and counts them in `summary.decided`; `include_decided`
       shows them with their `decision`. A row whose decision no longer holds comes back with it, its `state` saying
       why: `changed` or `still_flagged`.
+    - A decision made for a vendor (`for_this_vendor`) covers the vendor's rows of the same check on the same account,
+      on `over_amount` up to `up_to`; it shows on each row it covers as `vendor_decision`, and a larger row comes back
+      with `state` `above_up_to`. `uncategorized` and `no_payee` rows refuse it as `rule_fits_better`.
     - See [For developers](/ai/developers) for every field.
   </Accordion>
 

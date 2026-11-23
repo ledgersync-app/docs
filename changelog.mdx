@@ -4,6 +4,21 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-23" tags={["AI connector"]}>
+  ## A vendor's expected charge stays quiet next month too
+
+  In a review, tell your AI that a vendor's charge you expect every month, like rent, is fine for that vendor. After
+  your yes, that vendor's next entries on the same account stay out of the large amount, parent account and coded
+  differently checks too, for everyone at your firm and in every AI app. For large amounts it covers up to an amount:
+  that entry's, or more if you say, so a larger one still comes back. Entries waiting for a category or with no payee
+  get a rule instead, and the AI offers to set one up. See [Review a client's books](/ai/review-my-client).
+
+  - `ledgersync_record_review_decisions` takes `for_this_vendor` and, on `over_amount`, `up_to`. No new tool: 67 on
+    live, 65 on sandbox. Both inputs are optional, so an older tool list keeps working without them.
+  - `ledgersync_run_review_report` shows the decision on each row it covers as `vendor_decision`; a larger row comes
+    back with `state` `above_up_to`.
+</Update>
+
+<Update label="2026-11-23" tags={["AI connector"]}>
   ## Your AI remembers what you decided in a review
 
   After a review of a QuickBooks Online client's books, tell your AI which flagged entries are right as they are, not

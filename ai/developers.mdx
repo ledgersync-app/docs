@@ -81,7 +81,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_save_client_fact` | Saves, changes or removes one fact about a client that LedgerSync keeps for every chat, every staff member and every AI app, such as "uses Stripe for card payments" or "year ends in June", after you confirm the exact words | Yes |
 | `ledgersync_get_playbook` | The step-by-step instructions of one of LedgerSync's playbooks, such as `run_checklist`, word for word what its prompt returns, for requests typed in plain words and AI apps that show no prompts | No |
 | `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear; entries you already decided on are left out | No |
-| `ledgersync_record_review_decisions` | Records what you decided on entries a review check flagged, after you confirm each one: accepted (right as it is), ignored (not worth a look), fixed (fixed in QuickBooks), or reopen to take a decision back. They stop coming back in your firm's reviews of that client until the entry's amount, account or payee changes; an entry marked fixed comes back if QuickBooks still shows it | Yes |
+| `ledgersync_record_review_decisions` | Records what you decided on entries a review check flagged, after you confirm each one: accepted (right as it is), ignored (not worth a look), fixed (fixed in QuickBooks), or reopen to take a decision back. They stop coming back in your firm's reviews of that client until the entry's amount, account or payee changes; an entry marked fixed comes back if QuickBooks still shows it. For a vendor's charge you expect, like monthly rent, you can decide for the vendor, so its next entries on the same account stay quiet too | Yes |
 | `ledgersync_get_vendor_coding_history` | How a client has coded one vendor's entries over the last months: the accounts used, most used first, with how often, when last and the average amount. Takes the vendor, or the text of a bank row | No |
 | `ledgersync_compare_statement_to_books` | Why a bank or card statement does not reconcile: LedgerSync's copy of the statement against the client's QuickBooks register for its period, the difference on its last day split into parts that add up to it, and the rows on each side that nothing matched | No |
 | `ledgersync_get_financials` | One financial report of a client straight from QuickBooks Online: profit and loss, balance sheet, cash flow, trial balance, A/R aging or A/P aging, for one period (one day for the as-of reports) or compared with another, each line with its change and the big changes flagged | No |
@@ -547,6 +547,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       ignored before its amount, account or payee changed, so it shows again) or `still_flagged` (marked fixed, but
       QuickBooks still shows it). A `next_cursor` taken before a decision was recorded on the client is refused: call
       again without it.
+    - A row covered by a decision made for its vendor carries `vendor_decision`, with the same fields and, on
+      `over_amount`, `up_to`: the largest amount it covers. Its `state` is `in_force` (shown only with
+      `include_decided`) or `above_up_to`: the entry is larger than the vendor's decision covers, so it shows, and the
+      AI tells the user and offers to raise `up_to`. A row is left out when its own decision or its vendor's holds.
     - LedgerSync reads the period from QuickBooks once and keeps it for the day, so every report and threshold on
       that period reuses it. A large client's first call can answer `status: running`: the same call about 30
       seconds later answers the report. `refresh` reads again, unless the last read is under 5 minutes old
@@ -567,7 +571,18 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `decision_key`, `reason` and `message`. It needs `write:accounting`, works for every firm and takes 300 calls a
       day per AI app. Each call that changed something is in the history of AI changes, with the counts, never a
       payee, an amount or a note. Decisions on single entries do not quiet next month's new entries from the same
-      vendor.
+      vendor; a decision made for the vendor does.
+    - A decision with `for_this_vendor` true is made for the row's vendor: the vendor's entries of the same report on
+      the same account stay out of every later review of the client too, like a monthly rent. It takes `accepted`,
+      `ignored` or `reopen`, on `over_amount`, `parent_account` and `expense_inconsistency` rows. On `over_amount` it
+      covers amounts up to `up_to` (from 1 to 10,000,000, at most two decimals, at least the entry's amount); without
+      `up_to` it covers the entry's amount, and a decision made again from a smaller entry never lowers what the
+      vendor's decision already covers. LedgerSync refuses, row by row: `rule_fits_better` on `uncategorized` and
+      `no_payee` rows (they need a category or a payee, which a rule gives them; the AI offers the rules setup),
+      `no_vendor` for an entry with no payee, `fixed_for_vendor` for fixed, and `up_to_below_amount` for an `up_to`
+      below the entry's amount. An `up_to` outside those limits, without `for_this_vendor`, or on another report
+      refuses the whole call as an invalid field, before anything is recorded. To take it back, reopen any row it
+      covers with `for_this_vendor` true. The answer's `recorded.for_this_vendor` counts them.
     - `ledgersync_get_vendor_coding_history` shows how a QuickBooks Online client has coded one payee's expenses,
       checks, card charges, bills and vendor credits over the last full months (`months`, 1 to 12, 12 by default,
       counted back from last month; `window` gives the dates). Give `payee_id` with `payee_type` (from a review report
