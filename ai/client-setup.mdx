@@ -1,0 +1,106 @@
+---
+title: "Set up a client for the AI"
+description: "Tell your AI the few things about a client it should always know, like what the client does, the apps and banks it uses and how its books are closed. LedgerSync keeps them, so every chat about the client starts from them, for anyone at your firm and in any AI app."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiCopy, AiNote, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="Set up a client for the AI" subtitle="Answer a few questions about a client once. LedgerSync keeps the answers, so your AI stops asking what it already knows.">
+
+<AiNote tone="green">
+
+**For any client in LedgerSync.** Not set up yet? Go to [Start here](/ai/start-here). Added it a while ago? Do
+[After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+
+</AiNote>
+
+## Start
+
+<AiStep id="new-chat" n={1} total={5} title="Start a new chat">
+
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
+
+</AiStep>
+
+<AiStep id="ask" n={2} total={5} title="Ask the AI">
+
+Type *"Set up Acme for the AI."*, with your client's name, and press **Enter**. When the AI first looks at a client with
+nothing saved yet, LedgerSync points it to this setup.
+
+</AiStep>
+
+<AiStep id="answer" n={3} total={5} title="Answer its questions">
+
+The AI shows what LedgerSync already knows about the client, then asks for the rest in one message: what the client
+does, the apps, banks and cards it uses, its people and who to ask, how and when its books are closed, and its taxes.
+Answer what you know and skip the rest.
+
+</AiStep>
+
+<AiStep id="confirm" n={4} total={5} title="Check the words and say yes">
+
+The AI turns each answer into one short fact and shows you its exact words. Nothing is saved until you say yes. From
+then on, every chat about this client starts from them, for everyone at your firm, in any AI app.
+
+</AiStep>
+
+<AiStep id="playbooks" n={5} total={5} title="Pick what to do next">
+
+The AI offers the playbooks that fit the client, like the month-end review or the 1099 check. If this client needs
+different steps, it can also make a version of a playbook for this client only, after you see the changes and say yes.
+
+</AiStep>
+
+## More details
+
+<AccordionGroup>
+
+<Accordion title="What LedgerSync keeps">
+
+- Each fact is one line of at most 500 characters, in one of five groups: the business, its systems, its contacts,
+  how its books are closed, and its taxes.
+- A client keeps at most 20 facts, 6,000 characters in all.
+- Tax IDs, full account or card numbers and passwords are never kept: LedgerSync refuses a fact that holds a number
+  of 8 or more digits or sign-in details, and says why.
+- Ask the AI to change or remove a fact at any time. Each fact saved, changed or removed is in the history of AI
+  changes, without its words.
+- When a client is deleted, its facts go too.
+
+</Accordion>
+
+<Accordion title="Optional: the full instructions to paste">
+
+You don't need these: LedgerSync already tells your AI the main steps. If your AI does not follow them, give it these
+instructions.
+
+<div className="lsai-prompt">
+  <AiCopy label="Instructions for your AI" text={`Set up a LedgerSync client for the AI, so every chat starts from what your firm knows about it.
+1. Find the client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name.
+2. Call ledgersync_get_client_snapshot. Show the user the facts it lists for this client, by category, and do not ask again for what they already say.
+3. Ask the user, all in one message, for what the facts do not cover yet, by category, with an example for each: business (what the client does and when its year ends, for example "Plumbing contractor; its year ends in June"), systems (the apps, banks and cards it uses, for example "Stripe for card payments; the Chase checking account has a QuickBooks bank feed"), contacts (its people and who to ask, for example "The owner answers questions about deposits"), close (how and when its books are closed, for example "The bank never sends statements for the Chase savings account") and tax (its returns, 1099s and filings, for example "Only the Contract Labor account counts for 1099s"). Never ask for tax IDs, full account or card numbers, or passwords: LedgerSync does not keep them.
+4. Turn each answer into one short fact, one line of at most 500 characters, and show the user each fact's exact words with its category. Only after the user says yes, save each one with ledgersync_save_client_fact (action add; source user for the user's own words, ai for your wording). If LedgerSync refuses one, tell the user why and offer other words.
+5. Call ledgersync_get_playbook with no name and with the client's client_id and client_name, and offer the playbooks that fit this client, in plain words.
+6. If this client needs different steps than one of those playbooks has, offer to make a version of it for this client only: call ledgersync_preview_playbook with scope client and the full steps as they should read, show the user the changes, and call ledgersync_apply_playbook only after the user says yes.
+7. End by offering to run one of those playbooks now, and the same setup for the firm's other clients.`} />
+</div>
+
+1. Click **Copy** above.
+2. In Claude, ChatGPT or Grok, start a new chat.
+3. Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
+4. At the end, type the client's name. For example: *Acme*. Then press **Enter**.
+
+<AiNote tone="gray">
+
+**Using Claude Code?** The instructions are also a LedgerSync command there. Type **/**, pick **client_onboarding**
+(it says **(MCP)** next to it) and press **Enter**. Then tell it the client.
+
+</AiNote>
+
+</Accordion>
+
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>

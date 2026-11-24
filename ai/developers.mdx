@@ -77,9 +77,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | --- | --- | --- |
 | `ledgersync_get_account_status` | Which firm and login it is connected as; is the connection ready; sandbox or live; refreshes left | No |
 | `ledgersync_find_clients` | Finds clients by name or email, and the firm's own accounts, each with the id and the name the other client tools take together; says how many clients match in all and, with no search, how many have banks connected and how many need attention | No |
-| `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, less the ones you decided on, the facts your firm saved about the client, and the playbooks that fit, and its open W-9 requests | No |
+| `ledgersync_get_client_snapshot` | One call to start work on a client: its accounting ledger, whether QuickBooks is connected and the date its books are closed through, its first accounts with each one's latest statement, how many entries each review check flagged today, less the ones you decided on, the facts your firm saved about the client, the client's own versions of playbooks, and the playbooks that fit, and its open W-9 requests | No |
 | `ledgersync_save_client_fact` | Saves, changes or removes one fact about a client that LedgerSync keeps for every chat, every staff member and every AI app, such as "uses Stripe for card payments" or "year ends in June", after you confirm the exact words | Yes |
-| `ledgersync_get_playbook` | The step-by-step instructions of a playbook, such as `run_checklist`: your firm's own version when it has one (a client's own first, for a client's task), else LedgerSync's, word for word what its prompt returns. With no name, lists every playbook, your firm's included | No |
+| `ledgersync_get_playbook` | The step-by-step instructions of a playbook, such as `run_checklist`: your firm's own version when it has one (a client's own first, for a client's task), else LedgerSync's, the same steps its prompt gives. With no name, lists every playbook, your firm's included | No |
 | `ledgersync_run_checklist` | A QuickBooks Online client's month-end checklist read in one run: LedgerSync reads the month in the background and keeps it for the day, then hands it out one section at a time (statements, categorizing, rules, client questions, clean up, reconciliation, 1099s, final checks and the month summary), with the ids the preview tools take (rules setup finds its own category and vendor ids by name) | No |
 | `ledgersync_show_checklist` | Shows a built month-end checklist as LedgerSync's page in the chat, in AI apps that show pages (Claude and ChatGPT), with the AI's wording next to each item. The page changes nothing itself: the user's answers come back to the chat | No |
 | `ledgersync_preview_playbook` | Previews saving or removing your firm's own version of a playbook, for the whole firm or for one client: the lines that change, who they affect and the version it becomes. Changes nothing | No |
@@ -469,8 +469,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `ledgersync_list_statements` gives them), and `accounts_total`. It names the `recommended_playbooks` that fit:
       `month_end_review` while QuickBooks works, `explain_rec_difference` while QuickBooks works and one of the
       accounts it returns has a `last_statement` and is not a loan, `flux_and_summary` while QuickBooks works,
-      `form_1099_season` from November 1 to February 15 while QuickBooks works, and `quickbooks_bookkeeping` when an
-      account can post to QuickBooks. It never names `prospect_diagnostic`, since it cannot tell a new client from one
+      `form_1099_season` from November 1 to February 15 while QuickBooks works, `quickbooks_bookkeeping` when an
+      account can post to QuickBooks, and `client_onboarding` for a client with no facts yet. It never names
+      `prospect_diagnostic`, since it cannot tell a new client from one
       the firm has kept for years. `data_as_of` says when it was read. It also
       returns `open_w9_requests`, how many of the client's W-9 requests are still open (sent or opened): the
       requests `ledgersync_list_w9_requests` lists with `status: open`.
@@ -478,11 +479,15 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       category (`business`, `systems`, `contacts`, `close`, `tax`), newest first in each, each with its `fact_id`,
       `text`, `source` (`user` or `ai`) and `updated_on`, and `facts_total`. A client with no facts has no `facts`
       and `facts_total: 0`. The AI is told to use the facts instead of asking you again.
+    - It also returns `own_playbooks`: the playbooks your firm keeps a version of for this client only, each with its
+      `name` and `title`. The AI is told to follow those versions, through `ledgersync_get_playbook` with the client,
+      instead of your firm's or LedgerSync's. A client with none has no `own_playbooks`.
     - Its `next_step` ends with one or two offers, the first two of: the month-end review (until a review of last
       month finished today), the 1099 check in its season, bookkeeping, connecting a bank when the client has no
-      accounts yet, setting up the client's facts when it has none, and a dashboard of the client's status.
-    - The answer stays under 3,000 characters plus the client's facts, which are never cut (about 11,000 characters
-      at most, with a client's 20 facts): when the client has more accounts than fit, it shows fewer, never counts
+      accounts yet, setting up the client's facts when it has none (the `client_onboarding` playbook), and a dashboard
+      of the client's status.
+    - The answer stays under 3,000 characters plus the client's facts and its own playbooks, which are never cut
+      (about 12,000 characters at most, with a client's 20 facts and 5 playbooks): when the client has more accounts than fit, it shows fewer, never counts
       fewer, and its `next_step` points to `ledgersync_list_accounts`. It reads the client's QuickBooks once, for the
       closing date, and changes nothing.
     - When a review check already read the client's books for last month today and the client's QuickBooks connection
@@ -506,6 +511,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - Each saved, changed or removed fact is in the history of AI changes (`ledgersync_list_audit_log`), by its
       category, never its words. Facts are deleted with the client. A client moved to another firm does not take
       its facts along: its new firm starts with none.
+    - The instructions on [Set up a client for the AI](/ai/client-setup) are an MCP prompt, `client_onboarding`
+      ("Set up a client for the AI"), with an optional `client` argument. Claude Code lists it as a command. The AI
+      shows the facts LedgerSync already has, asks for the rest by category in one message, saves each fact after
+      you confirm its words, then offers the playbooks that fit and a version of one for this client only. AI apps
+      that show no prompts get the same steps from `ledgersync_get_playbook`.
     - Your firm can keep its own version of any of LedgerSync's playbooks, and playbooks of its own, for the
       whole firm or for one client. `ledgersync_get_playbook` with a `name` answers the one in use: the client's
       own when you pass `client_id` and it has one, else the firm's, else LedgerSync's. Each answer says `whose`
@@ -523,7 +533,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       firm's own is gone. Every saved version is kept. Changing the firm's playbooks needs the permission to manage global rules; a client's,
       a login that manages the client. Steps hold at most 18,000 characters, and like a fact they cannot hold a
       number of 8 or more digits or sign-in details. Both need `write:accounting`, and each change is in the
-      history of AI changes. The MCP prompts themselves still give LedgerSync's text.
+      history of AI changes. The MCP prompts give your firm's version too: an AI app's prompt menu answers your
+      firm's version of a LedgerSync playbook when it keeps one, else LedgerSync's. A client's own version is reached
+      through the client snapshot, which names it in `own_playbooks`.
     - `ledgersync_list_audit_log` lists the history of every change the AI made through LedgerSync, newest first:
       1099 marks, rules set up, transactions accepted from For review, QuickBooks pushes, categorized exports,
       clients added or edited, message templates saved, messages sent to clients, W-9 requests sent, reminded or
@@ -1383,8 +1395,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `counted_account_ids` (the ids applied), `unknown_account_ids` (ids the client's QuickBooks does not have),
       `left_out_by_choice` (what the vendors listed without the choice were paid through other accounts),
       `dropped_by_choice` (how many of them drop off) and, on `expense_accounts`, `counted`. A choice naming none of
-      the client's accounts answers `invalid_request` on `count_only_account_ids`. Nothing is saved: the AI asks
-      again next time. A cursor works only with the choice it came from.
+      the client's accounts answers `invalid_request` on `count_only_account_ids`. The tool saves nothing: the 1099
+      playbook offers to save the choice as a client fact (`ledgersync_save_client_fact`), which it reads first next
+      time. A cursor works only with the choice it came from.
     - Marking vendors for 1099 takes three steps and a yes. `ledgersync_preview_ledger_changes` takes `client_id`,
       `client_name` and `changes`: 1 to 100 of `type` `update_vendor`, a `vendor_id` from `ledgersync_get_1099_summary`
       (sealed: as that list gave it for this client) and

@@ -4,6 +4,23 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-24" tags={["AI connector"]}>
+  ## Every playbook starts from what your firm knows about the client
+
+  Your AI now reads the facts your firm saved about a client before every playbook, and stops asking what they
+  already say. A new playbook sets up a client for the AI in a few questions, and your firm's own version of a
+  playbook is used everywhere, the AI apps' prompt menus included. See [Set up a client for the AI](/ai/client-setup).
+
+  - New MCP prompt `client_onboarding` ("Set up a client for the AI"), 9 prompts in all. The client snapshot
+    recommends it for a client with no facts yet, and its offer to set up the client's facts names it.
+  - Every playbook reads the client's facts first. In the 1099 playbook, the accounts that count for 1099s can be
+    saved as a fact for the next check; the bookkeeping playbook skips asking about bank feeds the facts settle.
+  - The MCP prompts answer your firm's version of a playbook when it keeps one.
+  - `ledgersync_get_client_snapshot` returns `own_playbooks`, the playbooks your firm keeps a version of for this
+    client only, and tells the AI to follow them.
+  - No new tool: 71 tools on live, 69 on sandbox.
+</Update>
+
+<Update label="2026-11-24" tags={["AI connector"]}>
   ## The CheckList counts the way accountants do
 
   "Bookkeeping left to do" now counts only the work still waiting for review: transactions you already categorized
