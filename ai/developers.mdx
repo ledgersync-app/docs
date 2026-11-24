@@ -615,9 +615,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       matches several payees returns them as `candidates` for the user to pick; text that matches none says to find
       the payee with `ledgersync_search_quickbooks_payees`.
     - `top_categories` lists up to 10 accounts, the most used first, each with its `account`, `count`,
-      `share_percent`, `last_used` and `average_amount` (with its sign: a vendor credit takes off), and `waiting`,
-      `parent` or `inactive` when the account is one. `total_lines` counts every line; `other_accounts` and
-      `other_lines` count the rest. A bill with three lines counts three times.
+      `transactions`, `share_percent`, `last_used` and `average_amount` (with its sign: a vendor credit takes off), and
+      `waiting`, `parent` or `inactive` when the account is one. `total_lines` counts every line; `other_accounts` and
+      `other_lines` count the rest. A bill with three lines counts three times in `count` and once in `transactions`.
     - It uses the same read of last month as the review reports, so a large client's first call can answer
       `status: running`: call again in about 30 seconds. It changes nothing.
     - `ledgersync_compare_statement_to_books` compares one LedgerSync statement of a bank or card account with the
@@ -874,6 +874,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       built again after a few minutes; `refresh` true builds it again with fresh reads, unless it is under a few
       minutes old. Another client's `run_id` answers `not_found`. The
       `run_checklist` playbook uses it where the AI app lists it, and makes the single calls elsewhere.
+    - In the run, a vendor coded to one account every time in at least two transactions (not lines) is accepted by
+      itself, or flagged when the amount is over twice its average; a transfer or a card or loan payment with such a
+      history follows it, and is asked of the client otherwise. Each categorize row's history gives `lines` and
+      `transactions` per account. The overview's `meter` counts only the work still waiting for review: rows already
+      categorized stay out, so `user` is 0 when the run is built.
     - `ledgersync_show_checklist` (read-only, needs `read:accounting`) shows a built run as LedgerSync's page, an MCP
       Apps view (spec 2026-01-26): its tool `_meta` points at `ui://ledgersync/checklist-v1.html`
       (`text/html;profile=mcp-app`, served from `resources/read`), under `ui.resourceUri` and its aliases

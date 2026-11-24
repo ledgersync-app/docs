@@ -4,6 +4,20 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-24" tags={["AI connector"]}>
+  ## The CheckList counts the way accountants do
+
+  "Bookkeeping left to do" now counts only the work still waiting for review: transactions you already categorized
+  are done and stay out. A vendor counts as coded the same way after two transactions, not two lines of one bill. A
+  transfer or a card or loan payment your books always coded one way, at least twice, now follows that history
+  instead of going to your client. On the checklist page, any transaction can go on your client's list, and you can
+  decide one the AI left for the client.
+
+  - `ledgersync_get_vendor_coding_history`: each account in `top_categories` adds `transactions`.
+  - `ledgersync_run_checklist`: each categorize row's history adds `transactions`, and the overview's `meter` leaves
+    out the rows already categorized.
+</Update>
+
+<Update label="2026-11-24" tags={["AI connector"]}>
   ## The CheckList as a page in the chat
 
   In Claude and ChatGPT, the month-end checklist now opens as a page in the chat: the eight steps, how much AI did and
