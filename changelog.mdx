@@ -3,6 +3,20 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-24" tags={["AI connector"]}>
+  ## The CheckList as a page in the chat
+
+  In Claude and ChatGPT, the month-end checklist now opens as a page in the chat: the eight steps, how much AI did and
+  how much is left, the reconciliation explained account by account, and a button for each thing to approve. Nothing
+  is sent or changed from the page: when you are done, it sends your answers to the chat, and the AI shows what it
+  will do and asks for your yes. In other AI apps the checklist stays a message in the chat.
+
+  - New tool `ledgersync_show_checklist`, read-only: 71 tools on live, 69 on sandbox. It takes `client_id`,
+    `client_name`, `run_id` and the AI's wording for the page, and its tool `_meta` points at the MCP Apps view
+    `ui://ledgersync/checklist-v1.html`, which the server now serves through `resources/read`.
+  - The `run_checklist` playbook shows the page instead of its final message where the AI app lists the tool.
+</Update>
+
 <Update label="2026-11-23" tags={["AI connector"]}>
   ## Your AI says when it is on the sandbox
 

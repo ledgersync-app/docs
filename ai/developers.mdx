@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (70 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (71 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -81,6 +81,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_save_client_fact` | Saves, changes or removes one fact about a client that LedgerSync keeps for every chat, every staff member and every AI app, such as "uses Stripe for card payments" or "year ends in June", after you confirm the exact words | Yes |
 | `ledgersync_get_playbook` | The step-by-step instructions of a playbook, such as `run_checklist`: your firm's own version when it has one (a client's own first, for a client's task), else LedgerSync's, word for word what its prompt returns. With no name, lists every playbook, your firm's included | No |
 | `ledgersync_run_checklist` | A QuickBooks Online client's month-end checklist read in one run: LedgerSync reads the month in the background and keeps it for the day, then hands it out one section at a time (statements, categorizing, rules, client questions, clean up, reconciliation, 1099s, final checks and the month summary), with the ids the preview tools take (rules setup finds its own category and vendor ids by name) | No |
+| `ledgersync_show_checklist` | Shows a built month-end checklist as LedgerSync's page in the chat, in AI apps that show pages (Claude and ChatGPT), with the AI's wording next to each item. The page changes nothing itself: the user's answers come back to the chat | No |
 | `ledgersync_preview_playbook` | Previews saving or removing your firm's own version of a playbook, for the whole firm or for one client: the lines that change, who they affect and the version it becomes. Changes nothing | No |
 | `ledgersync_apply_playbook` | Saves or removes the playbook the preview showed, after your yes. Every saved version is kept | Yes |
 | `ledgersync_run_review_report` | One review check on a client's QuickBooks books for a period: entries waiting for a category, expenses with no payee, entries on parent accounts, entries coded differently than the vendor's usual account, or entries above an amount, each with why it was flagged and a suggested fix where one is clear; entries you already decided on are left out | No |
@@ -873,6 +874,17 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       built again after a few minutes; `refresh` true builds it again with fresh reads, unless it is under a few
       minutes old. Another client's `run_id` answers `not_found`. The
       `run_checklist` playbook uses it where the AI app lists it, and makes the single calls elsewhere.
+    - `ledgersync_show_checklist` (read-only, needs `read:accounting`) shows a built run as LedgerSync's page, an MCP
+      Apps view (spec 2026-01-26): its tool `_meta` points at `ui://ledgersync/checklist-v1.html`
+      (`text/html;profile=mcp-app`, served from `resources/read`), under `ui.resourceUri` and its aliases
+      `ui/resourceUri` and `openai/outputTemplate`. It takes `client_id`, `client_name`, `run_id` and `additions`, the
+      AI's wording (notes on rows, fixes, reconcile labels, decisions, the month summary, improvements). A note names
+      its item by the id its section gave (`transaction_id`, `qbo_ref`, `account_id`, `vendor_id`): one the run does not
+      hold answers `invalid_request` on that note, and a run built again meanwhile `version_conflict`. The answer's
+      `structuredContent` carries the run, the client, the month's dates, the environment, the firm's name and the
+      wording, and its text is a short summary, which says what to do in an app that shows no page. The page loads
+      each section with `ledgersync_run_checklist`, so its numbers come from LedgerSync, and sends nothing: its last
+      step sends the user's answers to the chat as a message (`ui/message`).
     - Rules setup lets the AI create a client's categorization rules in LedgerSync, with the new categories,
       category links and vendors they need, and change the rules that exist, after the user approves a preview. It
       works for Manual and QuickBooks Online clients. For a client on another accounting app, such as Zoho Books,
