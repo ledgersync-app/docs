@@ -4,6 +4,23 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-23" tags={["AI connector"]}>
+  ## The CheckList reads the whole month in one go
+
+  When you ask your AI to run the CheckList for a QuickBooks Online client, LedgerSync now reads the client's month for
+  it in one go: the bank statements, the month's bank transactions with a suggestion for each one left to do, the
+  review checks, the statements against the books, the 1099 list, and the month against the month before. Your AI
+  reads it one part at a time instead of making most of the calls itself, and asking again the same day reuses it. Nothing
+  changes until you say yes, as before. See [The CheckList](/ai/checklist).
+
+  - New tool `ledgersync_run_checklist`, read-only: 68 tools on live, 66 on sandbox. The first call takes `client_id`,
+    `client_name` and `month` (`YYYY-MM`) and answers `run_id` (`ckr_...`), with `status` `running` while the month is built. Later
+    calls take `run_id` and one `section` (`overview`, `statements`, `categorize`, `rules`, `questions`, `clean_up`,
+    `reconcile`, `form_1099`, `checks` or `summary`), a long one in pages by `next_cursor`.
+  - The `run_checklist` playbook uses it when the AI app lists it, and makes each call itself otherwise. To get the
+    new tool, do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+</Update>
+
+<Update label="2026-11-23" tags={["AI connector"]}>
   ## A vendor's expected charge stays quiet next month too
 
   In a review, tell your AI that a vendor's charge you expect every month, like rent, is fine for that vendor. After
