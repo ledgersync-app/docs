@@ -882,10 +882,12 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       its item by the id its section gave (`transaction_id`, `qbo_ref`, `account_id`, `vendor_id`): one the run does not
       hold answers `invalid_request` on that note, and a run built again meanwhile `version_conflict`. The answer's
       `structuredContent` carries the run, the client, the month's dates, the environment, the firm's name and the
-      wording, and its text is a short summary that tells the AI to wait for the user's decisions from the page, then
+      wording, and its text is a short summary that tells the AI to wait for the user's decisions from the page, to
+      give no counts or share of what is left of its own (the page shows them and keeps them current), then
       make the previews and ask for one yes, and what to do in an app that shows no page. The page loads
       each section with `ledgersync_run_checklist`, so its numbers come from LedgerSync, and sends nothing: its last
-      step sends the user's answers to the chat as a message (`ui/message`).
+      step sends the user's answers to the chat as a message (`ui/message`), its text as a list of content blocks.
+      Claude puts that message in its message box, and the user presses send.
     - Rules setup lets the AI create a client's categorization rules in LedgerSync, with the new categories,
       category links and vendors they need, and change the rules that exist, after the user approves a preview. It
       works for Manual and QuickBooks Online clients. For a client on another accounting app, such as Zoho Books,
