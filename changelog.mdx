@@ -4,6 +4,22 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-23" tags={["AI connector"]}>
+  ## Your firm's own playbooks
+
+  Your firm can now keep its own version of any of LedgerSync's playbooks, with your changes, for the whole firm
+  or for one client, and playbooks of its own. Ask your AI to show your playbooks, or to change a step of one: it
+  shows the lines that change and who they affect, and saves the new version only after your yes. From then on,
+  every chat at your firm, or about that client, follows your version. Every version is kept, and removing yours
+  goes back to the firm's or LedgerSync's playbook of that name. Changing the firm's playbooks needs the
+  permission to manage global rules.
+
+  - `ledgersync_get_playbook` answers your firm's version when it has one, and with no name lists every playbook.
+    It takes an optional `client_id`, `whose` and `cursor`; an older tool list keeps working.
+  - New tools `ledgersync_preview_playbook` and `ledgersync_apply_playbook`: 70 tools on live, 68 on sandbox.
+    To get them, do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+</Update>
+
+<Update label="2026-11-23" tags={["AI connector"]}>
   ## The CheckList reads the whole month in one go
 
   When you ask your AI to run the CheckList for a QuickBooks Online client, LedgerSync now reads the client's month for
