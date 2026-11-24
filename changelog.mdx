@@ -4,6 +4,18 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-23" tags={["AI connector"]}>
+  ## Your AI says when it is on the sandbox
+
+  When a search finds no client, your AI now says whether it searched live LedgerSync or the sandbox, so a client
+  set up on the other one is easy to place. On the sandbox, a preview of a client message now says that sending
+  delivers nothing to the client, before you say yes.
+
+  - `ledgersync_find_clients`: a search with no match ends its `next_step` with the LedgerSync it searched.
+  - `ledgersync_preview_client_message`: on the sandbox, `next_step` says the send is a dry run, as the send's own
+    answer already did.
+</Update>
+
+<Update label="2026-11-23" tags={["AI connector"]}>
   ## Your firm's own playbooks
 
   Your firm can now keep its own version of any of LedgerSync's playbooks, with your changes, for the whole firm
