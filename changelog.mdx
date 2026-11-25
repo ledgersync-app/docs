@@ -3,6 +3,22 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-25" tags={["AI connector"]}>
+  ## Apply the CheckList from its page
+
+  On the checklist page in Claude, **Preview the changes** shows everything LedgerSync will do for the month, in
+  order, and **Apply these changes** does it: the push to QuickBooks, the rules, the 1099 marks, the W-9 requests and
+  the email to your client, the email last. Your answers on the page are saved in LedgerSync as you go. See
+  [Run the CheckList](/ai/checklist).
+
+  - New tool `ledgersync_apply_checklist`, for the checklist page only. AI apps that show pages, such as Claude, keep
+    it from the AI, so there only your click on the page's preview applies. Apps that show no pages, such as Grok,
+    still list it. Each change still goes through its own preview.
+  - `ledgersync_show_checklist` takes `additions.rules_to_create`: each rule the AI proposes, written in full, which
+    the page shows and Apply creates when left on.
+  - 72 tools on live, 70 on sandbox. Reconnect in Claude to load the new tool list.
+</Update>
+
 <Update label="2026-11-24" tags={["AI connector"]}>
   ## Every playbook starts from what your firm knows about the client
 

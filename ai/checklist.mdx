@@ -77,11 +77,19 @@ change something in QuickBooks, ask for fresh numbers.
 
 **In Claude and ChatGPT** the checklist opens as a page in the chat, with the same steps. Go through them, accept or
 change what AI suggests, and answer its questions. Any transaction can go on your client's list: pick **Ask the
-client** in its category list, or pick a category for one the AI left for the client. Nothing is sent or changed
-from the page. On **Final checks and
-push**, click **Approve and finish**, then **Send to the chat**: your answers go to the chat (Claude puts them in the
-message box: press send), and the AI shows what it
-will do and asks for your yes. In other AI apps the checklist is a message in the chat:
+client** in its category list, or pick a category for one the AI left for the client. The rules step shows each rule
+as AI wrote it: its name, the bank text it matches and where it files. Your answers are saved in LedgerSync as you
+go, so the page opens with them on another computer too.
+
+On **Final checks and push**, approve the month (the button says **Push** with the number of transactions, or
+**Approve and finish** when there is nothing to post), then click **Preview the changes**. LedgerSync shows everything
+it will do, in order: what it posts to QuickBooks, the rules it creates, the 1099 marks, the W-9 requests and the email
+to your client, with anything it left out and why. Nothing has changed yet. Click **Apply these changes** and the page
+makes them one after another. After the rules run, it shows the transactions your exclusion rules marked and asks
+before it moves them out of For review. The **Results** step lists what was done. Where your AI app does not let the
+page apply, **Send to the chat** sends your answers to the chat instead (Claude puts them in the message
+box: press send), and the AI shows what it will do and asks for your yes. In other AI apps the checklist is a message
+in the chat:
 
 At the top, **Bookkeeping left to do**: of the work still waiting for review, how much AI did, how much you did and
 how much is left (transactions already categorized are done and don't count). Then the
@@ -94,8 +102,8 @@ you can answer. Say yes, or tell it what to leave out. Then it does everything i
 
 <AiNote tone="green">
 
-**Nothing changes until you say yes.** Nothing is posted to QuickBooks and nothing is sent to anyone before that.
-Emails go out last.
+**Nothing changes until you say yes:** on the page, your click on **Apply these changes** after the preview; in
+the chat, your yes. Nothing is posted to QuickBooks and nothing is sent to anyone before that. Emails go out last.
 
 </AiNote>
 
@@ -137,7 +145,8 @@ transactions to Categorized (and the ones to leave out to Excluded), then gives 
 <Accordion title="What it does not do yet">
 
 - Show the checklist as a page in Grok or Claude Code. There it is a message in the chat.
-- Keep your answers on the page in your LedgerSync account. Send them to the chat when you are done.
+- Create new QuickBooks accounts or vendors, or connect a bank account to QuickBooks, from the page. A row that
+  needs one is left out of the page's preview with the reason: ask your AI in the chat.
 - Show all your clients on the page. Its **All clients** view shows the client you opened.
 - Fix entries already in QuickBooks. It lists those fixes for you to make in QuickBooks.
 - Remember all your decisions for next time. It reads the facts you saved about the client, recognizes a bank that
