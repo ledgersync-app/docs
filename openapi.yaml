@@ -987,10 +987,6 @@ paths:
         LedgerSync page. Without `redirect_url` (no body, `{}` or `null`)
         every session ends on a LedgerSync page, as before.
 
-        Today the return covers connections whose `source` is `FINICITY`.
-        For `MX` and `FDE` connections the session still ends on a
-        LedgerSync page; their return is on the way.
-
         ### The URL is a reusable bearer credential
 
         The link is **not** single-use. It stays valid until
@@ -3704,8 +3700,6 @@ components:
             and for a Finicity bank it can also be `failed`. A URL too long
             to carry through the link is also refused with `400`. Omit it,
             or send `null`, for a link that ends on a LedgerSync page.
-            Today only `FINICITY` connections return; `MX` and `FDE`
-            connections follow.
           example: https://partner.example/callback
 
     ConnectionReauthorization:
