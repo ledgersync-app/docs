@@ -52,6 +52,13 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
   - In Claude, the checklist now opens as its page without you asking for it.
   - When nothing is posted to QuickBooks, the payee question no longer holds up the last step. See
     [Run the CheckList](/ai/checklist).
+  - When no transaction is ready to post, the page no longer asks whether the QuickBooks bank feed is off, so that
+    question no longer holds up the last step either.
+  - When the page hands your answers to the chat, it says the AI posts to QuickBooks only when there is something
+    to post, no longer counts transactions the page's Apply already posted, and passes on whether you confirmed
+    the QuickBooks bank feed is off.
+  - Counts of one now read "1 transaction", "1 rule" and so on, including in the email that asks your client about
+    a single transaction.
 </Update>
 
 <Update label="2026-11-26" tags={["AI connector"]}>
