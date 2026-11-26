@@ -962,6 +962,35 @@ paths:
         The response also carries `source`: the provider the URL leads to.
         See "Ids are not always stable" below.
 
+        ### Returning the end user to your app
+
+        Send `redirect_url` in the body to have LedgerSync bring the end
+        user back to your app when they finish. It must exactly match one
+        of the redirect URLs allowlisted for this environment on the
+        developer portal's Redirect URLs page (scheme, host, port and
+        path). Otherwise the call returns `400` with
+        `error.param = "redirect_url"` and no link is made.
+
+        When the end user finishes, their browser is sent to `redirect_url`
+        with two query parameters added:
+
+        - `status`: `connected` on success. For a Finicity bank it can also
+          be `failed`, or another reason Finicity reports.
+        - `connection_id`: the `connection_id` you passed. When the response
+          `source` differs from its source segment, the session created a new
+          connection instead (see "Ids are not always stable" below).
+
+        These parameters are not signed, and anyone can open your URL with
+        them, so confirm the outcome with `GET /connections/{connection_id}`
+        or the connection webhooks before acting on it. The return happens
+        once per link: a second session on the same link ends on a
+        LedgerSync page. Without `redirect_url` (no body, `{}` or `null`)
+        every session ends on a LedgerSync page, as before.
+
+        Today the return covers connections whose `source` is `FINICITY`.
+        For `MX` and `FDE` connections the session still ends on a
+        LedgerSync page; their return is on the way.
+
         ### The URL is a reusable bearer credential
 
         The link is **not** single-use. It stays valid until
@@ -1020,19 +1049,19 @@ paths:
 
         ### Empty-body POST
 
-        This endpoint takes no request body. Send an explicit
+        The request body is optional. When you send none, send an explicit
         `Content-Length: 0` header so the upstream HTTPS load balancer
         doesn't reject the request with `411 Length Required`.
       requestBody:
         required: false
         description: |
-          No body. Send `Content-Length: 0` so the upstream load
+          Optional. Send `redirect_url` to bring the end user back to your
+          app when they finish (see "Returning the end user to your app").
+          With no body, send `Content-Length: 0` so the upstream load
           balancer doesn't reject the request with 411.
         content:
           application/json:
-            schema:
-              type: object
-              nullable: true
+            schema: { $ref: '#/components/schemas/ConnectionReauthorizeRequest' }
       responses:
         '200':
           description: |
@@ -2808,8 +2837,11 @@ components:
           description: Connection id the widget session was bound to. Placeholder during pending; canonical after `connection.active`.
           example: con_FINICITY_41294
         client_id:
-          type: string
-          description: The Client id the connection belongs to.
+          type: [string, 'null']
+          description: |
+            The Client id the connection belongs to. `null` for a token made
+            by `POST /connections/{connection_id}/reauthorize`, which is not
+            told the Client.
           example: cli_smoke
 
     RedirectUrlsRequest:
@@ -3653,6 +3685,28 @@ components:
         kind: { type: string, enum: [reauthorize] }
         reauth_url: { type: string, format: uri }
         expires_at: { type: string, format: date-time }
+
+    ConnectionReauthorizeRequest:
+      type: object
+      description: |
+        Optional body of `POST /v3/connections/{connection_id}/reauthorize`.
+        Unknown fields are ignored.
+      properties:
+        redirect_url:
+          type: [string, 'null']
+          format: uri
+          description: |
+            Where LedgerSync sends the end user's browser when they finish.
+            It must exactly match one of the redirect URLs allowlisted for
+            this environment (scheme, host, port and path), or the call
+            returns `400` and no link is made. LedgerSync adds `status` and
+            `connection_id` query parameters: `status=connected` on success,
+            and for a Finicity bank it can also be `failed`. A URL too long
+            to carry through the link is also refused with `400`. Omit it,
+            or send `null`, for a link that ends on a LedgerSync page.
+            Today only `FINICITY` connections return; `MX` and `FDE`
+            connections follow.
+          example: https://partner.example/callback
 
     ConnectionReauthorization:
       type: object
