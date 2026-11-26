@@ -238,6 +238,12 @@ sequenceDiagram
   `connection.active` — reconcile on the webhook, not on the callback landing.
 </Info>
 
+<Note>
+  Repairing an existing connection? `POST /v3/connections/{connection_id}/reauthorize`
+  takes the same allowlisted `redirect_url`. See
+  [Send the user back to your app](/guides/connection-lifecycle#send-the-user-back-to-your-app).
+</Note>
+
 ## Embedding
 
 However you launch the connect flow, the hand-off is the same: you open a

@@ -3,6 +3,16 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-26" tags={["Connections"]}>
+  ## Reauthorize can send the user back to your app
+
+  `POST /v3/connections/{connection_id}/reauthorize` takes an optional `redirect_url`, checked against the same
+  allowlist as new connections. When the user finishes updating their bank login, LedgerSync sends the browser to
+  it with `status` and `connection_id`. Calls without a body work as before.
+
+  See [Send the user back to your app](/guides/connection-lifecycle#send-the-user-back-to-your-app).
+</Update>
+
 <Update label="2026-11-26" tags={["AI connector"]}>
   ## Your AI fills in the vendor and category on For review transactions
 

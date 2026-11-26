@@ -87,7 +87,7 @@ Connection reuse depends on the returned institution login. Linking a different 
 
 ### When to use reauthorize
 
-Use `POST /v3/connections/{connection_id}/reauthorize` when an existing connection needs repair. It takes no body; send `Content-Length: 0`. The response contains `action.reauth_url` and `action.expires_at`. That repair link can be reopened until it expires. Treat it as a bearer link and share it only through a trusted channel. See [Handling failed and disconnected](/guides/connection-lifecycle#handling-failed-and-disconnected) for the response example.
+Use `POST /v3/connections/{connection_id}/reauthorize` when an existing connection needs repair. Send no body (`Content-Length: 0`), or an optional `redirect_url` to bring the user back to your app when they finish; see [Send the user back to your app](/guides/connection-lifecycle#send-the-user-back-to-your-app). The response contains `action.reauth_url` and `action.expires_at`. That repair link can be reopened until it expires. Treat it as a bearer link and share it only through a trusted channel. See [Handling failed and disconnected](/guides/connection-lifecycle#handling-failed-and-disconnected) for the response example.
 
 For some institutions, including American Express, a Finicity repair can route through MX. Check the repair response's `source`: accounts linked through MX have new connection and account IDs, while the original Finicity connection keeps its old ones. List by `client_id` across sources in that case. This repair behavior is separate from the Full Connect account-addition flow above.
 

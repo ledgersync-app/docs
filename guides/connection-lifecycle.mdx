@@ -212,6 +212,30 @@ Both statuses mean the same thing to your UI: **the user needs to re-link.** You
 
 Redirect the user to `reauth_url` to re-enter credentials or re-consent at the institution, then watch for recovery and re-read the connection and accounts. A repair aims to preserve the existing connection and account identities. For Finicity, the same institution login and provider account IDs reuse the stored rows; a changed login requires a successful repair match to retain those identities. Check the returned `source` and canonical account IDs before assuming an overlap pull will deduplicate against records you already hold.
 
+#### Send the user back to your app
+
+Pass an optional `redirect_url` in the body and LedgerSync sends the user back to your app when they finish. It uses the same allowlist as the [redirect flow](/guides/connect-a-bank#redirect-flow) for new connections: the URL must exactly match one of your redirect URLs for this environment, or the call returns `400 invalid_request`.
+
+```bash
+curl -X POST https://api.ledgersyncappv2.com/v3/connections/con_MX_2418/reauthorize \
+  -H "Authorization: Bearer sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{"redirect_url":"https://app.acme.com/ledgersync/callback"}'
+```
+
+When the user finishes updating their bank login, the browser lands on your URL with two query parameters:
+
+```
+https://app.acme.com/ledgersync/callback?status=connected&connection_id=con_MX_2418
+```
+
+| Parameter | Meaning |
+| --- | --- |
+| `status` | `connected` when the update went through. For a Finicity bank it can also be `failed`, when the bank's page reported an error. |
+| `connection_id` | The connection you passed to reauthorize. When the response `source` differs from the source in that id, the accounts arrive on a new connection: list the client's connections to find it. |
+
+The response is the same with or without a body. Each link sends the user back once, so call reauthorize again for each new attempt. Treat the landing as a hint for your UI and confirm with the `connection.active` webhook or by re-reading the connection. Without a `redirect_url`, the user stays on the LedgerSync page when they finish, as before.
+
 <Info>
 Ownership is enforced server-side: a `connection_id` that doesn't belong to the authenticated customer returns `404`. Available for `FINICITY`, `MX`, and `FDE`. Uploaded-statement (`PDF`) sources are read-only and have no connection to reauthorize.
 </Info>
