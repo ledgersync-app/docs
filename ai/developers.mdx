@@ -8,7 +8,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 
 <AiPage title="For developers" subtitle={<span>Reference for developers and admins. Accountants setting up their firm don't need this page: go to <a href="/ai/start-here">Start here</a>.</span>}>
 
-<AiCopy label="Live connector (72 tools)" text="https://api.ledgersyncappv2.com/mcp" />
+<AiCopy label="Live connector (75 tools)" text="https://api.ledgersyncappv2.com/mcp" />
 
 <div className="lsai-grid-2">
   <AiBox title="Sandbox">
@@ -71,7 +71,7 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     with Cursor's client id are approved. Ask support if you need one.
 </Accordion>
 
-## Tools <span className="lsai-badge">70</span>
+## Tools <span className="lsai-badge">75</span>
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
@@ -144,12 +144,15 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
 | `ledgersync_preview_accept_transactions` | Checks accepting the For review transactions of 1 to 10 clients, by default the ones an inclusion rule filed, leaving out the categories you name: what would move to Categorized (an exclusion rule's to Excluded), what LedgerSync would refuse and why, and what would stay and why | No |
 | `ledgersync_accept_transactions` | Accepts the previewed transactions, client by client, as the LedgerSync app's Accept does; posts nothing to QuickBooks | Yes |
 | `ledgersync_undo_accept_transactions` | Shows which accepted transactions would go back to For review and which would stay (synced, exported or changed since); after a yes, moves them back | Yes |
+| `ledgersync_preview_categorize_transactions` | Checks setting the payee (a vendor) and the category of up to 100 of one Manual or QuickBooks Online client's For review transactions that no rule filed: each one's payee and category now and after, the new vendors it would add or reuse, and what it would leave as it is and why. Never a new category | No |
+| `ledgersync_categorize_transactions` | Sets the previewed payees and categories, as the LedgerSync app does on one transaction, after adding the new vendors (for a QuickBooks client, in its QuickBooks); the transactions stay in For review | Yes |
+| `ledgersync_undo_categorize_transactions` | Shows which transactions' payee and category would go back and which would stay (changed, accepted, synced or exported since); after a yes, puts them back | Yes |
 | `ledgersync_list_audit_log` | The history of every change the AI made through LedgerSync, newest first: when, the client, who approved it, from which AI app, what was done and, for work that runs in the background, how it went; narrowed by client, dates, tool or person | No |
 | `ledgersync_get_desktop_app_status` | Is the desktop app linked and connected (live only) | No |
 | `ledgersync_pair_desktop_app` | Links the desktop app with its 7-character code (live only) | Yes |
 
 <AccordionGroup>
-  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, counting clients, the firm's own accounts, duplicates, reading and changing a client's details, client messages, invitations and clarification requests, the desktop app, statement conversions, the client snapshot, client facts, the history of AI changes, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, W-9 requests, accepting For review transactions and checking rules against them">
+  <Accordion title="Tool details: each client named with its id, ids sealed to their client, refreshes left, which firm and login, counting clients, the firm's own accounts, duplicates, reading and changing a client's details, client messages, invitations and clarification requests, the desktop app, statement conversions, the client snapshot, client facts, the history of AI changes, QuickBooks bookkeeping, rules setup, categorized export, the 1099 list and marking vendors for 1099, W-9 requests, accepting For review transactions, checking rules against them and setting their payees and categories">
     - Every tool that works on a client names it twice: by its id and by its name. `client_name` goes right after
       `client_id`, and `client_names` after `client_ids`, one name for each id in the same order, as
       `ledgersync_find_clients` lists them in the same chat. The name is the client's name, not its email or id.
@@ -196,10 +199,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       The firm's ids (`cat_f_...`, `ven_f_...`), rule ids, and ids no tool takes back, such as a pushed transaction's
       QuickBooks id, stay as they are.
     - A change that runs a preview's confirmation names the same clients, with their names, as the preview did:
-      `ledgersync_push_to_quickbooks`, `ledgersync_apply_rules_setup` and `ledgersync_apply_ledger_changes` take its
-      `client_id` and `client_name`, `ledgersync_accept_transactions` and `ledgersync_send_client_message` its
-      `client_ids` and `client_names`, and the second call of `ledgersync_undo_accept_transactions` the same clients
-      as its first. Other clients are refused with `invalid_request`, and nothing changes. A confirmation that named
+      `ledgersync_push_to_quickbooks`, `ledgersync_apply_rules_setup`, `ledgersync_apply_ledger_changes` and
+      `ledgersync_categorize_transactions` take its `client_id` and `client_name`, `ledgersync_accept_transactions` and
+      `ledgersync_send_client_message` its `client_ids` and `client_names`, and the second call of
+      `ledgersync_undo_accept_transactions` or `ledgersync_undo_categorize_transactions` the same clients as its
+      first. Other clients are refused with `invalid_request`, and nothing changes. A confirmation that named
       no client (the links of `ledgersync_preview_category_links`, or a reconnect message chosen by bank or for every
       connection needing attention) takes none.
     - An id of a client's data (such as a `cli_`, `con_` or `acc_` id, or a sealed id) in an input that does not take
@@ -538,7 +542,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       firm's version of a LedgerSync playbook when it keeps one, else LedgerSync's. A client's own version is reached
       through the client snapshot, which names it in `own_playbooks`.
     - `ledgersync_list_audit_log` lists the history of every change the AI made through LedgerSync, newest first:
-      1099 marks, rules set up, transactions accepted from For review, QuickBooks pushes, categorized exports,
+      1099 marks, rules set up, transactions accepted from For review, payees and categories set on For review
+      transactions, QuickBooks pushes, categorized exports,
       clients added or edited, message templates saved, messages sent to clients, W-9 requests sent, reminded or
       cancelled, W-9s saved to QuickBooks, client facts saved, changed or removed, review decisions recorded or reopened, your firm's playbooks saved or removed, and every undo. Each entry says
       when, the client, who approved it, from which AI app (`claude`, `chatgpt`, `grok`, `cursor`, `other`, or
@@ -1600,9 +1605,71 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `not_found`.
     - The steps on [Accept For review transactions](/ai/accept-transactions) are not an MCP prompt: the four tools'
       descriptions and `next_step`s carry them.
+    - Setting payees and categories fills in the vendor, as the payee, and the category of a Manual or QuickBooks
+      Online client's For review transactions that no rule filed, as the LedgerSync app does on one transaction,
+      after the user approves a preview. The transactions stay in For review: the accept tools move them later
+      (`only_rule_filed` `false`). It uses only the client's own categories and never creates one. The payee is one
+      of the client's vendors or a new vendor by name, created for the client (for a QuickBooks client, in its
+      QuickBooks); customers and employees are not taken yet. As after a person's edit in the app, a rule created or
+      edited later, a new bank download or a run of the firm's global rules at a Manual client can file these
+      transactions again. See [Fill in the vendor and category](/ai/categorize-transactions).
+    - `ledgersync_preview_categorize_transactions` takes one `client_id` with its `client_name` and `rows` (1 to
+      100), each with a `transaction_id` (`txn_...`, from `ledgersync_list_review_transactions`) and what to set: a
+      `category_id`, the client's own (`cat_c_...` from `ledgersync_list_setup_categories`, kind client), a payee,
+      either `payee_id`, one of the client's vendors (`ven_c_...` from `ledgersync_list_setup_vendors`), or
+      `new_vendor_name` (1 to 80 characters), or both a category and a payee. These ids are sealed to the client, as
+      in rules setup. Each transaction comes once, `payee_id` and `new_vendor_name` never together, and up to 20 new
+      vendor names (capitals and spaces at the ends do not count). A firm category (`cat_f_...`), a firm vendor
+      (`ven_f_...`), a customer (`cus_c_...`) or any other bad row is refused with `invalid_request` on that row,
+      before the call is counted. A category or vendor that is not the client's, or is inactive (and a new vendor
+      name that belongs to a deactivated vendor), refuses the whole call with
+      `invalid_request` on that row, and its `next_step` says to pick one from the client's list. It changes
+      nothing, so it is annotated read-only; it needs `write:accounting`.
+    - It answers `client_id`, `client_name`, `platform`, `will_change` (`count` and the rows, each with
+      `transaction_id`, `date`, `amount`, `description`, `account`, `before` with `category`, `gl_code`,
+      `split_categories` and `payee` as `ledgersync_list_review_transactions` shows them, and `after` with
+      `category`, `gl_code`, `payee` and `new_vendor`), `refused` (`count` and the rows with their `reason`:
+      `not_in_for_review`, `filed_by_rule`, `split`, `synced`, `exported`, `already_set` when the row already has
+      what was asked, `vendor_name_too_long` when the vendor's name is longer than the 80 characters LedgerSync puts
+      on a transaction, or `not_checked` when LedgerSync did not check the row, so preview it again) and `new_vendors` (each `name` with its `action`: `reuse`, when the client already has an
+      active vendor with that name, or `create`). When something would change, it also has a `confirmation_id` with
+      its `expires_at`, 30 minutes on; with nothing to change, it keeps no confirmation, and its `next_step` says
+      why. The answer fits in 20,000 characters: when it would not, each list is cut to 40 rows, then fewer,
+      counted in `more_rows`. The counts always cover every row, and the confirmation keeps them all.
+    - `ledgersync_categorize_transactions` takes the `confirmation_id`, with the same `client_id` and `client_name`
+      as the preview, after the user's yes. For a QuickBooks client, LedgerSync first creates each new vendor in the
+      client's QuickBooks, or reuses the active vendor that already holds the name there. It never turns a
+      deactivated vendor back on: a name it cannot use (a deactivated vendor's, or one of the client's customers')
+      refuses its rows with `vendor_not_created`. A Manual client's new vendors are added in LedgerSync. Then
+      LedgerSync checks each transaction again as the signed-in person and changes it only while it is still in For
+      review, no rule filed it, and its payee and category are as the preview saw them; the others come back in
+      `changed` (`no_longer_for_review`, `filed_by_rule`, `changed_since_preview`, `split`, `synced` or `exported`).
+      It sets the vendor as the payee, in place of any customer or employee payee, and the category as the
+      transaction's only category line, with no amount or class, and changes nothing else on that transaction or any
+      other. It answers a `change_id` (`rvc_...`), `applied` (`count` and the rows, each with the category and payee
+      it now has), `refused`, `changed` and `new_vendors` (each `name` with what happened: `reused`, `created` or
+      `refused`). LedgerSync records each change with who approved it and from which AI app.
+    - Calling it again with the same `confirmation_id` answers from what it kept, for 24 hours, and never changes a
+      transaction twice. One call runs at a time for a confirmation: another one meanwhile gets
+      `idempotency_conflict`. A change that got no clear answer comes back as `upstream_unknown`: call it again with
+      the same `confirmation_id`, and LedgerSync answers from its record of that change. A call that never reached
+      LedgerSync is not counted.
+    - `ledgersync_undo_categorize_transactions` takes the `change_id` with the same `client_id` and `client_name`.
+      It works in two calls. The first, without `undo_id`, changes nothing: it lists the transactions whose payee and
+      category would go back and the ones that would stay, with a reason (`changed`, `accepted`, `synced` or
+      `exported`), and, when something would go back, an `undo_id` that works for 15 minutes. The second, with that
+      `undo_id`, the same `change_id` and the same client, puts back each transaction's payee and category exactly
+      as they were (all three payee kinds and every category line) and answers what went back and what stayed. Only
+      transactions still in For review and still as the change left them go back. A vendor the change created stays.
+      An undo that got no clear answer comes back as `upstream_unknown`: call it again without `undo_id` to see what
+      has not gone back yet. A `change_id` LedgerSync has no record of, among the clients the person manages,
+      answers `not_found`. The change and its undo each have an entry in the history of AI changes, and the
+      change's entry names its undo tool.
+    - The steps on [Fill in the vendor and category](/ai/categorize-transactions) are not an MCP prompt: the three
+      tools' descriptions and `next_step`s carry them.
   </Accordion>
 
-  <Accordion title="Security: a tool acts only on the client the user named, bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement and check image links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview, rules saved only after a preview, 24-hour export links that export only on Download, vendors marked for 1099 only after a preview, tax IDs never shown, For review transactions accepted only after a preview">
+  <Accordion title="Security: a tool acts only on the client the user named, bank sign-ins never in the chat, 72-hour connect links, 10-minute one-use statement and check image links, 6-day invitation sign-in links, client messages carry only LedgerSync links, QuickBooks posts only after a preview, rules saved only after a preview, 24-hour export links that export only on Download, vendors marked for 1099 only after a preview, tax IDs never shown, For review transactions accepted, or given a payee and category, only after a preview">
     - A tool acts only on the client the user named. Each client id comes with the client's name, and LedgerSync
       checks they are the same client, and one the person sees, before it reads or changes anything. An id that is
       another client than the name, such as one the AI remembered from an earlier chat, is refused, and so is a
@@ -1690,9 +1757,19 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     - Accepting posts nothing to QuickBooks, and the undo puts back only transactions still as the accept left them:
       one synced to QuickBooks, exported or changed since stays. Each person accepts only for the clients they see in
       the LedgerSync app: an employee, the clients assigned to them.
+    - Payees and categories are set on For review transactions only after a preview and a yes.
+      `ledgersync_categorize_transactions` takes only the preview's `confirmation_id`, with the client that preview
+      named, which works for 30 minutes and only for the person and the AI app that made it, and changes only the
+      transactions that preview counted, and only while they are as the preview saw them. It and
+      `ledgersync_undo_categorize_transactions` are marked as changing data, so Claude and ChatGPT ask before they
+      run. In Grok, ask it to wait for your yes.
+    - Setting payees and categories never creates a category, and creates a vendor only by a name the preview showed
+      (for a QuickBooks client, in its QuickBooks, never turning a deactivated vendor back on). It changes no other
+      transaction, and the undo puts back only transactions still as the change left them. Each person sets them only
+      for the clients they see in the LedgerSync app: an employee, the clients assigned to them.
   </Accordion>
 
-  <Accordion title="Refreshes and limits: 50 AI refreshes a day on live, 20 on sandbox, 300 client messages a day per firm on live, 60 QuickBooks pushes a day per AI app, 30 rules setups a day per AI app, 30 export links an hour per AI app, 30 sets of 1099 marks a day per AI app, 60 accepts of For review transactions a day per AI app, per-minute and per-hour caps">
+  <Accordion title="Refreshes and limits: 50 AI refreshes a day on live, 20 on sandbox, 300 client messages a day per firm on live, 60 QuickBooks pushes a day per AI app, 30 rules setups a day per AI app, 30 export links an hour per AI app, 30 sets of 1099 marks a day per AI app, 60 accepts of For review transactions a day per AI app, 60 sets of payees and categories a day per AI app, per-minute and per-hour caps">
     - LedgerSync refreshes every working connection about once a day. A refresh you ask for takes a few
       minutes; see [Keeping data fresh](/guides/data-freshness).
     - A connection refreshed in the last 30 minutes is skipped unless you ask for a new pull anyway.
@@ -1781,6 +1858,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       refused as busy (`rate_limit_exceeded`, "Other transactions are being accepted; try again in a minute."), is
       not counted, and can be sent again a minute later with the same `confirmation_id`. A preview's confirmation
       works for 30 minutes, an accept's answer is kept for 24 hours, and an undo check works for 15 minutes.
+    - Setting payees and categories: one preview takes one client, 1 to 100 transactions and up to 20 new vendor
+      names, each 1 to 80 characters. Per connected AI app: 120 previews an hour, 60 changes a day and 30 undos a
+      day; a change or an undo counts only when it reaches LedgerSync, and the undo's first call is not counted. A
+      preview's confirmation works for 30 minutes, a change's answer is kept for 24 hours, and an undo check works for
+      15 minutes.
   </Accordion>
 
   <Accordion title="Tool updates: Claude and ChatGPT keep a copy of the tool list, and Grok may too">
@@ -1821,7 +1903,10 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
     again. An accept of For review transactions that
     LedgerSync did not confirm comes back as `upstream_unknown` too: call `ledgersync_accept_transactions` again with
     the same `confirmation_id`, which never accepts twice. For its undo, call `ledgersync_undo_accept_transactions`
-    without `undo_id` to see what has not gone back yet. A change to a client's details that LedgerSync did not
+    without `undo_id` to see what has not gone back yet. So does a change of payees and categories on For review
+    transactions: call `ledgersync_categorize_transactions` again with the same `confirmation_id`, which never
+    changes a transaction twice, and for its undo, `ledgersync_undo_categorize_transactions` without `undo_id`. A
+    change to a client's details that LedgerSync did not
     confirm comes back as `upstream_unavailable`: read the client with `ledgersync_get_client` before trying again.
 
     The client check adds no new codes. A client id with no name or with another client's name, an id sealed to

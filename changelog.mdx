@@ -4,6 +4,39 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
 ---
 
 <Update label="2026-11-26" tags={["AI connector"]}>
+  ## Your AI fills in the vendor and category on For review transactions
+
+  Ask your AI to fill in the vendor and category on a client's For review transactions that no rule filed. For
+  example: *"For Acme, fill in the vendor and category on the For review transactions with no rule. Use the vendors
+  and categories Acme already has. You may add a new vendor, but never a new category."* It uses only the client's
+  own categories and never adds one. It can add a new vendor: for a QuickBooks client, in its QuickBooks. It shows you
+  each transaction before and after first, and changes them only after your yes. The transactions stay in For review,
+  and you can undo it in the same chat. For Manual and QuickBooks Online clients. See
+  [Fill in the vendor and category](/ai/categorize-transactions).
+
+  - New tools `ledgersync_preview_categorize_transactions`, `ledgersync_categorize_transactions` and
+    `ledgersync_undo_categorize_transactions`: 75 tools on live, 73 on sandbox. To get them, do
+    [After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+  - When an accept refuses a transaction for a missing payee or category, its `next_step` now points to these tools
+    for a transaction no rule filed, and to the rule for one a rule filed. See [For developers](/ai/developers).
+</Update>
+
+<Update label="2026-11-26" tags={["AI connector"]}>
+  ## Keep one transaction in For review when you accept
+
+  When your AI accepts a client's For review transactions, it can now keep single transactions in For review, such
+  as one you flagged, while the rest of their category moves. Before, the only way was to keep the whole category. See
+  [Accept For review transactions](/ai/accept-transactions).
+
+  - `ledgersync_preview_accept_transactions` takes `leave_out_transaction_ids`: up to 50 `txn_` ids across its
+    clients. Each client's answer shows them in `left_out_transactions`, and `left_out` counts them as
+    `left_out_transaction`.
+  - A kept transaction that no client of the preview has in For review keeps no confirmation, and is listed in
+    `not_found_transaction_ids`.
+  - No new tool.
+</Update>
+
+<Update label="2026-11-26" tags={["AI connector"]}>
   ## The CheckList opens as its page in Claude
 
   - In Claude, the checklist now opens as its page without you asking for it.
@@ -22,19 +55,6 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
     change, and find the same history on the **AI changes** page in the LedgerSync app.
   - [Set up a client for the AI](/ai/client-setup) and [Review a client's books](/ai/review-my-client#decide) now
     show more of their steps in pictures.
-
-  ## Keep one transaction in For review when you accept
-
-  When your AI accepts a client's For review transactions, it can now keep single transactions in For review, such
-  as one you flagged, while the rest of their category moves. Before, the only way was to keep the whole category. See
-  [Accept For review transactions](/ai/accept-transactions).
-
-  - `ledgersync_preview_accept_transactions` takes `leave_out_transaction_ids`: up to 50 `txn_` ids across its
-    clients. Each client's answer shows them in `left_out_transactions`, and `left_out` counts them as
-    `left_out_transaction`.
-  - A kept transaction that no client of the preview has in For review keeps no confirmation, and is listed in
-    `not_found_transaction_ids`.
-  - No new tool.
 </Update>
 
 <Update label="2026-11-25" tags={["AI connector"]}>

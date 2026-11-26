@@ -65,6 +65,7 @@
               "ai/checklist",
               "ai/quickbooks-bookkeeping",
               "ai/rules-setup",
+              "ai/categorize-transactions",
               "ai/accept-transactions",
               "ai/categorized-export",
               "ai/1099-vendors",

@@ -1,0 +1,348 @@
+---
+title: "Fill in the vendor and category"
+description: "Your AI fills in the vendor and category on a client's For review transactions that no rule filed, for Manual and QuickBooks Online clients. It uses the client's own categories and never adds one, and it can add a new vendor. It shows you each transaction before and after first, and changes them only after you say yes. The transactions stay in For review."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiCopy, AiNote, AiEmail, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="Fill in the vendor and category" subtitle="Ask your AI. It shows you each For review transaction's vendor and category now and after. After your yes, LedgerSync fills them in, and the transactions stay in For review.">
+
+<AiNote tone="green">
+
+**For Manual and QuickBooks Online clients.** Not set up yet? Go to [Start here](/ai/start-here). Added it a while ago? Do
+[After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+
+</AiNote>
+
+## Start
+
+<AiStep id="new-chat" n={1} total={4} title="Start a new chat">
+
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
+
+</AiStep>
+
+<AiStep id="ask" n={2} total={4} title="Ask the AI">
+
+Type *"Fill in the vendor and category on Acme's For review transactions with no rule"*, with your client's name, and
+press **Enter**.
+
+</AiStep>
+
+<AiStep id="check" n={3} total={4} title="Check the preview">
+
+For each transaction, the AI shows its vendor and category now and after. It also shows the new vendors it would add,
+and what LedgerSync would leave as it is, and why. Nothing has changed yet.
+
+</AiStep>
+
+<AiStep id="yes" n={4} total={4} title="Say yes">
+
+Say yes, and allow it each time Claude or ChatGPT asks. LedgerSync fills them in, and the AI tells you what changed and
+what did not. The transactions stay in **For review**.
+
+</AiStep>
+
+<AiNote tone="green">
+
+**Say exactly what to use.** For example: *"For Acme, fill in the vendor and category on the For review transactions
+with no rule. Use the vendors and categories Acme already has. You may add a new vendor, but never a new category."*
+
+</AiNote>
+
+<AiNote tone="yellow">
+
+**Using Grok?** Tell it to wait for your yes before it changes anything.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**Never a new category.** The AI uses only the client's own categories. It can add a new vendor. For a QuickBooks
+client, LedgerSync adds the new vendor in the client's QuickBooks.
+
+</AiNote>
+
+<AiNote tone="green">
+
+**They stay in For review.** Filling them in moves nothing. When they look right, ask the AI to accept them, and to
+take the transactions no rule filed too. See [Accept For review transactions](/ai/accept-transactions).
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**A rule can still change them.** As when you fill them in yourself in the app, a rule you add or change later, a new
+bank download or, at a Manual client, a run of your global rules can file these transactions again.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**Changed your mind?** In the same chat, ask: *"Undo the vendors and categories you just filled in."* See
+[Undo](#undo).
+
+</AiNote>
+
+<AiNote tone="yellow">
+
+**Your client's bank data goes through your AI account.** Check its data settings first.
+
+</AiNote>
+
+## More details
+
+<AccordionGroup>
+
+<Accordion title="What happens after you ask">
+
+1. The AI finds your client. It works on one client at a time.
+2. It reads the client's transactions on **For review** in the Rules Engine, and the client's categories and vendors.
+3. For each transaction no rule filed, it picks a vendor and a category from the client's own, or uses the ones you
+   name. A vendor the client does not have yet is a new vendor.
+4. The AI shows you a preview: each transaction with its vendor and category now and after, the new vendors it would
+   add, and what LedgerSync would leave as it is, and why. Nothing has changed yet.
+5. You say yes. Claude and ChatGPT also ask you to allow it: allow it if the preview looked right.
+6. For a QuickBooks client, LedgerSync first adds the new vendors in the client's QuickBooks. Then it checks each
+   transaction again and fills in its vendor and category, as when you pick them on the transaction in the app. A
+   transaction that changed since the preview stays as it is.
+7. The AI tells you what changed, what LedgerSync refused and why, what changed since the preview, and which new
+   vendors it added. The transactions stay in **For review**.
+8. When they look right, accept them: ask the AI, as in [Accept For review transactions](/ai/accept-transactions), or
+   click **Accept** in the LedgerSync app.
+
+<AiNote tone="gray">
+
+**Which transactions can change?** The ones on the client's **For review** list that no rule filed, including ones
+someone filled in by hand: the preview shows what they have now. LedgerSync leaves these as they are, and says why:
+
+- **Filed by a rule.** Change the rule instead: see [Changing your rules](/ai/rules-setup#changing-your-rules).
+- **Split** over several categories.
+- **Synced** to QuickBooks or **exported**.
+- **Not in For review:** already accepted or excluded, or not this client's.
+- **Already set:** it already has the vendor and category you asked for.
+- **Vendor name too long:** the vendor you picked has a name longer than the 80 characters LedgerSync puts on a
+  transaction. Pick another vendor.
+- **Not checked:** LedgerSync could not check it this time. Ask the AI to preview it again.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**The vendor and the category.**
+
+- **Category:** one of the client's own active categories. Never one of your firm's global categories, and never a
+  new one.
+- **Vendor:** one of the client's vendors, or a new one by name. When the client already has an active vendor with that
+  name, LedgerSync uses it. Otherwise it adds it: for a Manual client in LedgerSync, for a QuickBooks client in its
+  QuickBooks. A customer or an employee cannot be the payee yet.
+- A transaction can get a vendor, a category, or both. What you don't ask for stays as it is.
+- The vendor becomes the transaction's payee, in place of the one it had, even a customer or an employee. The
+  category replaces the one it had.
+
+</AiNote>
+
+<AiNote tone="gray">
+
+**What changes in LedgerSync.** Only the transactions in the preview, and only their payee and category, as when you
+pick them in the app. They stay in **For review**, and nothing is posted to QuickBooks: for a QuickBooks client, only
+the new vendors go to its QuickBooks. LedgerSync keeps who said yes, and in which AI app.
+
+</AiNote>
+
+</Accordion>
+
+<Accordion title="Undo" id="undo">
+
+Changed your mind? In the same chat, ask the AI to undo it. For example: *"Undo the vendors and categories you just
+filled in."*
+
+1. The AI first checks what the undo would do. Claude and ChatGPT already ask you to allow it here: allow it,
+   because this check changes nothing. Then the AI shows you what would go back and what would stay, and why.
+   Nothing has changed yet.
+2. You say yes. Claude and ChatGPT also ask you to allow it.
+3. LedgerSync puts back each transaction's payee and category as they were before. The AI tells you what went back
+   and what stayed.
+
+- **What stays.** A transaction that someone changed since, that a rule filed since, or that was accepted, synced
+  to QuickBooks or exported since stays as it is.
+- **New vendors stay.** A vendor LedgerSync added stays, in LedgerSync and, for a QuickBooks client, in its
+  QuickBooks.
+- **In the same chat.** The AI needs that change's details. In a later chat, ask it to find the change in the history
+  of AI changes first.
+
+</Accordion>
+
+<Accordion title="What it does not do yet">
+
+- Clients that use another accounting app, such as Zoho Books.
+- Bank accounts on LedgerSync's own bank connection, such as banks that need the LedgerSync desktop app.
+- A customer or an employee as the payee. Set those in the LedgerSync app.
+- Transactions a rule filed. Change the rule, or change them in the LedgerSync app.
+- Splitting a transaction over several categories, or changing one that is split.
+- Moving the transactions to **Categorized**. Accept them afterwards: see
+  [Accept For review transactions](/ai/accept-transactions).
+
+</Accordion>
+
+<Accordion title="Before you start">
+
+- **LedgerSync is in your AI app:** Claude, ChatGPT or Grok. Not yet? Go to [Start here](/ai/start-here). Added it
+  a while ago? Do [After a LedgerSync update](/ai/troubleshooting#after-an-update) once, so your AI gets the new
+  tools. On ChatGPT Business, Enterprise or Edu, your workspace admin refreshes LedgerSync's tools first if they added it by hand. On
+  Enterprise and Edu, they also turn on the new tools: **Workspace settings**, then **Apps**, then **...** next to
+  LedgerSync, then **Action control** (for the plugin from ChatGPT's plugin directory: **Admin console**, then **Plugins**, then **New tools** or **New actions**).
+- **The client is a Manual or QuickBooks Online client.** In the LedgerSync app, you work on these clients under
+  **Rules Engine**, then **Manual** or **QuickBooks**.
+- **The client has the categories you need.** The AI never adds one. Add a new one to the client in LedgerSync first.
+  For a QuickBooks client, add it in QuickBooks, then sync the client's QuickBooks data in LedgerSync.
+- **Your connection can make changes.** A read-only connection can show the transactions, but not change them.
+- **Your clients.** Each person works only on the clients they see in the LedgerSync app: an employee, the clients
+  assigned to them.
+
+</Accordion>
+
+<Accordion title="Your client's data">
+
+<AiNote tone="yellow">
+
+**Your client's bank data goes through your AI account.** The AI app reads the client's For review transactions:
+dates, amounts, bank text, accounts, categories, payees and the rules that filed them. It also reads the client's
+categories and vendors. It keeps the chat under your AI account's settings. Check that account's data settings before
+you start.
+
+</AiNote>
+
+</Accordion>
+
+<Accordion title="Optional: the full instructions to paste">
+
+You don't need these: LedgerSync already gives your AI the same steps. If your AI does not follow them, give it these
+instructions.
+
+<div className="lsai-prompt">
+  <AiCopy label="Instructions for your AI" text={`Fill in the vendor and category on a LedgerSync client's For review transactions that no rule filed, then report what changed. The transactions stay in For review.
+1. Find the client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool. Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. This works for QuickBooks Online and Manual clients, one client at a time.
+2. List the client's For review transactions with ledgersync_list_review_transactions. Only the ones no rule filed can change, and not one that is split, synced or exported.
+3. Read the client's own categories with ledgersync_list_setup_categories (kind client) and its vendors with ledgersync_list_setup_vendors. Use only the client's own categories: never a firm category, and never a new one. For the payee, use one of the client's vendors or a new vendor by its name, never a customer or an employee.
+4. Call ledgersync_preview_categorize_transactions with the client and up to 100 rows, each with its transaction_id and what to set: a category_id, a payee (payee_id or new_vendor_name, never both), or both. Up to 20 new vendor names in one preview. A category or vendor that is not this client's, or is inactive, refuses the whole preview: pick another one from those lists.
+5. Show the user each transaction's vendor and category before and after, the new vendors (for a QuickBooks client, they are created in its QuickBooks), and what is refused and why. Nothing has changed yet.
+6. Only after the user says yes, call ledgersync_categorize_transactions with the preview's confirmation_id and the same client_id and client_name. If it answers upstream_unknown, call it again with the same confirmation_id: it never changes a transaction twice.
+7. Report what changed, what was refused and why, what changed since the preview, and the new vendors. The transactions stay in For review. To move them to Categorized later, preview the accept with ledgersync_preview_accept_transactions and only_rule_filed false, and accept only after the user's yes.
+8. If the user wants it undone, call ledgersync_undo_categorize_transactions with the change_id and the same client_id and client_name. The first call only shows what would go back and what would stay. Only after the user says yes, call it again with the same change_id, client_id and client_name and the undo_id.`} />
+</div>
+
+1. Click **Copy** above.
+2. In Claude, ChatGPT or Grok, start a new chat.
+3. Click the message box and press **Ctrl+V** (**Command+V** on a Mac).
+4. At the end, type your client's name and what to use. For example: *Acme. Use Acme's vendors and categories. You
+   may add a new vendor, never a new category.* Then press **Enter**.
+
+</Accordion>
+
+</AccordionGroup>
+
+## If something goes wrong
+
+<AccordionGroup>
+
+<Accordion title="Most common messages">
+
+| The AI says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. On ChatGPT Business, Enterprise or Edu, ask your workspace admin to refresh LedgerSync's tools if they added it by hand. On Enterprise and Edu, also ask them to turn on the new tools under **Action control** (for the plugin from ChatGPT's plugin directory: **New tools** or **New actions** under **Plugins** in the **Admin console**). |
+| The client uses another accounting app, such as Zoho Books | Not yet. Fill in its vendors and categories in the LedgerSync app. |
+| A rule filed a transaction | LedgerSync leaves it as it is. To change it, change the rule: ask the AI, as in [Changing your rules](/ai/rules-setup#changing-your-rules). Or change the transaction in the LedgerSync app. |
+| A transaction is split over several categories | LedgerSync leaves it as it is. Change it in the LedgerSync app. |
+| A transaction is synced to QuickBooks or exported | LedgerSync leaves it as it is. |
+| A transaction is not waiting in For review | It may be accepted or excluded already, or another client's. LedgerSync leaves it as it is. Ask the AI to show the client's For review transactions, then preview again. |
+| A category or vendor is not the client's, or is no longer active | Nothing was changed. Ask the AI to pick one from the client's own list and preview again. |
+| The client has no category that fits | The AI never adds a category. Add it to the client in LedgerSync first. For a QuickBooks client, add it in QuickBooks, then sync the client's QuickBooks data in LedgerSync. Then ask the AI again. |
+| Some transactions changed since the preview | After the preview, someone changed, accepted, excluded, synced or exported them, or a rule filed them. LedgerSync left them as they are. Ask the AI to preview again. |
+| Too many transactions for one preview | One preview takes up to 100 transactions and 20 new vendors. Ask the AI to do the rest in another preview. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+
+</Accordion>
+
+<Accordion title="QuickBooks clients: new vendors">
+
+| The AI says | Do this |
+| --- | --- |
+| A new vendor's name belongs to a deactivated vendor in QuickBooks | LedgerSync never turns it back on. Use another name, or pick one of the client's vendors. Or turn it back on in QuickBooks, then sync the client's QuickBooks data in LedgerSync, and ask the AI to preview again. |
+| A new vendor has the name of one of the client's customers | LedgerSync did not add that vendor, and left its transactions as they are. Give the vendor another name and ask the AI again. Or set the customer as the payee in the LedgerSync app. |
+
+</Accordion>
+
+<Accordion title="More messages: preview expired, change not confirmed, read-only, limits, undo">
+
+| The AI says | Do this |
+| --- | --- |
+| The preview is unknown or expired | A preview works for 30 minutes. Ask the AI to preview again. |
+| LedgerSync **did not confirm** the change, so the transactions may or may not have changed | Ask the AI to fill them in again from the same preview. LedgerSync never changes a transaction twice, and the AI then tells you what changed. |
+| These transactions are already being changed | Wait a minute, then ask the AI to fill them in again from the same preview. It tells you what changed, and never changes anything twice. |
+| **This connection is read-only or lacks permission for this action.** | This connection can show the transactions, but not change them. Fill them in in the LedgerSync app, or email <AiEmail />. |
+| This connection has used a tool too many times this hour or this day | Each AI app you connect can preview 120 times an hour, fill in 60 times a day and undo 30 times a day. Try again next hour or tomorrow, as the AI says, or do it in the LedgerSync app. |
+| LedgerSync needs its current release, which is not running just now | Nothing was changed. Try again later, or fill them in in the LedgerSync app meanwhile. |
+| A new vendor's name is too long | A new vendor's name can be up to 80 characters. Ask the AI for a shorter one. |
+| The undo check expired | An undo check works for 15 minutes. Ask the AI to check the undo again. |
+| LedgerSync **did not confirm** the undo | Ask the AI to check the undo again before you undo again. The check shows what has not gone back yet. |
+| This undo is already running | Wait a minute, then ask the AI to check the undo again. |
+
+</Accordion>
+
+</AccordionGroup>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the 3 tools and what they change">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_preview_categorize_transactions` | Checks setting the payee (a vendor) and the category of up to 100 of one client's For review transactions that no rule filed: each one's payee and category now and after, the new vendors it would add or reuse, and what it would leave as it is and why | No |
+    | `ledgersync_categorize_transactions` | Sets the previewed payees and categories, as the LedgerSync app does on one transaction, after adding the new vendors (for a QuickBooks client, in its QuickBooks); the transactions stay in For review | Yes |
+    | `ledgersync_undo_categorize_transactions` | Shows which transactions' payee and category would go back and which would stay (changed, accepted, synced or exported since); after a yes, puts them back | Yes |
+
+    - The preview, the change and the undo need `write:accounting`. A read-only connection can list the
+      transactions, categories and vendors, but cannot preview, change or undo. The preview changes nothing, so it is
+      annotated read-only.
+    - The preview takes one client, `client_id` with its `client_name`, and `rows`: each a `transaction_id` from
+      `ledgersync_list_review_transactions` with a `category_id` (the client's own, `cat_c_...` from
+      `ledgersync_list_setup_categories`), a payee (`payee_id`, one of the client's vendors, `ven_c_...` from
+      `ledgersync_list_setup_vendors`, or `new_vendor_name`), or both. A firm category or vendor, or a customer, is
+      refused with `invalid_request`. A category or vendor that is not the client's, or is inactive, refuses the
+      whole call.
+    - The change takes the preview's `confirmation_id` with the same `client_id` and `client_name`. It works for 30
+      minutes, only for the person and the AI app that made the preview, and changes only the transactions that
+      preview counted, and only while their payee and category are as the preview saw them. Calling it again with
+      the same confirmation answers from what it kept, for 24 hours, and never changes a transaction twice.
+    - The undo takes the `change_id` the change returned, with the same `client_id` and `client_name`. It works in
+      two calls. The first, without `undo_id`, changes nothing: it returns what would go back and what would stay
+      and, when something would go back, an `undo_id`. Only a second call with that `undo_id`, within 15 minutes,
+      puts them back. Both calls go to the same tool, marked as changing data, so Claude and ChatGPT ask before
+      each one, the check included.
+    - There is no MCP prompt for these tools: each tool's description and `next_step` carry the steps.
+    - No new error codes: `invalid_request`, `not_found`, `insufficient_scope`, `rate_limit_exceeded`,
+      `idempotency_conflict`, `upstream_unavailable`, `upstream_unknown` and `internal_error`.
+    - On the sandbox connector, a change really sets the sandbox client's payees and categories, and an undo really
+      puts them back. For a QuickBooks client, a new vendor is created in the Intuit sandbox QuickBooks company the
+      client is connected to.
+    - See [For developers](/ai/developers) for every field.
+  </Accordion>
+
+  <Accordion title="For developers: limits">
+    - One preview takes one client and 1 to 100 transactions, each once. A row sets a category, a payee or both, and
+      never `payee_id` and `new_vendor_name` together. One preview names up to 20 new vendors, each 1 to 80
+      characters; capitals and spaces at the ends do not count when names are compared.
+    - Each connected AI app can make 120 previews an hour, 60 changes a day and 30 undos a day. A change or an undo
+      counts only when it reaches LedgerSync, and the undo's first call is not counted.
+    - A preview's confirmation works for 30 minutes, a change's answer is kept for 24 hours, and an undo check works
+      for 15 minutes.
+    - Each person works only on the clients they see in the LedgerSync app: an employee, the clients assigned to
+      them.
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>
