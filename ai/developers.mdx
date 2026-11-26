@@ -906,9 +906,11 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       its item by the id its section gave (`transaction_id`, `qbo_ref`, `account_id`, `vendor_id`): one the run does not
       hold answers `invalid_request` on that note, and a run built again meanwhile `version_conflict`. The answer's
       `structuredContent` carries the run, the client, the month's dates, the environment, the firm's name and the
-      wording, and its text is a short summary that tells the AI to wait for the user's decisions from the page, to
-      give no counts or share of what is left of its own (the page shows them and keeps them current), then
-      make the previews and ask for one yes, and what to do in an app that shows no page. The page loads
+      wording, and its text is a short summary that tells the AI the page replaces the checklist in its reply (one
+      short line that it is open, never the checklist's steps, counts or share of what is left, which the page shows
+      and keeps current), to wait for the user's decisions from the page, then make the previews and ask for one
+      yes, and what to do in an app that shows no page. The page's resource carries the same guidance for ChatGPT's
+      model in `openai/widgetDescription`. The page loads
       each section with `ledgersync_run_checklist`, so its numbers come from LedgerSync. `additions.rules_to_create`
       holds each rule the AI proposes, written in full (`scope`, a `name` in the firm's pattern, `direction`, `match`,
       `conditions`, the `category` and `payee` ids as `ledgersync_list_setup_categories` and
