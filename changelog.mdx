@@ -22,6 +22,19 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
     change, and find the same history on the **AI changes** page in the LedgerSync app.
   - [Set up a client for the AI](/ai/client-setup) and [Review a client's books](/ai/review-my-client#decide) now
     show more of their steps in pictures.
+
+  ## Keep one transaction in For review when you accept
+
+  When your AI accepts a client's For review transactions, it can now keep single transactions in For review, such
+  as one you flagged, while the rest of their category moves. Before, the only way was to keep the whole category. See
+  [Accept For review transactions](/ai/accept-transactions).
+
+  - `ledgersync_preview_accept_transactions` takes `leave_out_transaction_ids`: up to 50 `txn_` ids across its
+    clients. Each client's answer shows them in `left_out_transactions`, and `left_out` counts them as
+    `left_out_transaction`.
+  - A kept transaction that no client of the preview has in For review keeps no confirmation, and is listed in
+    `not_found_transaction_ids`.
+  - No new tool.
 </Update>
 
 <Update label="2026-11-25" tags={["AI connector"]}>

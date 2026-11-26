@@ -115,6 +115,8 @@ ask for:
   transaction stays in **For review** when its category, or any line of a split, has that GL code or name, or a name
   that starts with it followed by a space or a dash, such as *8001 - Ask Accountant*.
 - **Some dates only.** For example: *only September.* LedgerSync goes by the posted date.
+- **One transaction to stay.** For example: *"Keep the $250 Zelle on November 3 in For review."* Only that transaction
+  stays; the rest of its category still moves. Up to 50 in one preview.
 
 </AiNote>
 
@@ -122,8 +124,8 @@ ask for:
 
 **Why some transactions stay in For review.**
 
-- **Left out:** no rule filed it, a kind of rule you did not ask for filed it (by default, an exclusion rule), or its
-  category is one you asked to keep.
+- **Left out:** no rule filed it, a kind of rule you did not ask for filed it (by default, an exclusion rule), its
+  category is one you asked to keep, or it is a transaction you asked to keep.
 - **Refused,** as the app refuses it: it has no payee (a vendor, customer or employee), no category, or, for a
   QuickBooks client, its bank account is not mapped to a QuickBooks bank or credit card account. Add what is missing
   in the LedgerSync app, then ask the AI again.
@@ -223,7 +225,7 @@ instructions.
 <div className="lsai-prompt">
   <AiCopy label="Instructions for your AI" text={`Accept a LedgerSync client's For review transactions, then report what moved and what did not.
 1. Find each client with ledgersync_find_clients in this chat and pass its client_name with its client_id to every tool (client_names with client_ids, in the same order). Never reuse a client id from an earlier chat or from memory: LedgerSync refuses a client_id given with another client's name. This works for QuickBooks Online and Manual clients, up to 10 clients in one preview.
-2. Call ledgersync_preview_accept_transactions with the clients. By default it takes the transactions an inclusion rule filed. Use rule_type exclusion for the ones exclusion rules filed (accepting moves them to Excluded) or any for both, only_rule_filed false to add the ones no rule filed, leave_out_categories for the GL codes or category names to keep in For review, and from and to for the posted dates. For example, "move the transactions with rules to Categorized, except exclusion rules and those coded to 8001 or 8002" is rule_type inclusion with leave_out_categories ["8001", "8002"].
+2. Call ledgersync_preview_accept_transactions with the clients. By default it takes the transactions an inclusion rule filed. Use rule_type exclusion for the ones exclusion rules filed (accepting moves them to Excluded) or any for both, only_rule_filed false to add the ones no rule filed, leave_out_categories for the GL codes or category names to keep in For review, leave_out_transaction_ids for single transactions to keep in For review (each one's transaction_id from an earlier preview or ledgersync_list_review_transactions), and from and to for the posted dates. For example, "move the transactions with rules to Categorized, except exclusion rules and those coded to 8001 or 8002" is rule_type inclusion with leave_out_categories ["8001", "8002"].
 3. Show the user, client by client, what moves (to Categorized, or to Excluded for an exclusion rule's transactions), what LedgerSync would refuse and why, and what stays in For review and why. Nothing has moved yet.
 4. Only after the user says yes, call ledgersync_accept_transactions with the preview's confirmation_id and the same client_ids and client_names. If a client is not done yet (upstream_unknown, not_reached or not_started), call it again with the same confirmation_id, client_ids and client_names: it never accepts twice.
 5. Report to the user, client by client: what moved, what LedgerSync refused and why, what changed since the preview, and what stayed in For review. Accepting posts nothing to QuickBooks: a QuickBooks client's Categorized transactions are synced in the LedgerSync app, and a Manual client's go in its next export.
@@ -255,6 +257,7 @@ instructions.
 | A bank account is not mapped | QuickBooks clients only. Map the client's bank account to a QuickBooks bank or credit card account on **Bank Accounts Mapping** (**Rules Engine**, then **QuickBooks**, in the menu on the left), then ask the AI again. |
 | Some transactions changed since the preview | Someone accepted, excluded or changed them after the preview, or their rule or category no longer matches what you asked. LedgerSync left them as they are. Ask the AI to preview again. |
 | Too many transactions for one accept | One accept moves up to 500 transactions, across all its clients. The AI previews again with a shorter date range or fewer clients. |
+| A transaction you asked to keep is not waiting in For review | Nothing was moved. It may be another client's, or it moved since. Ask the AI to show the client's For review transactions, then preview again. |
 | More than 10 clients | One preview takes up to 10 clients. Ask for the others in another preview. |
 | It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
 
@@ -320,7 +323,9 @@ Anything else? See [Troubleshooting](/ai/troubleshooting).
   </Accordion>
 
   <Accordion title="For developers: limits">
-    - One preview takes 1 to 10 clients and up to 20 categories to leave out, each up to 100 characters. One accept
+    - One preview takes 1 to 10 clients, up to 20 categories to leave out, each up to 100 characters, and up to 50
+      transactions to keep (`leave_out_transaction_ids`) across its clients. A kept transaction that no client of the
+      preview has in For review keeps no confirmation: the answer lists it in `not_found_transaction_ids`. One accept
       moves up to 500 transactions across its clients: a preview that would move more keeps no confirmation.
     - Each connected AI app can make 120 previews an hour, 60 accepts a day and 30 undos a day. An accept or an undo
       counts only when it reaches LedgerSync, and the undo's first call is not counted.

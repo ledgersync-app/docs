@@ -1542,7 +1542,9 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       transactions move to Excluded; or `any`), `only_rule_filed` (`true` by default; `false` also takes the
       transactions no rule filed, such as ones categorized by hand), `leave_out_categories` (up to 20 GL codes or
       names, each up to 100 characters: a transaction stays when its category, or any split line's, has that GL code
-      or name, or a name that starts with it followed by a space or a dash) and `from` and `to` (posted dates). For
+      or name, or a name that starts with it followed by a space or a dash), `leave_out_transaction_ids` (up to 50
+      `txn_` ids across the clients, from an earlier preview or `ledgersync_list_review_transactions`: each stays in For
+      review whatever else it matches, while the rest of its category moves) and `from` and `to` (posted dates). For
       example, "move the transactions with rules to Categorized, except exclusion rules and those coded to 8001 or
       8002" is `rule_type` `inclusion` with `leave_out_categories` `["8001", "8002"]`. It changes nothing, so it is
       annotated read-only; it needs `write:accounting`. Two ids of the same client are refused with
@@ -1551,12 +1553,17 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       `to_excluded` and the rows, each with `transaction_id`, `date`, `amount`, `description`, `category`, `gl_code`,
       `split_categories`, `payee`, `rule` and `move_to`: `categorized` or `excluded`), `will_refuse` (rows with the
       `reason` the accept would give: `missing_payee`, `missing_category` or, at a QuickBooks client,
-      `missing_bank_account_mapping`) and `left_out` (counts by `no_rule`, `other_rule_type` and
-      `left_out_category`, a `total`, and up to 20 rows with their `reason`). A client LedgerSync cannot preview (for
+      `missing_bank_account_mapping`), `left_out` (counts by `no_rule`, `other_rule_type`, `left_out_category` and
+      `left_out_transaction`, a `total`, and up to 20 rows with their `reason`) and `left_out_transactions` (`count` and
+      the rows kept by their id, with reason `left_out_transaction`). A client LedgerSync cannot preview (for
       example, one on another accounting app) gets an `error` (`code`, `message`) while the others are previewed; when
       none can be, the first one's error is the tool's. An id that is not a client the person sees, or a name that is
       not that client, refuses the whole call before any client is previewed. The answer also has the `criteria`, the `totals` and, when at
       least one transaction would move, a `confirmation_id` with its `expires_at`, 30 minutes on.
+    - A transaction in `leave_out_transaction_ids` that no client of the call has in For review in the date window
+      (a wrong id, another client's, or one moved since) keeps no confirmation: the answer lists it in
+      `not_found_transaction_ids`, and its `next_step` says to check it with `ledgersync_list_review_transactions` and
+      preview again.
     - With nothing to move, or with more than 500 to move across the clients (a client with more than 500 alone has
       `over_cap` and `matching_total`), the preview keeps no confirmation, and its `next_step` says why: with too
       many, preview again with a shorter date range or fewer clients. The answer fits in 20,000 characters: when it
