@@ -215,12 +215,16 @@ sequenceDiagram
     {
       "redirect_url": "https://app.acme.com/ledgersync/callback",
       "connection_id": "con_FINICITY_41294",
-      "client_id": "cli_123"
+      "client_id": "cli_123",
+      "flow": "connect"
     }
     ```
 
     `connection_id` is the canonical `con_SOURCE_id` you use everywhere else
-    (accounts, transactions, statements).
+    (accounts, transactions, statements). `flow` names the call that made the
+    token: `connect` here. A token from
+    `POST /v3/connections/{connection_id}/reauthorize` says `reauthorize`, and
+    LedgerSync's own return page reads those, so your callback gets `connect`.
   </Step>
 </Steps>
 
