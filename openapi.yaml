@@ -1101,7 +1101,8 @@ paths:
         `ls_token` query parameter — a short-lived HS256 JWT minted by
         v3. The integrator's frontend POSTs that token to this endpoint
         to retrieve the canonical `connection_id`, the original
-        `redirect_url` it was bound to, and the `client_id`.
+        `redirect_url` it was bound to, the `client_id`, and the `flow`
+        that made it.
 
         CORS-enabled so a browser-side integrator page can call this
         directly. No API key is required because the token itself is the
@@ -2821,7 +2822,7 @@ components:
 
     RedirectTokenVerifyResponse:
       type: object
-      required: [redirect_url, connection_id, client_id]
+      required: [redirect_url, connection_id, client_id, flow]
       properties:
         redirect_url:
           type: string
@@ -2839,6 +2840,15 @@ components:
             by `POST /connections/{connection_id}/reauthorize`, which is not
             told the Client.
           example: cli_smoke
+        flow:
+          type: string
+          enum: [connect, reauthorize]
+          description: |
+            The call that made the token: `connect` for a Connect session,
+            `reauthorize` for `POST /connections/{connection_id}/reauthorize`.
+            LedgerSync's own return page reads a `reauthorize` token, so the
+            tokens your callback receives are `connect`.
+          example: connect
 
     RedirectUrlsRequest:
       type: object
