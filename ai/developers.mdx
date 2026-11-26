@@ -886,7 +886,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       id per month. A complete build is kept for the UTC day, so asking again that day reuses it, and one with `gaps` is
       built again after a few minutes; `refresh` true builds it again with fresh reads, unless it is under a few
       minutes old. Another client's `run_id` answers `not_found`. The
-      `run_checklist` playbook uses it where the AI app lists it, and makes the single calls elsewhere.
+      `run_checklist` playbook uses it wherever the AI can call it, loading it first in apps that load tools when
+      needed, and makes the single calls elsewhere.
     - In the run, a vendor coded to one account every time in at least two transactions (not lines) is accepted by
       itself, or flagged when the amount is over twice its average; a transfer or a card or loan payment with such a
       history follows it, and is asked of the client otherwise. Each categorize row's history gives `lines` and
