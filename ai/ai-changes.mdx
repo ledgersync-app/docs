@@ -1,0 +1,125 @@
+---
+title: "What the AI changed"
+description: "LedgerSync keeps a history of every change your AI makes through it: what it did, for which client, who said yes and from which AI app. Ask your AI about it, or see it in the LedgerSync app."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiNote, AiBox, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="What the AI changed" subtitle="Ask your AI what it changed, for which client and who said yes. LedgerSync keeps the history for your whole firm.">
+
+<AiNote tone="green">
+
+**For any client in LedgerSync.** Not set up yet? Go to [Start here](/ai/start-here). Added it a while ago? Do
+[After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+
+</AiNote>
+
+## Start
+
+<AiStep id="new-chat" n={1} total={4} title="Start a new chat">
+
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
+
+</AiStep>
+
+<AiStep id="ask" n={2} total={4} title="Ask the AI" img="/images/ai-memory/history-1-answer.png" caption="What the AI changed for a client">
+
+Type *"What did the AI change for Acme this month?"*, with your client's name, and press **Enter**. You can also ask
+*"Who approved the rules for Acme?"*, or *"What did the AI change today?"* for your whole firm.
+
+</AiStep>
+
+<AiStep id="read" n={3} total={4} title="Read the history">
+
+For each change, the AI says when it happened, for which client, who said yes, from which AI app, and what was done.
+For work that runs in the background, like posting to QuickBooks, it also says how it went: still running, done,
+partly done, failed or undone.
+
+</AiStep>
+
+<AiStep id="undo" n={4} total={4} title="Undo a change, if you need to">
+
+Ask the AI, for example *"Undo the rules you set up for Acme yesterday."* It shows what goes back first and waits for
+your yes. 1099 marks, W-9s saved to QuickBooks, rules setups and transactions accepted from For review can be undone. A fact about a client can
+be removed, a review decision reopened, and your firm's version of a playbook removed.
+
+</AiStep>
+
+<AiNote tone="green">
+
+**Asking only reads.** Nothing changes until you ask for an undo and say yes.
+
+</AiNote>
+
+## In the LedgerSync app
+
+<AiBox id="app" title="The AI changes page" img="/images/ai-memory/history-2-app.png" caption="The AI changes page in the LedgerSync app">
+
+Your firm's owner and admins see the same history in the LedgerSync app: click your name at the top right, then
+**AI changes**.
+
+</AiBox>
+
+## More details
+
+<AccordionGroup>
+
+<Accordion title="What the history keeps">
+
+- 1099 marks, rules set up, transactions accepted from For review, QuickBooks pushes, categorized exports, clients
+  added or edited, message templates saved, messages sent to clients, W-9 requests sent, reminded or cancelled, W-9s
+  saved to QuickBooks, facts about clients saved, changed or removed, review decisions recorded or reopened, your
+  firm's playbooks saved or removed, and every undo.
+- Changes the AI made before the history started are in it too: 1099 marks, W-9s saved to QuickBooks, rules setups
+  and transactions accepted from For review, and their undos.
+- The AI app is Claude, ChatGPT, Grok, Cursor or another app. LedgerSync itself shows for work it finished on its own
+  after an AI request, like saving a signed W-9 to QuickBooks.
+- It never shows a fact's words or a message's text. For a client edit it says what changed, like the name or the
+  emails, never the details themselves. For review decisions it says how many, never the entries.
+
+</Accordion>
+
+<Accordion title="Who sees what">
+
+- Your firm's owner and admins see every change at your firm.
+- Anyone else sees the changes for their own clients and the changes they approved.
+- Narrow it down in your own words, for example *"only the rules changes from last week"*.
+
+</Accordion>
+
+<Accordion title="How long it is kept">
+
+- The history of a client is kept as long as the client. When a client is deleted, its history goes too.
+
+</Accordion>
+
+<Accordion title="If the AI says">
+
+| The AI says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| It shows only some of your firm's changes | You see your own clients' changes and the ones you approved. Ask your firm's owner or an administrator for the whole firm. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+
+</Accordion>
+
+</AccordionGroup>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the tool">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_list_audit_log` | The history of every change the AI made through LedgerSync, newest first: when, the client, who approved it, from which AI app, what was done and, for work that runs in the background, how it went. Narrowed by client, dates, tool or person | No |
+
+    - An entry whose change can still be undone names its undo tool, and the AI offers the undo only when you ask
+      for it.
+    - Every field and filter is on [For developers](/ai/developers).
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>

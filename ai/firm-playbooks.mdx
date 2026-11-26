@@ -1,0 +1,140 @@
+---
+title: "Your firm's own playbooks"
+description: "Change the steps your AI follows, like adding a check to the month-end review, for your whole firm or for one client. LedgerSync keeps your version, so every chat at your firm follows it, in any AI app. Nothing changes in QuickBooks."
+mode: "frame"
+---
+
+import { AiPage, AiStep, AiNote, AiStuck } from "/snippets/ai-ui.jsx";
+
+<AiPage title="Your firm's own playbooks" subtitle="Change a step of any playbook once. Every chat at your firm, or about one client, follows your version.">
+
+<AiNote tone="green">
+
+**For any client in LedgerSync.** Not set up yet? Go to [Start here](/ai/start-here). Added it a while ago? Do
+[After a LedgerSync update](/ai/troubleshooting#after-an-update) once.
+
+</AiNote>
+
+## Start
+
+<AiStep id="new-chat" n={1} total={5} title="Start a new chat">
+
+In Claude, ChatGPT or Grok. In ChatGPT, also type **@** and pick **LedgerSync**.
+
+</AiStep>
+
+<AiStep id="ask" n={2} total={5} title="Tell the AI what to change">
+
+Type what your firm does differently, for example *"In our month-end review, also check the payroll account."* For
+one client only, name the client: *"For Acme, the 1099 check should count only the Contract Labor account."* Not sure
+what you have? Ask *"Show me our firm's playbooks."*
+
+</AiStep>
+
+<AiStep id="check" n={3} total={5} title="Check the changes" img="/images/ai-memory/playbook-1-preview.png" caption="The new step, before anything is saved">
+
+The AI shows exactly which lines change and who the change reaches: every chat at your firm, or the chats about that
+client. Nothing is saved yet. Ask for changes until it reads right.
+
+</AiStep>
+
+<AiStep id="yes" n={4} total={5} title="Say yes">
+
+LedgerSync saves your version. From then on, every chat at your firm, or about that client, follows it, for everyone
+at your firm and in every AI app.
+
+</AiStep>
+
+<AiStep id="use" n={5} total={5} title="Ask for the work as usual">
+
+For example *"Review Acme's books for October."* The AI follows your version. In Claude, the ready-made guides give
+your firm's version too: the **+** button, **Connectors**, **Add from LedgerSync**, then the playbook.
+
+</AiStep>
+
+<AiNote tone="green">
+
+**Only the steps change.** Nothing changes in QuickBooks, and you can go back at any time.
+
+</AiNote>
+
+## More details
+
+<AccordionGroup>
+
+<Accordion title="Who can change a playbook">
+
+- **Your firm's playbooks:** people allowed to manage your firm's global rules. Your firm's owner can give that
+  permission.
+- **A version for one client:** anyone at your firm who manages that client.
+- Everyone at your firm uses your firm's versions, in every AI app, whoever made them.
+
+</Accordion>
+
+<Accordion title="Versions and going back">
+
+- Every version is kept.
+- To go back, ask the AI to remove your version. It shows what changes first and waits for your yes. Then the next
+  one is used: for a client, your firm's version, else LedgerSync's; for your firm, LedgerSync's. A playbook your
+  firm wrote from scratch is gone.
+- When LedgerSync improves its own version of a playbook you changed, the AI tells you, so you can compare them.
+  Ask, for example, *"Show me LedgerSync's own month-end review."*
+
+</Accordion>
+
+<Accordion title="What LedgerSync keeps">
+
+- Your firm keeps at most 30 playbooks of its own, and 5 for each client.
+- A playbook's steps hold at most 18,000 characters. Like the facts about a client, they can't hold a number of 8 or
+  more digits, such as a tax ID or an account or card number, or sign-in details.
+- Each change is in the [history of AI changes](/ai/ai-changes).
+- When a client is deleted, its own playbooks go too.
+
+</Accordion>
+
+<Accordion title="LedgerSync's playbooks">
+
+Every firm starts with LedgerSync's nine: [Review a client's books for the month](/ai/review-my-client),
+[Explain why an account does not reconcile](/ai/explain-my-reconciliation), [Explain what changed between two
+periods](/ai/what-changed), [Check a new client's books before pricing a cleanup](/ai/new-client-check),
+[Find who needs a 1099](/ai/1099-vendors), [Set up a client for the AI](/ai/client-setup), [Bookkeeping into
+QuickBooks](/ai/quickbooks-bookkeeping), [Set up rules for a client](/ai/rules-setup) and [Run the CheckList for a
+client](/ai/checklist). Your firm can change any of them, or write playbooks of its own.
+
+</Accordion>
+
+<Accordion title="If the AI says">
+
+| The AI says | Do this |
+| --- | --- |
+| It doesn't know how to do this | Your AI may still have an older copy of LedgerSync's tools. Do [After a LedgerSync update](/ai/troubleshooting#after-an-update), then start a new chat. |
+| Changing the firm's playbooks needs the permission to manage global rules | Ask your firm's owner for that permission, or let the AI save the change for one client instead. |
+| The playbook changed since your preview | Someone at your firm changed it in the meantime. Let the AI show the changes again, then say yes. |
+| The steps can't be kept as they are | Take out any long number or sign-in details, or shorten the steps. The AI shows the new version before saving. |
+| Your firm or the client already keeps as many playbooks as LedgerSync allows | Ask the AI to remove one you no longer use first. |
+| It cannot find the client | Ask "Find my client ..." first. Not the firm owner or an administrator? You see only the clients assigned to you in LedgerSync. |
+
+</Accordion>
+
+</AccordionGroup>
+
+Anything else? See [Troubleshooting](/ai/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="For developers: the 3 tools">
+    | Tool | What it does | Changes data |
+    | --- | --- | --- |
+    | `ledgersync_get_playbook` | A playbook's steps by name, the one in use: a client's own version, else your firm's, else LedgerSync's. With no name, the list of every playbook, the one in use first | No |
+    | `ledgersync_preview_playbook` | Previews saving or removing your firm's own version of a playbook, for the whole firm or for one client: the lines that change, who they affect and the version it becomes. Changes nothing | No |
+    | `ledgersync_apply_playbook` | Saves or removes the playbook the preview showed, after your yes. Every saved version is kept | Yes |
+
+    - `ledgersync_preview_playbook` and `ledgersync_apply_playbook` need `write:accounting` and change only
+      LedgerSync's playbooks, never QuickBooks. An AI app's prompt menu gives your firm's version of a LedgerSync
+      playbook when it keeps one; a client's own version comes through the client snapshot.
+    - Every field, limit and refusal is on [For developers](/ai/developers).
+  </Accordion>
+</AccordionGroup>
+
+<AiStuck />
+
+</AiPage>
