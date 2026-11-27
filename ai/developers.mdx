@@ -337,7 +337,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       your clients, the ones that need the account holder first. For the owner and administrators it also lists
       the ones on the firm's own accounts, marked `firm_own: true`, with the firm's own entry's id as
       `client_id`. Each connection names its client: `client_id` and `client_name`, the name
-      `ledgersync_find_clients` shows.
+      `ledgersync_find_clients` shows. When LedgerSync listed as many as `limit` asks for (100 unless you set it, at
+      most 200), the answer adds `limit_reached: true`: more connections may need attention.
     - `ledgersync_preview_client_message` comes first. It finds the clients whose bank connection needs
       attention: all of them, the ones at a bank you name (for example American Express), or the connections
       you pick. It says how many messages will go out, who is skipped and why, and which link each client

@@ -3,6 +3,24 @@ title: "Changelog"
 description: "New features, improvements, and fixes to the LedgerSync v3 API. Newest first."
 ---
 
+<Update label="2026-11-27" tags={["AI connector"]}>
+  ## The CheckList shows the bank connections that need attention
+
+  - **All clients** at the top of the CheckList page now lists the bank connections that need attention at your
+    clients, up to 200, each with its bank and what is wrong. It reads them when you open it, and again when you
+    click **Refresh**.
+    See [Run the CheckList](/ai/checklist).
+  - For a client whose transactions LedgerSync does not post to QuickBooks, the page no longer asks about the payees
+    of the transactions your rules filed.
+  - The last step's first count now shows the transactions still to post (none for a client LedgerSync does not post
+    for), and its counts of one read "1 rule to create".
+  - LedgerSync now asks the AI to write every rule it proposes in full when it opens the page, so the page's Apply can
+    create them.
+  - `ledgersync_list_connections_needing_attention` adds `limit_reached: true` when it listed as many connections as
+    `limit` asks for. See [For developers](/ai/developers).
+  - No new tool.
+</Update>
+
 <Update label="2026-11-26" tags={["Connections"]}>
   ## Reauthorize can send the user back to your app
 
