@@ -914,7 +914,8 @@ import { AiPage, AiBox, AiCopy, AiStuck } from "/snippets/ai-ui.jsx";
       model in `openai/widgetDescription`, and the tool's description and the connector's instructions say it too. The
       page loads
       each section with `ledgersync_run_checklist`, so its numbers come from LedgerSync. `additions.rules_to_create`
-      holds each rule the AI proposes, written in full (`scope`, a `name` in the firm's pattern, `direction`, `match`,
+      is required (an empty list when the AI proposes no rule; a call without it answers `invalid_request` on it, with
+      the way to send it) and holds each rule the AI proposes, written in full (`scope`, a `name` in the firm's pattern, `direction`, `match`,
       `conditions`, the `category` and `payee` ids as `ledgersync_list_setup_categories` and
       `ledgersync_list_setup_vendors` gave them, the month's `transaction_ids` it files, `why`); a row the run does not
       hold, an id sealed to another client, or a rule the rules setup preview would refuse at Apply (a `key` not in

@@ -15,7 +15,9 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
   - The last step's first count now shows the transactions still to post (none for a client LedgerSync does not post
     for), and its counts of one read "1 rule to create".
   - LedgerSync now asks the AI to write every rule it proposes in full when it opens the page, so the page's Apply can
-    create them.
+    create them. `ledgersync_show_checklist` refuses a call without `additions.rules_to_create` (an empty list when
+    the AI proposes no rule). See [For developers](/ai/developers).
+  - On **All clients**, a connection's account name shows only when it differs from its bank's name.
   - `ledgersync_list_connections_needing_attention` adds `limit_reached: true` when it listed as many connections as
     `limit` asks for. See [For developers](/ai/developers).
   - No new tool.
