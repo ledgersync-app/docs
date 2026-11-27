@@ -20,6 +20,11 @@ description: "New features, improvements, and fixes to the LedgerSync v3 API. Ne
   - On **All clients**, a connection's account name shows only when it differs from its bank's name.
   - `ledgersync_list_connections_needing_attention` adds `limit_reached: true` when it listed as many connections as
     `limit` asks for. See [For developers](/ai/developers).
+  - When the AI suggests no rules, the CheckList page now writes LedgerSync's own: one for each vendor you accepted in
+    step 2, matching that vendor's bank text exactly. **Apply these changes** creates them with the rest, with no
+    extra step in the chat. See [Run the CheckList](/ai/checklist).
+  - A rule in `ledgersync_apply_checklist`'s plan may give its category and vendor by `name`, found among the
+    client's at preview. See [For developers](/ai/developers).
   - No new tool.
 </Update>
 
